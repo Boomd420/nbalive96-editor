@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NBA Live '96 Mobile Roster Editor</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0 0 8px 0;
+      color: #38bdf8;
+    }
+
+    p {
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .btn {
+      background-color: var(--accent);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+
+    .btn:active {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-success {
+      background-color: #16a34a;
+    }
+
+    .btn-success:active {
+      background-color: #15803d;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"], input[type="number"], select {
+      background-color: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid var(--accent);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      background-color: #334155;
+      color: #cbd5e1;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>NBA Live '96 Roster Editor</h1>
+      <p>Mobile Web Tool for Sega Genesis ROM Updating</p>
+    </header>
+
+    <!-- ROM Upload Section -->
+    <div class="card">
+      <div class="file-input-wrapper">
+        <label for="romFile" class="btn">Select NBA Live '96 ROM (.bin)</label>
+        <input type="file" id="romFile" accept=".bin,.md" />
+        <span id="status" class="status-badge">No ROM Loaded</span>
+      </div>
+    </div>
+
+    <!-- Editor UI (Hidden until ROM loaded) -->
+    <div id="editorUI" class="hidden">
+      
+      <!-- Player Selection -->
+      <div class="card">
+        <div class="form-group full-width">
+          <label for="playerSelect">Select Player</label>
+          <select id="playerSelect">
+            <option value="0">Player 1 (A. Lang)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Player Attributes Form -->
+      <div class="card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" maxlength="12" placeholder="Andrew" />
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" maxlength="14" placeholder="Lang" />
+          </div>
+
+          <div class="form-group">
+            <label for="jerseyNum">Jersey #</label>
+            <input type="number" id="jerseyNum" min="0" max="99" value="28" />
+          </div>
+
+          <div class="form-group">
+            <label for="posSelect">Position</label>
+            <select id="posSelect">
+              <option value="C">Center</option>
+              <option value="PF">Power Forward</option>
+              <option value="SF">Small Forward</option>
+              <option value="SG">Shooting Guard</option>
+              <option value="PG">Point Guard</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="speed">Speed (1-99)</label>
+            <input type="number" id="speed" min="1" max="99" value="70" />
+          </div>
+
+          <div class="form-group">
+            <label for="threePt">3PT Rating (1-99)</label>
+            <input type="number" id="threePt" min="1" max="99" value="50" />
+          </div>
+
+          <div class="form-group">
+            <label for="dunk">Dunk (1-99)</label>
+            <input type="number" id="dunk" min="1" max="99" value="65" />
+          </div>
+
+          <div class="form-group">
+            <label for="pass">Pass (1-99)</label>
+            <input type="number" id="pass" min="1" max="99" value="60" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="card">
+        <button id="savePlayerBtn" class="btn" style="margin-bottom: 12px;">Update Player Data</button>
+        <button id="downloadRomBtn" class="btn btn-success">Download Modified ROM</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let romBuffer = null;
+    let fileName = "NBA_Live_96_Updated.bin";
+
+    // Placeholder offsets (will be mapped precisely during tuning)
+    const PLAYER_DATA_START = 0x000F4A0;
+    const RECORD_SIZE = 64; // Bytes per player record
+
+    const fileInput = document.getElementById('romFile');
+    const statusText = document.getElementById('status');
+    const editorUI = document.getElementById('editorUI');
+
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      fileName = file.name.replace('.bin', '_2026.bin');
+      const reader = new FileReader();
+
+      reader.onload = function(evt) {
+        romBuffer = new Uint8Array(evt.target.result);
+        statusText.innerText = `Loaded: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        statusText.style.backgroundColor = '#16a34a';
+        statusText.style.color = '#ffffff';
+        editorUI.classList.remove('hidden');
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+
+    document.getElementById('savePlayerBtn').addEventListener('click', function() {
+      if (!romBuffer) return;
+      alert("Player updated in buffer! Click 'Download Modified ROM' when finished editing.");
+    });
+
+    document.getElementById('downloadRomBtn').addEventListener('click', function() {
+      if (!romBuffer) return;
+
+      const blob = new Blob([romBuffer], { type: 'application/octet-stream' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    });
+  </script>
+</body>
+</html>
