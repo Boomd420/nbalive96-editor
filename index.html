@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NBA Live '96 Roster Editor</title>
+  <title>NBA Live '96 Pro Roster Editor</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -104,7 +104,7 @@
   <h1>NBA Live '96 Pro Roster Editor</h1>
 
   <div class="card">
-    <label for="romFile">Load ROM File (.bin / .md)</label>
+    <label for="romFile">Load Unmodified ROM File (.bin / .md)</label>
     <input type="file" id="romFile" accept=".bin,.md" />
   </div>
 
@@ -146,8 +146,8 @@
         <input type="number" id="height" min="0" max="255" />
       </div>
       <div class="field-group">
-        <label for="weight">Weight</label>
-        <input type="number" id="weight" min="0" max="500" />
+        <label for="weight">Weight (+100)</label>
+        <input type="number" id="weight" min="100" max="400" />
       </div>
       <div class="field-group">
         <label for="skinTone">Skin Tone</label>
@@ -197,8 +197,8 @@
 <script>
   let romData = null;
   const TOTAL_PLAYERS = 470;
-  const RECORD_SIZE = 126; 
-  let baseOffset = 0x028000; // Standard Genesis Player Data Base Offset
+  const RECORD_SIZE = 126;
+  let baseOffset = 0x028000;
 
   const fileInput = document.getElementById('romFile');
   const editorCard = document.getElementById('editorCard');
@@ -211,10 +211,7 @@
     const reader = new FileReader();
     reader.onload = function(evt) {
       romData = new Uint8Array(evt.target.result);
-      
-      // Determine offset base safely without throwing errors
-      baseOffset = locatePlayerTableBase(romData);
-      
+      baseOffset = locatePlayerTable(romData);
       populatePlayerDropdown();
       editorCard.classList.remove('hidden');
       loadPlayerData(0);
@@ -222,37 +219,38 @@
     reader.readAsArrayBuffer(file);
   });
 
-  function locatePlayerTableBase(buf) {
-    // Scan for signature or fallback to default
-    for (let i = 0; i < buf.length - 2000; i += 2) {
-      if (buf[i + 100] === 0x41 && buf[i + 101] === 0x2e && buf[i + 102] === 0x20) { // "A. "
+  function locatePlayerTable(buf) {
+    // Standard table seeker for 2MB Genesis ROMs
+    for (let i = 0x20000; i < 0x60000; i += 2) {
+      // Check for first valid name sequence marker "Andrew" or "A. Lang"
+      if (buf[i+100] === 0x41 && buf[i+101] === 0x2E) {
         return i;
       }
     }
-    // Hardcoded standard table base for raw 2MB Genesis ROMs
-    return (buf.length >= 0x200000) ? 0x028000 : 0x000000;
+    return 0x028000;
   }
 
   function readAsciiString(buf, start, length) {
     let str = "";
     if (start + length > buf.length) return "";
     for (let i = 0; i < length; i++) {
-      let charCode = buf[start + i];
-      if (charCode === 0 || charCode === 0xFF) break;
-      if (charCode >= 32 && charCode <= 126) {
-        str += String.fromCharCode(charCode);
+      let code = buf[start + i];
+      if (code === 0 || code === 0xFF || code === 0x20) {
+        if (code === 0 || code === 0xFF) break;
+      }
+      if (code >= 32 && code <= 126) {
+        str += String.fromCharCode(code);
       }
     }
     return str.trim();
   }
 
   function writeAsciiString(buf, start, length, text) {
-    if (start + length > buf.length) return;
     for (let i = 0; i < length; i++) {
       if (i < text.length) {
         buf[start + i] = text.charCodeAt(i);
       } else {
-        buf[start + i] = 0x20;
+        buf[start + i] = 0x20; // Space padded
       }
     }
   }
@@ -268,7 +266,7 @@
       let last = readAsciiString(romData, recStart + 100, 13);
       let first = readAsciiString(romData, recStart + 113, 13);
       
-      let name = (first || last) ? `${first} ${last}`.trim() : `Player Slot ${i + 1}`;
+      let name = (first || last) ? `${first} ${last}`.trim() : `Player ${i + 1}`;
       let opt = document.createElement('option');
       opt.value = i;
       opt.textContent = `${i + 1}. ${name}`;
@@ -284,41 +282,41 @@
     let o = getPlayerRecordOffset(index);
     if (o + RECORD_SIZE > romData.length) return;
 
-    // General & Appearance
-    document.getElementById('jerseyNum').value = romData[o + 7] || 0;
-    document.getElementById('position').value = romData[o + 8] || 0;
-    document.getElementById('height').value = romData[o + 9] || 0;
-    document.getElementById('weight').value = romData[o + 10] || 0;
-    document.getElementById('skinTone').value = romData[o + 12] || 0;
-    document.getElementById('overall').value = romData[o + 3] || 0;
+    // General & Appearance (Original.CSV / INI Mapping)
+    document.getElementById('jerseyNum').value = romData[o + 7];
+    document.getElementById('position').value = romData[o + 8];
+    document.getElementById('height').value = romData[o + 9];
+    document.getElementById('weight').value = romData[o + 10];
+    document.getElementById('skinTone').value = romData[o + 12];
+    document.getElementById('overall').value = romData[o + 3];
 
     // Abilities
-    document.getElementById('fieldGoal').value = romData[o + 4] || 0;
-    document.getElementById('dunk').value = romData[o + 5] || 0;
-    document.getElementById('threePoint').value = romData[o + 6] || 0;
-    document.getElementById('freeThrow').value = romData[o + 19] || 0;
-    document.getElementById('steal').value = romData[o + 21] || 0;
-    document.getElementById('block').value = romData[o + 22] || 0;
-    document.getElementById('offRebound').value = romData[o + 23] || 0;
-    document.getElementById('defRebound').value = romData[o + 24] || 0;
-    document.getElementById('ballControl').value = romData[o + 25] || 0;
-    document.getElementById('defAware').value = romData[o + 26] || 0;
-    document.getElementById('speed').value = romData[o + 27] || 0;
-    document.getElementById('agility').value = romData[o + 28] || 0;
-    document.getElementById('jump').value = romData[o + 29] || 0;
-    document.getElementById('dribble').value = romData[o + 30] || 0;
-    document.getElementById('offAware').value = romData[o + 31] || 0;
+    document.getElementById('fieldGoal').value = romData[o + 4];
+    document.getElementById('dunk').value = romData[o + 5];
+    document.getElementById('threePoint').value = romData[o + 6];
+    document.getElementById('freeThrow').value = romData[o + 19];
+    document.getElementById('steal').value = romData[o + 21];
+    document.getElementById('block').value = romData[o + 22];
+    document.getElementById('offRebound').value = romData[o + 23];
+    document.getElementById('defRebound').value = romData[o + 24];
+    document.getElementById('ballControl').value = romData[o + 25];
+    document.getElementById('defAware').value = romData[o + 26];
+    document.getElementById('speed').value = romData[o + 27];
+    document.getElementById('agility').value = romData[o + 28];
+    document.getElementById('jump').value = romData[o + 29];
+    document.getElementById('dribble').value = romData[o + 30];
+    document.getElementById('offAware').value = romData[o + 31];
 
-    // Season Statistics
-    document.getElementById('statGames').value = romData[o + 44] || 0;
-    document.getElementById('statStarts').value = romData[o + 45] || 0;
-    document.getElementById('statMinutes').value = ((romData[o + 46] << 8) | romData[o + 47]) || 0;
-    document.getElementById('statPoints').value = ((romData[o + 59] << 8) | romData[o + 60]) || 0;
-    document.getElementById('statAssists').value = ((romData[o + 55] << 8) | romData[o + 56]) || 0;
-    document.getElementById('statSteals').value = ((romData[o + 56] << 8) | romData[o + 57]) || 0;
-    document.getElementById('statBlocks').value = ((romData[o + 58] << 8) | romData[o + 59]) || 0;
-    document.getElementById('statTurnovers').value = ((romData[o + 57] << 8) | romData[o + 58]) || 0;
-    document.getElementById('statFouls').value = ((romData[o + 62] << 8) | romData[o + 63]) || 0;
+    // Season Statistics (2-byte big endian)
+    document.getElementById('statGames').value = romData[o + 44];
+    document.getElementById('statStarts').value = romData[o + 45];
+    document.getElementById('statMinutes').value = (romData[o + 46] << 8) | romData[o + 47];
+    document.getElementById('statPoints').value = (romData[o + 59] << 8) | romData[o + 60];
+    document.getElementById('statAssists').value = (romData[o + 55] << 8) | romData[o + 56];
+    document.getElementById('statSteals').value = (romData[o + 56] << 8) | romData[o + 57];
+    document.getElementById('statBlocks').value = (romData[o + 58] << 8) | romData[o + 59];
+    document.getElementById('statTurnovers').value = (romData[o + 57] << 8) | romData[o + 58];
+    document.getElementById('statFouls').value = (romData[o + 62] << 8) | romData[o + 63];
 
     document.getElementById('lastName').value = readAsciiString(romData, o + 100, 13);
     document.getElementById('firstName').value = readAsciiString(romData, o + 113, 13);
@@ -367,7 +365,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'nbalive96_original_edited.bin';
+    a.download = 'nbalive96_pro_edited.bin';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -375,4 +373,3 @@
 
 </body>
 </html>
-
