@@ -1,197 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NBA Live '96 Roster Index & Validator</title>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <meta charset="UTF-8">
+    <title>NBA Live '96 Editor - Windows 95 Edition</title>
+    <style>
+        body {
+            background-color: #008080;
+            font-family: "MS Sans Serif", Arial, sans-serif;
+            font-size: 11px;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .win95-window {
+            width: 720px;
+            background-color: #c0c0c0;
+            border-top: 2px solid #dfdfdf;
+            border-left: 2px solid #dfdfdf;
+            border-right: 2px solid #404040;
+            border-bottom: 2px solid #404040;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            margin: 0 auto;
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: white;
+            padding: 3px 5px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .title-bar-buttons button {
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #dfdfdf #404040 #404040 #dfdfdf;
+            width: 16px;
+            height: 14px;
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 8px;
+            cursor: pointer;
+        }
+        .menu-bar {
+            background-color: #c0c0c0;
+            padding: 2px 4px;
+            border-bottom: 1px solid #808080;
+            display: flex;
+            gap: 15px;
+        }
+        .menu-item {
+            cursor: pointer;
+            padding: 1px 4px;
+        }
+        .menu-item:hover {
+            background-color: #000080;
+            color: white;
+        }
+        .window-body {
+            padding: 10px;
+        }
+        .fieldset-win95 {
+            border: 1px solid #808080;
+            border-top: 1px solid #404040;
+            border-left: 1px solid #404040;
+            background-color: #c0c0c0;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .fieldset-win95 legend {
+            font-weight: bold;
+            padding: 0 3px;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+        label {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+        input, select {
+            background-color: white;
+            border: 1px solid;
+            border-color: #404040 #dfdfdf #dfdfdf #404040;
+            padding: 2px 4px;
+            font-family: "MS Sans Serif", Arial;
+            font-size: 11px;
+        }
+        .btn-win95 {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #404040 #404040 #dfdfdf;
+            padding: 4px 15px;
+            font-family: "MS Sans Serif", Arial;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-win95:active {
+            border-color: #404040 #dfdfdf #dfdfdf #404040;
+            padding: 5px 14px 3px 16px;
+        }
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+        .grid-stats label {
+            width: auto;
+            text-align: center;
+            font-size: 10px;
+        }
+        .grid-stats input {
+            width: 45px;
+            text-align: right;
+        }
+        .status-bar {
+            background-color: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 3px 6px;
+            font-size: 10px;
+            border-left: 1px solid #404040;
+            border-right: 1px solid #dfdfdf;
+            border-bottom: 1px solid #dfdfdf;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
-<div class="max-w-6xl mx-auto px-4 py-8">
-<!-- Header -->
-<header class="mb-8 border-b border-slate-800 pb-6">
-<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-<div>
-<h1 class="text-3xl font-black tracking-tight text-amber-500 flex items-center gap-2">
-<span>🏀</span> NBA Live '96 Roster Index
-</h1>
-<p class="text-slate-400 mt-1">
-Companion index database and sequence validator for dejfatman editor workflows.
-</p>
+<body>
+
+<div class="win95-window">
+    <div class="title-bar">
+        <span>NBA Live '96 Editor - [Project1 - Player Editor]</span>
+        <div class="title-bar-buttons">
+            <button>_</button>
+            <button>□</button>
+            <button>×</button>
+        </div>
+    </div>
+    <div class="menu-bar">
+        <div class="menu-item"><b>F</b>ile</div>
+        <div class="menu-item"><b>I</b>mport/Export</div>
+        <div class="menu-item"><b>H</b>elp</div>
+    </div>
+    
+    <div class="window-body">
+        <!-- General Section -->
+        <fieldset class="fieldset-win95">
+            <legend>General</legend>
+            <div class="row">
+                <label>#:</label> <input type="text" id="txtNbr" value="28" style="width: 35px;">
+                <label>Last Name:</label> <input type="text" id="txtName" value="Lang" style="width: 120px;">
+                <label>First Name:</label> <input type="text" id="txtFirst" value="Andrew" style="width: 120px;">
+            </div>
+            <div class="row">
+                <label>Position:</label>
+                <select id="cPosition" style="width: 130px;">
+                    <option value="0">Center</option>
+                    <option value="1">Power Forward</option>
+                    <option value="2">Small Forward</option>
+                    <option value="3">Shooting Guard</option>
+                    <option value="4">Point Guard</option>
+                </select>
+                <label>School:</label> <input type="text" id="cSchool" value="Arkansas" style="width: 120px;">
+            </div>
+        </fieldset>
+
+        <!-- Appearance Section -->
+        <fieldset class="fieldset-win95">
+            <legend>Appearance</legend>
+            <div class="row">
+                <label>Ht.:</label> <input type="text" id="txtHeight" value="83" style="width: 45px;">
+                <label>Wt.:</label> <input type="text" id="txtWeight" value="250" style="width: 45px;">
+                <label>Skin Tone:</label>
+                <select id="cSkin" style="width: 100px;">
+                    <option value="0">Darkest</option>
+                    <option value="1">Dark</option>
+                    <option value="2">Light</option>
+                    <option value="3">Lightest</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <!-- Abilities Section -->
+        <fieldset class="fieldset-win95">
+            <legend>Abilities</legend>
+            <div class="grid-stats" id="abilitiesGrid">
+               <div><label>FG</label><br><input type="text" value="70"></div>
+               <div><label>3P</label><br><input type="text" value="55"></div>
+               <div><label>FT</label><br><input type="text" value="80"></div>
+               <div><label>DNK</label><br><input type="text" value="80"></div>
+               <div><label>STL</label><br><input type="text" value="67"></div>
+               <div><label>BLK</label><br><input type="text" value="80"></div>
+               <div><label>ORB</label><br><input type="text" value="75"></div>
+               <div><label>DRB</label><br><input type="text" value="79"></div>
+               <div><label>BCT</label><br><input type="text" value="68"></div>
+               <div><label>DAW</label><br><input type="text" value="85"></div>
+               <div><label>SPD</label><br><input type="text" value="72"></div>
+               <div><label>AGI</label><br><input type="text" value="70"></div>
+            </div>
+        </fieldset>
+
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin-top: 15px; margin-bottom: 10px;">
+            <button class="btn-win95" onclick="alert('Changes saved to ROM buffer in memory!')">SAVE</button>
+            <button class="btn-win95" onclick="alert('Exporting player data to CSV...');">EXPORT CSV</button>
+            <button class="btn-win95" onclick="alert('Cancelled changes.')">CANCEL</button>
+        </div>
+    </div>
+    
+    <div class="status-bar" id="statusBar">
+        Opening ROM... DONE. Total 470 players loaded from NBALIVE96OGROS.CSV.
+    </div>
 </div>
-<div class="flex items-center gap-3">
-<button id="exportCsvBtn" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-lg cursor-pointer">
-Export Full CSV Index
-</button>
-</div>
-</div>
-</header>
-​<!-- Stats Bar -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow">
-<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Slots Tracked</span>
-<p id="totalSlotsCount" class="text-2xl font-bold text-slate-100 mt-1">470</p>
-</div>
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow">
-<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sequence Status</span>
-<p id="sequenceStatus" class="text-2xl font-bold text-emerald-400 mt-1">Valid (0 - 469)</p>
-</div>
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow">
-<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target Format</span>
-<p class="text-xl font-bold text-indigo-400 mt-1">dejfatman CSV</p>
-</div>
-</div>
-​<!-- Main Content Area -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-<!-- Left Column: Search & Filter / Validator -->
-<div class="lg:col-span-1 space-y-6">
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow">
-<h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-<span>🔍</span> Search Index
-</h2>
-<div class="space-y-4">
-<div>
-<label class="block text-xs font-medium text-slate-400 mb-1">Filter by Name or Sequence ID</label>
-<input type="text" id="searchInput" placeholder="e.g. Lang, 14, Jordan..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
-</div>
-</div>
-</div>
-​<!-- CSV Validator Tool -->
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow">
-<h2 class="text-lg font-bold text-slate-200 mb-2 flex items-center gap-2">
-<span>⚡</span> Paste & Validate CSV
-</h2>
-<p class="text-xs text-slate-400 mb-4">Paste rows or your whole CSV here to verify sequence continuity before ROM compile.</p>
-<textarea id="csvInputBox" rows="6" placeholder="Paste CSV text here..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-amber-500 mb-3"></textarea>
-<button id="validateBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold py-2 rounded-lg text-sm transition-colors border border-slate-700 cursor-pointer">
-Run Sequence Check
-</button>
-<div id="validationResult" class="mt-3 text-xs font-mono hidden p-3 rounded-lg border"></div>
-</div>
-</div>
-​<!-- Right Column: Player Database Table -->
-<div class="lg:col-span-2">
-<div class="bg-slate-900 border border-slate-800 rounded-xl shadow overflow-hidden">
-<div class="px-5 py-4 border-b border-slate-800 flex justify-between items-center">
-<h2 class="text-lg font-bold text-slate-200">Player Sequence Registry</h2>
-<span id="matchCount" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Showing 470 records</span>
-</div>
-<div class="overflow-x-auto max-h-[600px] overflow-y-auto">
-<table class="w-full text-left border-collapse">
-<thead class="bg-slate-950 text-slate-400 uppercase text-xs sticky top-0 border-b border-slate-800">
-<tr>
-<th class="py-3 px-4 font-semibold">Seq ID</th>
-<th class="py-3 px-4 font-semibold">Last Name</th>
-<th class="py-3 px-4 font-semibold">First Name</th>
-<th class="py-3 px-4 font-semibold">Team Slot Map</th>
-</tr>
-</thead>
-<tbody id="playerTableBody" class="divide-y divide-slate-800/60 text-sm">
-<!-- Populated dynamically -->
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-​<script>
-// Full curated database sample for the 470 slots in NBA Live '96
-const rosterData = [
-{ seq: 0, last: "Lang", first: "Andrew", team: "Atlanta Hawks" },
-{ seq: 1, last: "Long", first: "Grant", team: "Atlanta Hawks" },
-{ seq: 2, last: "Augmon", first: "Stacey", team: "Atlanta Hawks" },
-{ seq: 3, last: "Smith", first: "Steve", team: "Atlanta Hawks" },
-{ seq: 4, last: "Blaylock", first: "Mookie", team: "Atlanta Hawks" },
-{ seq: 5, last: "Koncak", first: "Jon", team: "Atlanta Hawks" },
-{ seq: 6, last: "Norman", first: "Ken", team: "Atlanta Hawks" },
-{ seq: 7, last: "Ehlo", first: "Craig", team: "Atlanta Hawks" },
-{ seq: 8, last: "Corbin", first: "Tyrone", team: "Atlanta Hawks" },
-{ seq: 9, last: "Edwards", first: "Doug", team: "Atlanta Hawks" },
-{ seq: 10, last: "Anderson", first: "Greg", team: "Atlanta Hawks" },
-{ seq: 11, last: "Les", first: "Jim", team: "Atlanta Hawks" },
-{ seq: 12, last: "Whatley", first: "Ennis", team: "Atlanta Hawks" },
-{ seq: 13, last: "Rasmussen", first: "Blair", team: "Atlanta Hawks" },
-{ seq: 14, last: "Montross", first: "Eric", team: "Boston Celtics" },
-{ seq: 15, last: "Radja", first: "Dino", team: "Boston Celtics" },
-{ seq: 16, last: "Fox", first: "Rick", team: "Boston Celtics" },
-{ seq: 17, last: "Brown", first: "Dee", team: "Boston Celtics" },
-{ seq: 18, last: "Wesley", first: "David", team: "Boston Celtics" },
-{ seq: 19, last: "Douglas", first: "Sherman", team: "Boston Celtics" },
-{ seq: 20, last: "Pinckney", first: "Ed", team: "Boston Celtics" },
-{ seq: 21, last: "Fox", first: "Jim", team: "Boston Celtics" },
-{ seq: 22, last: "Popson", first: "Dave", team: "Boston Celtics" },
-{ seq: 23, last: "Wennington", first: "Bill", team: "Chicago Bulls" },
-{ seq: 24, last: "Jordan", first: "Michael", team: "Chicago Bulls" },
-{ seq: 25, last: "Pippen", first: "Scottie", team: "Chicago Bulls" },
-{ seq: 26, last: "Rodman", first: "Dennis", team: "Chicago Bulls" },
-{ seq: 27, last: "Kukoc", first: "Toni", team: "Chicago Bulls" },
-{ seq: 28, last: "Longley", first: "Luc", team: "Chicago Bulls" },
-{ seq: 29, last: "Harper", first: "Ron", team: "Chicago Bulls" },
-{ seq: 30, last: "Kerr", first: "Steve", team: "Chicago Bulls" }
-];
-​// Fill out remaining slots up to 469 for completeness in local demo
-for (let i = 31; i < 470; i++) {
-rosterData.push({
-seq: i,
-last: Player_${i},
-first: Custom,
-team: Slot Group ${Math.floor(i / 15) + 1}
-});
-}
-​const tableBody = document.getElementById('playerTableBody');
-const searchInput = document.getElementById('searchInput');
-const matchCount = document.getElementById('matchCount');
-​function renderTable(data) {
-tableBody.innerHTML = '';
-data.forEach(item => {
-const tr = document.createElement('tr');
-tr.className = "hover:bg-slate-800/50 transition-colors";
-tr.innerHTML = <td class="py-3 px-4 font-mono text-amber-400 font-bold">${item.seq}</td> <td class="py-3 px-4 font-medium text-slate-100">${item.last}</td> <td class="py-3 px-4 text-slate-300">${item.first}</td> <td class="py-3 px-4 text-slate-400 text-xs">${item.team}</td>;
-tableBody.appendChild(tr);
-});
-matchCount.textContent = Showing ${data.length} records;
-}
-​renderTable(rosterData);
-​searchInput.addEventListener('input', (e) => {
-const query = e.target.value.toLowerCase();
-const filtered = rosterData.filter(p =>
-p.last.toLowerCase().includes(query) ||
-p.first.toLowerCase().includes(query) ||
-p.seq.toString().includes(query) ||
-p.team.toLowerCase().includes(query)
-);
-renderTable(filtered);
-});
-​// Validator logic
-document.getElementById('validateBtn').addEventListener('click', () => {
-const text = document.getElementById('csvInputBox').value.trim();
-const resultBox = document.getElementById('validationResult');
-resultBox.classList.remove('hidden');
-​if (!text) {
-resultBox.className = "mt-3 text-xs font-mono p-3 rounded-lg border bg-amber-950/40 border-amber-800 text-amber-300";
-resultBox.textContent = "Please paste some CSV text or rows to validate.";
-return;
-}
-​const lines = text.split('\n');
-resultBox.className = "mt-3 text-xs font-mono p-3 rounded-lg border bg-emerald-950/40 border-emerald-800 text-emerald-300";
-resultBox.textContent = Success: Analyzed ${lines.length} lines. Sequence index structure aligns with 0-469 range expectation.;
-});
-​// Export full CSV handler
-document.getElementById('exportCsvBtn').addEventListener('click', () => {
-let csvContent = "Sequence,LastName,FirstName,Team\n";
-rosterData.forEach(p => {
-csvContent += ${p.seq},"${p.last}","${p.first}","${p.team}"\n;
-});
-const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.setAttribute('href', url);
-a.setAttribute('download', 'nbalive96_sequence_registry.csv');
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-});
-</script>
+
 </body>
 </html>
