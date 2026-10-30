@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NBA Live '96 Editor (dejfatman - Win95)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Live '96 Editor - [Project1 - Player Editor]</title>
     <style>
         body {
             background-color: #008080;
             font-family: "MS Sans Serif", Arial, sans-serif;
             font-size: 11px;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             color: #000;
-            user-select: none;
         }
         .win95-window {
-            width: 780px;
+            max-width: 780px;
             background-color: #c0c0c0;
             border-top: 2px solid #dfdfdf;
             border-left: 2px solid #dfdfdf;
@@ -49,12 +49,35 @@
             border-bottom: 1px solid #808080;
             display: flex;
             gap: 15px;
+            position: relative;
         }
         .menu-item {
             cursor: pointer;
-            padding: 1px 4px;
+            padding: 1px 6px;
+            position: relative;
         }
         .menu-item:hover {
+            background-color: #000080;
+            color: white;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 18px;
+            left: 0;
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #dfdfdf #404040 #404040 #dfdfdf;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            z-index: 1000;
+            min-width: 130px;
+        }
+        .dropdown-item {
+            padding: 4px 12px;
+            color: black;
+            cursor: pointer;
+        }
+        .dropdown-item:hover {
             background-color: #000080;
             color: white;
         }
@@ -71,11 +94,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
         }
         .main-layout {
             display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
+        }
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
         }
         .fieldset-win95 {
             border: 1px solid #808080;
@@ -94,10 +124,12 @@
             gap: 6px;
             margin-bottom: 4px;
             align-items: center;
+            flex-wrap: wrap;
         }
         label {
             display: inline-block;
             text-align: right;
+            font-size: 10px;
         }
         input, select {
             background-color: white;
@@ -126,34 +158,32 @@
         }
         .grid-abilities {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
             text-align: center;
         }
         .grid-abilities label {
             font-size: 9px;
-            width: auto;
             text-align: center;
             display: block;
         }
         .grid-abilities input {
-            width: 30px;
+            width: 36px;
             text-align: center;
         }
         .grid-unknown-top {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 3px;
+            gap: 2px;
             text-align: center;
         }
         .grid-unknown-top label {
             font-size: 9px;
-            width: auto;
             text-align: center;
             display: block;
         }
         .grid-unknown-top input {
-            width: 32px;
+            width: 28px;
             text-align: center;
         }
         .grid-stats {
@@ -165,28 +195,26 @@
         }
         .grid-stats label {
             font-size: 9px;
-            width: auto;
             text-align: center;
             display: block;
         }
         .grid-stats input {
-            width: 35px;
+            width: 34px;
             text-align: center;
         }
         .grid-unknown-bot {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 4px;
+            gap: 3px;
             text-align: center;
         }
         .grid-unknown-bot label {
             font-size: 9px;
-            width: auto;
             text-align: center;
             display: block;
         }
         .grid-unknown-bot input {
-            width: 44px;
+            width: 42px;
             text-align: center;
         }
         .status-bar {
@@ -205,26 +233,42 @@
 
 <div class="win95-window">
     <div class="title-bar">
-        <span>NBA Live '96 Editor - D:\VB\NBA 96 Editor\Project1 (frmPlayer)</span>
+        <span>NBA Live '96 Editor - [Project1 - Player Editor]</span>
         <div class="title-bar-buttons">
             <button>_</button>
             <button>□</button>
             <button>×</button>
         </div>
     </div>
+    
+    <!-- Menu Bar with working dropdowns -->
     <div class="menu-bar">
-        <div class="menu-item" onclick="exportCSV()"><b>F</b>ile / Export CSV</div>
-        <div class="menu-item" onclick="document.getElementById('csvUpload').click()"><b>I</b>mport CSV</div>
-        <input type="file" id="csvUpload" style="display:none" onchange="importCSV(event)">
-        <div class="menu-item" onclick="alert('NBA Live 96 Editor (Replicated from dejfatman VB6 source & Romhacking.net)')"><b>H</b>elp</div>
+        <div class="menu-item" onclick="toggleMenu('fileMenu')">File
+            <div id="fileMenu" class="dropdown-menu">
+                <div class="dropdown-item" onclick="exportCSV()">Export CSV</div>
+                <div class="dropdown-item" onclick="document.getElementById('csvUpload').click()">Import CSV</div>
+            </div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('importExportMenu')">Import/Export
+            <div id="importExportMenu" class="dropdown-menu">
+                <div class="dropdown-item" onclick="exportCSV()">Export NBALIVE96OGROS.CSV</div>
+                <div class="dropdown-item" onclick="document.getElementById('csvUpload').click()">Import NBALIVE96OGROS.CSV</div>
+            </div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('helpMenu')">Help
+            <div id="helpMenu" class="dropdown-menu">
+                <div class="dropdown-item" onclick="alert('NBA Live 96 Editor (dejfatman / Win95 VB6 Replication)')">About</div>
+            </div>
+        </div>
     </div>
+    <input type="file" id="csvUpload" style="display:none" onchange="importCSV(event)">
     
     <div class="window-body">
         <!-- Navigation / Selector Bar -->
         <div class="nav-bar">
             <div>
                 <b>Player (0 - 469):</b>
-                <select id="playerSelect" onchange="loadPlayer(this.value)" style="width: 250px;"></select>
+                <select id="playerSelect" onchange="loadPlayer(this.value)" style="width: 220px;"></select>
             </div>
             <div>
                 <button class="btn-win95" onclick="saveCurrentPlayer()">SAVE</button>
@@ -238,16 +282,16 @@
                 <fieldset class="fieldset-win95">
                     <legend>General</legend>
                     <div class="row">
-                        <label style="width: 25px;">#:</label>
+                        <label style="width: 20px;">#:</label>
                         <input type="text" id="f_nbr" style="width: 35px;" value="21">
-                        <label style="width: 40px;">Name:</label>
-                        <input type="text" id="f_last" style="width: 85px;" value="A. Lang">
-                        <label style="width: 60px;">First Name:</label>
-                        <input type="text" id="f_first" style="width: 95px;" value="Andrew">
+                        <label style="width: 35px;">Name:</label>
+                        <input type="text" id="f_last" style="width: 80px;" value="A. Lang">
+                        <label style="width: 55px;">First Name:</label>
+                        <input type="text" id="f_first" style="width: 85px;" value="Andrew">
                     </div>
                     <div class="row" style="margin-top: 5px;">
-                        <label style="width: 50px;">Position:</label>
-                        <select id="f_pos" style="width: 95px;">
+                        <label style="width: 45px;">Position:</label>
+                        <select id="f_pos" style="width: 90px;">
                             <option value="0">Center</option>
                             <option value="1">Power Forward</option>
                             <option value="2">Small Forward</option>
@@ -255,7 +299,7 @@
                             <option value="4">Point Guard</option>
                         </select>
                         <label style="width: 45px;">School:</label>
-                        <input type="text" id="f_school" style="width: 142px;" value="Arkansas">
+                        <input type="text" id="f_school" style="width: 110px;" value="Arkansas">
                     </div>
                 </fieldset>
 
@@ -267,17 +311,17 @@
                         <input type="text" id="f_ht" style="width: 35px;" value="83">
                         <label style="width: 25px;">Wt.:</label>
                         <input type="text" id="f_wt" style="width: 40px;" value="250">
-                        <label style="width: 60px;">Skin Tone:</label>
-                        <select id="f_skin" style="width: 75px;">
+                        <label style="width: 55px;">Skin Tone:</label>
+                        <select id="f_skin" style="width: 65px;">
                             <option value="0">Darkest</option>
                             <option value="1">Dark</option>
                             <option value="2">Light</option>
                             <option value="3">Lightest</option>
                         </select>
-                        <label style="width: 18px;">??:</label>
-                        <input type="text" id="f_face" style="width: 28px;" value="5">
-                        <label style="width: 18px;">??:</label>
-                        <input type="text" id="f_hair" style="width: 28px;" value="0">
+                        <label style="width: 15px;">??:</label>
+                        <input type="text" id="f_face" style="width: 24px;" value="5">
+                        <label style="width: 15px;">??:</label>
+                        <input type="text" id="f_hair" style="width: 24px;" value="0">
                     </div>
                 </fieldset>
 
@@ -285,7 +329,7 @@
                 <fieldset class="fieldset-win95">
                     <legend>Abilities</legend>
                     <div class="grid-abilities" id="abilitiesContainer">
-                        <!-- Populated dynamically matching exact screenshot layout -->
+                        <!-- Populated dynamically -->
                     </div>
                 </fieldset>
             </div>
@@ -318,15 +362,16 @@
             </div>
         </div>
 
-        <!-- Bottom Action Buttons -->
+        <!-- Bottom Action Buttons matching screenshot exactly -->
         <div style="text-align: center; margin-top: 8px;">
-            <button class="btn-win95" style="width: 110px;" onclick="saveCurrentPlayer()">SAVE</button>
-            <button class="btn-win95" style="width: 110px; margin-left: 20px;" onclick="exportCSV()">EXPORT CSV</button>
+            <button class="btn-win95" style="width: 90px;" onclick="saveCurrentPlayer()">SAVE</button>
+            <button class="btn-win95" style="width: 110px; margin-left: 15px;" onclick="exportCSV()">EXPORT CSV</button>
+            <button class="btn-win95" style="width: 90px; margin-left: 15px;" onclick="resetForm()">CANCEL</button>
         </div>
     </div>
     
     <div class="status-bar" id="statusBar">
-        Opening ROM... DONE. Loaded 470 player records successfully. Ready.
+        Opening ROM... DONE. Total 470 players loaded from NBALIVE96OGROS.CSV.
     </div>
 </div>
 
@@ -343,6 +388,22 @@
         "FT", "FTA", "ORB", "DRB", "AST", "STL", "BLK", 
         "TO", "PF", "PTS", "??", "??"
     ];
+
+    function toggleMenu(menuId) {
+        ['fileMenu', 'importExportMenu', 'helpMenu'].forEach(id => {
+            if(id !== menuId) document.getElementById(id).style.display = 'none';
+        });
+        let m = document.getElementById(menuId);
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.menu-item')) {
+            ['fileMenu', 'importExportMenu', 'helpMenu'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+        }
+    }
 
     function initEditor() {
         const abDiv = document.getElementById('abilitiesContainer');
@@ -475,6 +536,12 @@
         populateSelector();
         document.getElementById('playerSelect').value = idx;
         document.getElementById('statusBar').textContent = `Saved changes for player ID ${idx} (${p.LastName}).`;
+    }
+
+    function resetForm() {
+        const idx = parseInt(document.getElementById('playerSelect').value);
+        loadPlayer(idx);
+        document.getElementById('statusBar').textContent = `Changes cancelled for player ID ${idx}.`;
     }
 
     function exportCSV() {
