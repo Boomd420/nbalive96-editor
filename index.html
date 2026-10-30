@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NBA Live '96 Mobile Roster Editor</title>
+  <title>NBA Live '96 Roster Editor</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -16,7 +16,7 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
       margin: 0;
@@ -27,25 +27,11 @@
     }
 
     .container {
-      max-width: 600px;
       width: 100%;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      margin: 0 0 8px 0;
-      color: #38bdf8;
-    }
-
-    p {
-      color: var(--text-sub);
-      font-size: 0.9rem;
-      margin: 0;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .card {
@@ -53,308 +39,253 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 16px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .file-input-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: center;
+    h1 {
+      font-size: 1.25rem;
+      margin: 0 0 12px 0;
+      text-align: center;
+      color: var(--text-main);
     }
 
-    input[type="file"] {
-      display: none;
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 4px;
     }
 
-    .btn {
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #0f172a;
+      color: var(--text-main);
+      box-sizing: border-box;
+      font-size: 0.95rem;
+    }
+
+    button {
       background-color: var(--accent);
       color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
       font-weight: 600;
-      cursor: pointer;
       border: none;
-      width: 100%;
-      text-align: center;
-      box-sizing: border-box;
-      font-size: 1rem;
-      transition: background-color 0.2s;
+      cursor: pointer;
+      margin-top: 8px;
     }
 
-    .btn:active {
+    button:hover {
       background-color: var(--accent-hover);
     }
 
-    .btn-success {
-      background-color: #16a34a;
-    }
-
-    .btn-success:active {
-      background-color: #15803d;
-    }
-
-    .form-grid {
+    .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .form-group.full-width {
-      grid-column: span 2;
-    }
-
-    label {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    input[type="text"], input[type="number"], select {
-      background-color: #0f172a;
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-
-    input:focus, select:focus {
-      outline: 2px solid var(--accent);
-    }
-
     .hidden {
       display: none;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      background-color: #334155;
-      color: #cbd5e1;
-      margin-top: 8px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <h1>NBA Live '96 Roster Editor</h1>
-      <p>Mobile Web Tool for Sega Genesis ROM Updating</p>
-    </header>
+<div class="container">
+  <h1>NBA Live '96 Mobile Roster Editor</h1>
 
-    <!-- ROM Upload Section -->
-    <div class="card">
-      <div class="file-input-wrapper">
-        <label for="romFile" class="btn">Select NBA Live '96 ROM (.bin / .md)</label>
-        <input type="file" id="romFile" accept=".bin,.md" />
-        <span id="status" class="status-badge">No ROM Loaded</span>
-      </div>
-    </div>
-
-    <!-- Editor UI (Hidden until ROM loaded) -->
-    <div id="editorUI" class="hidden">
-      
-      <!-- Player Selection -->
-      <div class="card">
-        <div class="form-group full-width">
-          <label for="playerSelect">Select Player</label>
-          <select id="playerSelect">
-            <!-- Dynamically populated from ROM buffer -->
-          </select>
-        </div>
-      </div>
-
-      <!-- Player Attributes Form -->
-      <div class="card">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" maxlength="12" placeholder="First Name" />
-          </div>
-
-          <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" maxlength="14" placeholder="Last Name" />
-          </div>
-
-          <div class="form-group">
-            <label for="jerseyNum">Jersey #</label>
-            <input type="number" id="jerseyNum" min="0" max="99" value="0" />
-          </div>
-
-          <div class="form-group">
-            <label for="posSelect">Position</label>
-            <select id="posSelect">
-              <option value="0">Center</option>
-              <option value="1">Power Forward</option>
-              <option value="2">Small Forward</option>
-              <option value="3">Shooting Guard</option>
-              <option value="4">Point Guard</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="speed">Speed (1-99)</label>
-            <input type="number" id="speed" min="1" max="99" value="50" />
-          </div>
-
-          <div class="form-group">
-            <label for="threePt">3PT Rating (1-99)</label>
-            <input type="number" id="threePt" min="1" max="99" value="50" />
-          </div>
-
-          <div class="form-group">
-            <label for="dunk">Dunk (1-99)</label>
-            <input type="number" id="dunk" min="1" max="99" value="50" />
-          </div>
-
-          <div class="form-group">
-            <label for="pass">Pass (1-99)</label>
-            <input type="number" id="pass" min="1" max="99" value="50" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="card">
-        <button id="savePlayerBtn" class="btn" style="margin-bottom: 12px;">Update Player Data</button>
-        <button id="downloadRomBtn" class="btn btn-success">Download Modified ROM</button>
-      </div>
-
-    </div>
+  <div class="card">
+    <label for="romFile">Load NBA Live '96 ROM (.bin / .md)</label>
+    <input type="file" id="romFile" accept=".bin,.md" />
   </div>
 
-  <script>
-    let romBuffer = null;
-    let fileName = "NBA_Live_96_Updated.bin";
+  <div id="editorCard" class="card hidden">
+    <label for="playerSelect">Select Player (470 Slots Available)</label>
+    <select id="playerSelect"></select>
 
-    // Standard player record offsets and size
-    const PLAYER_DATA_START = 0x000F4A0;
-    const RECORD_SIZE = 64; 
-    const TOTAL_PLAYERS = 300;
+    <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;" />
 
-    const fileInput = document.getElementById('romFile');
-    const statusText = document.getElementById('status');
-    const editorUI = document.getElementById('editorUI');
-    const playerSelect = document.getElementById('playerSelect');
+    <div class="grid">
+      <div>
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" maxlength="13" />
+      </div>
+      <div>
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" maxlength="13" />
+      </div>
+    </div>
 
-    fileInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    <div class="grid" style="margin-top: 12px;">
+      <div>
+        <label for="jerseyNum">Jersey Number</label>
+        <input type="number" id="jerseyNum" min="0" max="99" />
+      </div>
+      <div>
+        <label for="position">Position Code</label>
+        <input type="number" id="position" min="0" max="4" />
+      </div>
+    </div>
 
-      fileName = file.name.replace(/\.(bin|md)$/i, '_2026.bin');
-      const reader = new FileReader();
+    <div class="grid" style="margin-top: 12px;">
+      <div>
+        <label for="speed">Speed (0-99)</label>
+        <input type="number" id="speed" min="0" max="99" />
+      </div>
+      <div>
+        <label for="threePoint">3-Pointer (0-99)</label>
+        <input type="number" id="threePoint" min="0" max="99" />
+      </div>
+    </div>
 
-      reader.onload = function(evt) {
-        romBuffer = new Uint8Array(evt.target.result);
-        statusText.innerText = `Loaded: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-        statusText.style.backgroundColor = '#16a34a';
-        statusText.style.color = '#ffffff';
+    <div class="grid" style="margin-top: 12px;">
+      <div>
+        <label for="dunk">Dunk (0-99)</label>
+        <input type="number" id="dunk" min="0" max="99" />
+      </div>
+      <div>
+        <label for="overall">Overall Rating</label>
+        <input type="number" id="overall" min="0" max="99" />
+      </div>
+    </div>
 
-        populatePlayerDropdown();
-        editorUI.classList.remove('hidden');
-        loadPlayerData(0);
-      };
+    <button id="savePlayerBtn" style="margin-top: 16px;">Update Player Data in Memory</button>
+    <button id="downloadRomBtn" style="background-color: #16a34a; margin-top: 8px;">Download Modified ROM</button>
+  </div>
+</div>
 
-      reader.readAsArrayBuffer(file);
-    });
+<script>
+  let romData = null;
+  const TOTAL_PLAYERS = 470;
+  const RECORD_SIZE = 126; // 100 attribute bytes + 13 bytes Last Name + 13 bytes First Name
+  let baseOffset = 0;
 
-    function populatePlayerDropdown() {
-      playerSelect.innerHTML = '';
-      for (let i = 0; i < TOTAL_PLAYERS; i++) {
-        const offset = PLAYER_DATA_START + (i * RECORD_SIZE);
-        let name = readString(offset, 12);
-        if (!name.trim()) name = `Player #${i + 1}`;
+  const fileInput = document.getElementById('romFile');
+  const editorCard = document.getElementById('editorCard');
+  const playerSelect = document.getElementById('playerSelect');
 
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${i + 1}. ${name}`;
-        playerSelect.appendChild(option);
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      romData = new Uint8Array(evt.target.result);
+      
+      // Locate the player data block dynamically or using default offset
+      baseOffset = findPlayerDataOffset(romData);
+      
+      populatePlayerDropdown();
+      editorCard.classList.remove('hidden');
+      loadPlayerData(0);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  function findPlayerDataOffset(buf) {
+    // Search for known ASCII markers or fallback to default table base
+    for (let i = 0; i < buf.length - 2000; i += 2) {
+      // Searching for initial player records
+      if (buf[i + 100] === 0x41 && buf[i + 101] === 0x2e && buf[i + 102] === 0x20) { // "A. "
+        return i;
       }
     }
+    return 0x100000; // Default fallback offset if direct scan varies
+  }
 
-    function readString(offset, maxLength) {
-      if (!romBuffer || offset >= romBuffer.length) return "";
-      let str = "";
-      for (let i = 0; i < maxLength; i++) {
-        const charCode = romBuffer[offset + i];
-        if (charCode === 0 || charCode === 0xFF) break;
-        if (charCode >= 32 && charCode <= 126) {
-          str += String.fromCharCode(charCode);
-        }
-      }
-      return str.trim();
-    }
-
-    function writeString(offset, str, maxLength) {
-      for (let i = 0; i < maxLength; i++) {
-        if (i < str.length) {
-          romBuffer[offset + i] = str.charCodeAt(i);
-        } else {
-          romBuffer[offset + i] = 0x20; // fill space padding
-        }
+  function readAsciiString(buf, start, length) {
+    let str = "";
+    for (let i = 0; i < length; i++) {
+      let charCode = buf[start + i];
+      if (charCode === 0 || charCode === 0xFF) break;
+      if (charCode >= 32 && charCode <= 126) {
+        str += String.fromCharCode(charCode);
       }
     }
+    return str.trim();
+  }
 
-    function loadPlayerData(index) {
-      if (!romBuffer) return;
-      const offset = PLAYER_DATA_START + (index * RECORD_SIZE);
-
-      document.getElementById('firstName').value = readString(offset, 12);
-      document.getElementById('lastName').value = readString(offset + 12, 14);
-      document.getElementById('jerseyNum').value = romBuffer[offset + 26] || 0;
-      document.getElementById('posSelect').value = romBuffer[offset + 27] || 0;
-      document.getElementById('speed').value = romBuffer[offset + 28] || 50;
-      document.getElementById('threePt').value = romBuffer[offset + 29] || 50;
-      document.getElementById('dunk').value = romBuffer[offset + 30] || 50;
-      document.getElementById('pass').value = romBuffer[offset + 31] || 50;
+  function writeAsciiString(buf, start, length, text) {
+    for (let i = 0; i < length; i++) {
+      if (i < text.length) {
+        buf[start + i] = text.charCodeAt(i);
+      } else {
+        buf[start + i] = 0x20; // Pad with space
+      }
     }
+  }
 
-    playerSelect.addEventListener('change', function() {
-      loadPlayerData(parseInt(this.value));
-    });
+  function getPlayerRecordOffset(index) {
+    return baseOffset + (index * RECORD_SIZE);
+  }
 
-    document.getElementById('savePlayerBtn').addEventListener('click', function() {
-      if (!romBuffer) return;
-      const index = parseInt(playerSelect.value);
-      const offset = PLAYER_DATA_START + (index * RECORD_SIZE);
+  function populatePlayerDropdown() {
+    playerSelect.innerHTML = "";
+    for (let i = 0; i < TOTAL_PLAYERS; i++) {
+      let recStart = getPlayerRecordOffset(i);
+      let last = readAsciiString(romData, recStart + 100, 13);
+      let first = readAsciiString(romData, recStart + 113, 13);
+      
+      let name = (first || last) ? `${first} ${last}`.trim() : `Player ${i + 1}`;
+      let opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${i + 1}. ${name}`;
+      playerSelect.appendChild(opt);
+    }
+  }
 
-      writeString(offset, document.getElementById('firstName').value, 12);
-      writeString(offset + 12, document.getElementById('lastName').value, 14);
-      romBuffer[offset + 26] = parseInt(document.getElementById('jerseyNum').value) || 0;
-      romBuffer[offset + 27] = parseInt(document.getElementById('posSelect').value) || 0;
-      romBuffer[offset + 28] = parseInt(document.getElementById('speed').value) || 50;
-      romBuffer[offset + 29] = parseInt(document.getElementById('threePt').value) || 50;
-      romBuffer[offset + 30] = parseInt(document.getElementById('dunk').value) || 50;
-      romBuffer[offset + 31] = parseInt(document.getElementById('pass').value) || 50;
+  playerSelect.addEventListener('change', (e) => {
+    loadPlayerData(parseInt(e.target.value));
+  });
 
-      // Update dropdown option label live
-      playerSelect.options[index].text = `${index + 1}. ${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+  function loadPlayerData(index) {
+    let offset = getPlayerRecordOffset(index);
 
-      alert(`Player #${index + 1} updated in memory!`);
-    });
+    document.getElementById('jerseyNum').value = romData[offset + 0];
+    document.getElementById('position').value = romData[offset + 1];
+    document.getElementById('overall').value = romData[offset + 3];
+    document.getElementById('speed').value = romData[offset + 20];
+    document.getElementById('threePoint').value = romData[offset + 11];
+    document.getElementById('dunk').value = romData[offset + 13];
 
-    document.getElementById('downloadRomBtn').addEventListener('click', function() {
-      if (!romBuffer) return;
+    document.getElementById('lastName').value = readAsciiString(romData, offset + 100, 13);
+    document.getElementById('firstName').value = readAsciiString(romData, offset + 113, 13);
+  }
 
-      const blob = new Blob([romBuffer], { type: 'application/octet-stream' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = fileName;
-      link.click();
-    });
-  </script>
+  document.getElementById('savePlayerBtn').addEventListener('click', () => {
+    let index = parseInt(playerSelect.value);
+    let offset = getPlayerRecordOffset(index);
+
+    romData[offset + 0] = parseInt(document.getElementById('jerseyNum').value) || 0;
+    romData[offset + 1] = parseInt(document.getElementById('position').value) || 0;
+    romData[offset + 3] = parseInt(document.getElementById('overall').value) || 0;
+    romData[offset + 20] = parseInt(document.getElementById('speed').value) || 0;
+    romData[offset + 11] = parseInt(document.getElementById('threePoint').value) || 0;
+    romData[offset + 13] = parseInt(document.getElementById('dunk').value) || 0;
+
+    writeAsciiString(romData, offset + 100, 13, document.getElementById('lastName').value);
+    writeAsciiString(romData, offset + 113, 13, document.getElementById('firstName').value);
+
+    // Refresh option display name
+    let last = document.getElementById('lastName').value;
+    let first = document.getElementById('firstName').value;
+    playerSelect.options[index].textContent = `${index + 1}. ${first} ${last}`.trim();
+
+    alert('Player updated in memory!');
+  });
+
+  document.getElementById('downloadRomBtn').addEventListener('click', () => {
+    const blob = new Blob([romData], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'nbalive96_edited.bin';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+
 </body>
 </html>
