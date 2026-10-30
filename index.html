@@ -45,9 +45,16 @@
 
     h1 {
       font-size: 1.15rem;
-      margin: 0 0 8px 0;
+      margin: 0 0 4px 0;
       text-align: center;
       color: var(--text-main);
+    }
+
+    .subtitle {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      text-align: center;
+      margin-bottom: 12px;
     }
 
     h3 {
@@ -96,16 +103,38 @@
 
     .field-group { margin-bottom: 6px; }
     .hidden { display: none; }
+    .status-badge {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      text-align: center;
+      margin-top: 6px;
+      padding: 4px;
+      background: rgba(56, 189, 248, 0.1);
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>NBA Live '96 Pro Roster Editor</h1>
+  <h1>NBA Live '96 Pro ROM Editor</h1>
+  <div class="subtitle">Sega Genesis (.bin) Mobile Roster Toolkit</div>
 
   <div class="card">
-    <label for="romFile">Load Unmodified ROM File (.bin / .md)</label>
+    <label for="romFile">Load Sega Genesis ROM File (.bin / .md)</label>
     <input type="file" id="romFile" accept=".bin,.md" />
+    
+    <div id="offsetControl" class="field-group hidden" style="margin-top: 10px;">
+      <label for="baseOffsetSelect">Table Base Offset Pointer</label>
+      <select id="baseOffsetSelect">
+        <option value="0x028000" selected>0x028000 (Standard Raw .bin Default)</option>
+        <option value="0x030000">0x030000 (Alternate Uncompressed Dump)</option>
+        <option value="0x020000">0x020000 (Header Shift Variant A)</option>
+        <option value="0x038000">0x038000 (Header Shift Variant B)</option>
+      </select>
+    </div>
+
+    <div id="statusBadge" class="status-badge hidden"></div>
   </div>
 
   <div id="editorCard" class="card hidden">
@@ -131,7 +160,7 @@
         <input type="number" id="jerseyNum" min="0" max="99" />
       </div>
       <div class="field-group">
-        <label for="position">Position Code</label>
+        <label for="position">Position (0-4)</label>
         <input type="number" id="position" min="0" max="4" />
       </div>
       <div class="field-group">
@@ -142,11 +171,11 @@
 
     <div class="grid-3">
       <div class="field-group">
-        <label for="height">Height</label>
+        <label for="height">Height (Inches)</label>
         <input type="number" id="height" min="0" max="255" />
       </div>
       <div class="field-group">
-        <label for="weight">Weight (+100)</label>
+        <label for="weight">Weight (+100 Lbs)</label>
         <input type="number" id="weight" min="100" max="400" />
       </div>
       <div class="field-group">
@@ -156,7 +185,7 @@
     </div>
 
     <!-- ABILITIES & RATINGS -->
-    <h3>Player Abilities (0-99)</h3>
+    <h3>Player Abilities (0-99 Scale)</h3>
     <div class="grid-4">
       <div class="field-group"><label>Speed</label><input type="number" id="speed" min="0" max="99"></div>
       <div class="field-group"><label>3-Point</label><input type="number" id="threePoint" min="0" max="99"></div>
@@ -175,8 +204,8 @@
       <div class="field-group"><label>Dribble</label><input type="number" id="dribble" min="0" max="99"></div>
     </div>
 
-    <!-- SEASON STATISTICS -->
-    <h3>Season Statistics</h3>
+    <!-- HISTORICAL SEASON STATISTICS -->
+    <h3>Historical Season Statistics</h3>
     <div class="grid-3">
       <div class="field-group"><label>Games</label><input type="number" id="statGames"></div>
       <div class="field-group"><label>Starts</label><input type="number" id="statStarts"></div>
@@ -190,7 +219,7 @@
     </div>
 
     <button id="savePlayerBtn">Update Player Data in Memory</button>
-    <button id="downloadRomBtn" style="background-color: var(--success);">Download Modified ROM</button>
+    <button id="downloadRomBtn" style="background-color: var(--success);">Download Modified .bin ROM</button>
   </div>
 </div>
 
@@ -198,9 +227,12 @@
   let romData = null;
   const TOTAL_PLAYERS = 470;
   const RECORD_SIZE = 126;
-  let baseOffset = 0x028000;
+  let currentBaseOffset = 0x028000;
 
   const fileInput = document.getElementById('romFile');
+  const offsetControl = document.getElementById('offsetControl');
+  const baseOffsetSelect = document.getElementById('baseOffsetSelect');
+  const statusBadge = document.getElementById('statusBadge');
   const editorCard = document.getElementById('editorCard');
   const playerSelect = document.getElementById('playerSelect');
 
@@ -211,7 +243,12 @@
     const reader = new FileReader();
     reader.onload = function(evt) {
       romData = new Uint8Array(evt.target.result);
-      baseOffset = locatePlayerTable(romData);
+      currentBaseOffset = parseInt(baseOffsetSelect.value, 16);
+      
+      offsetControl.classList.remove('hidden');
+      statusBadge.classList.remove('hidden');
+      statusBadge.textContent = `Loaded ${file.name} (${romData.length} bytes) | Base: 0x${currentBaseOffset.toString(16).toUpperCase()}`;
+      
       populatePlayerDropdown();
       editorCard.classList.remove('hidden');
       loadPlayerData(0);
@@ -219,25 +256,21 @@
     reader.readAsArrayBuffer(file);
   });
 
-  function locatePlayerTable(buf) {
-    // Standard table seeker for 2MB Genesis ROMs
-    for (let i = 0x20000; i < 0x60000; i += 2) {
-      // Check for first valid name sequence marker "Andrew" or "A. Lang"
-      if (buf[i+100] === 0x41 && buf[i+101] === 0x2E) {
-        return i;
-      }
+  baseOffsetSelect.addEventListener('change', (e) => {
+    currentBaseOffset = parseInt(e.target.value, 16);
+    if (romData) {
+      statusBadge.textContent = `Offset switched to: 0x${currentBaseOffset.toString(16).toUpperCase()}`;
+      populatePlayerDropdown();
+      loadPlayerData(parseInt(playerSelect.value) || 0);
     }
-    return 0x028000;
-  }
+  });
 
   function readAsciiString(buf, start, length) {
     let str = "";
     if (start + length > buf.length) return "";
     for (let i = 0; i < length; i++) {
       let code = buf[start + i];
-      if (code === 0 || code === 0xFF || code === 0x20) {
-        if (code === 0 || code === 0xFF) break;
-      }
+      if (code === 0 || code === 0xFF) break;
       if (code >= 32 && code <= 126) {
         str += String.fromCharCode(code);
       }
@@ -246,17 +279,18 @@
   }
 
   function writeAsciiString(buf, start, length, text) {
+    if (start + length > buf.length) return;
     for (let i = 0; i < length; i++) {
       if (i < text.length) {
         buf[start + i] = text.charCodeAt(i);
       } else {
-        buf[start + i] = 0x20; // Space padded
+        buf[start + i] = 0x20; // Space padded per INI ASCII spec
       }
     }
   }
 
   function getPlayerRecordOffset(index) {
-    return baseOffset + (index * RECORD_SIZE);
+    return currentBaseOffset + (index * RECORD_SIZE);
   }
 
   function populatePlayerDropdown() {
@@ -282,15 +316,15 @@
     let o = getPlayerRecordOffset(index);
     if (o + RECORD_SIZE > romData.length) return;
 
-    // General & Appearance (Original.CSV / INI Mapping)
+    // Bio & Appearance (Original.CSV / INI Spec)
     document.getElementById('jerseyNum').value = romData[o + 7];
     document.getElementById('position').value = romData[o + 8];
     document.getElementById('height').value = romData[o + 9];
-    document.getElementById('weight').value = romData[o + 10];
+    document.getElementById('weight').value = romData[o + 10]; // +100 Weight representation
     document.getElementById('skinTone').value = romData[o + 12];
     document.getElementById('overall').value = romData[o + 3];
 
-    // Abilities
+    // Abilities (0-99)
     document.getElementById('fieldGoal').value = romData[o + 4];
     document.getElementById('dunk').value = romData[o + 5];
     document.getElementById('threePoint').value = romData[o + 6];
@@ -307,7 +341,7 @@
     document.getElementById('dribble').value = romData[o + 30];
     document.getElementById('offAware').value = romData[o + 31];
 
-    // Season Statistics (2-byte big endian)
+    // Stats (2-byte Big Endian)
     document.getElementById('statGames').value = romData[o + 44];
     document.getElementById('statStarts').value = romData[o + 45];
     document.getElementById('statMinutes').value = (romData[o + 46] << 8) | romData[o + 47];
@@ -357,7 +391,7 @@
     let first = document.getElementById('firstName').value;
     playerSelect.options[index].textContent = `${index + 1}. ${first} ${last}`.trim();
 
-    alert('Player updated in memory!');
+    alert('Player updated successfully in ROM memory!');
   });
 
   document.getElementById('downloadRomBtn').addEventListener('click', () => {
@@ -365,7 +399,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'nbalive96_pro_edited.bin';
+    a.download = 'nbalive96_edited.bin';
     a.click();
     URL.revokeObjectURL(url);
   });
