@@ -2,24 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NBA Live '96 Editor - Windows 95 Edition</title>
+    <title>NBA Live '96 Editor (dejfatman - Win95)</title>
     <style>
         body {
             background-color: #008080;
             font-family: "MS Sans Serif", Arial, sans-serif;
             font-size: 11px;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             color: #000;
+            user-select: none;
         }
         .win95-window {
-            width: 720px;
+            width: 780px;
             background-color: #c0c0c0;
             border-top: 2px solid #dfdfdf;
             border-left: 2px solid #dfdfdf;
             border-right: 2px solid #404040;
             border-bottom: 2px solid #404040;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 4px 4px 16px rgba(0,0,0,0.7);
             margin: 0 auto;
         }
         .title-bar {
@@ -30,6 +31,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 11px;
         }
         .title-bar-buttons button {
             background-color: #c0c0c0;
@@ -39,7 +41,6 @@
             height: 14px;
             font-size: 9px;
             font-weight: bold;
-            line-height: 8px;
             cursor: pointer;
         }
         .menu-bar {
@@ -58,15 +59,31 @@
             color: white;
         }
         .window-body {
-            padding: 10px;
+            padding: 8px;
+        }
+        .nav-bar {
+            background: #d4d0c8;
+            border: 1px solid #808080;
+            border-top: 1px solid #404040;
+            border-left: 1px solid #404040;
+            padding: 5px 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 8px;
         }
         .fieldset-win95 {
             border: 1px solid #808080;
             border-top: 1px solid #404040;
             border-left: 1px solid #404040;
             background-color: #c0c0c0;
-            padding: 8px;
-            margin-bottom: 10px;
+            padding: 6px 8px 8px 8px;
+            margin-bottom: 6px;
         }
         .fieldset-win95 legend {
             font-weight: bold;
@@ -74,51 +91,103 @@
         }
         .row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 6px;
+            gap: 6px;
+            margin-bottom: 4px;
             align-items: center;
         }
         label {
             display: inline-block;
-            width: 80px;
             text-align: right;
         }
         input, select {
             background-color: white;
             border: 1px solid;
             border-color: #404040 #dfdfdf #dfdfdf #404040;
-            padding: 2px 4px;
-            font-family: "MS Sans Serif", Arial;
+            padding: 2px 3px;
+            font-family: "MS Sans Serif", Arial, sans-serif;
             font-size: 11px;
+        }
+        input:focus, select:focus {
+            outline: none;
         }
         .btn-win95 {
             background-color: #c0c0c0;
             border: 2px solid;
             border-color: #dfdfdf #404040 #404040 #dfdfdf;
-            padding: 4px 15px;
-            font-family: "MS Sans Serif", Arial;
+            padding: 4px 14px;
+            font-family: "MS Sans Serif", Arial, sans-serif;
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
         }
         .btn-win95:active {
-            border-color: #404040 #dfdfdf #dfdfdf #404040;
-            padding: 5px 14px 3px 16px;
+            border-color: #404040 #dfdfdf #dfdfdf #dfdfdf;
+            padding: 5px 13px 3px 15px;
+        }
+        .grid-abilities {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            text-align: center;
+        }
+        .grid-abilities label {
+            font-size: 9px;
+            width: auto;
+            text-align: center;
+            display: block;
+        }
+        .grid-abilities input {
+            width: 30px;
+            text-align: center;
+        }
+        .grid-unknown-top {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 3px;
+            text-align: center;
+        }
+        .grid-unknown-top label {
+            font-size: 9px;
+            width: auto;
+            text-align: center;
+            display: block;
+        }
+        .grid-unknown-top input {
+            width: 32px;
+            text-align: center;
         }
         .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .grid-stats label {
+            font-size: 9px;
+            width: auto;
+            text-align: center;
+            display: block;
+        }
+        .grid-stats input {
+            width: 35px;
+            text-align: center;
+        }
+        .grid-unknown-bot {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             gap: 4px;
             text-align: center;
         }
-        .grid-stats label {
+        .grid-unknown-bot label {
+            font-size: 9px;
             width: auto;
             text-align: center;
-            font-size: 10px;
+            display: block;
         }
-        .grid-stats input {
-            width: 45px;
-            text-align: right;
+        .grid-unknown-bot input {
+            width: 44px;
+            text-align: center;
         }
         .status-bar {
             background-color: #c0c0c0;
@@ -128,6 +197,7 @@
             border-left: 1px solid #404040;
             border-right: 1px solid #dfdfdf;
             border-bottom: 1px solid #dfdfdf;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -135,7 +205,7 @@
 
 <div class="win95-window">
     <div class="title-bar">
-        <span>NBA Live '96 Editor - [Project1 - Player Editor]</span>
+        <span>NBA Live '96 Editor - D:\VB\NBA 96 Editor\Project1 (frmPlayer)</span>
         <div class="title-bar-buttons">
             <button>_</button>
             <button>□</button>
@@ -143,80 +213,351 @@
         </div>
     </div>
     <div class="menu-bar">
-        <div class="menu-item"><b>F</b>ile</div>
-        <div class="menu-item"><b>I</b>mport/Export</div>
-        <div class="menu-item"><b>H</b>elp</div>
+        <div class="menu-item" onclick="exportCSV()"><b>F</b>ile / Export CSV</div>
+        <div class="menu-item" onclick="document.getElementById('csvUpload').click()"><b>I</b>mport CSV</div>
+        <input type="file" id="csvUpload" style="display:none" onchange="importCSV(event)">
+        <div class="menu-item" onclick="alert('NBA Live 96 Editor (Replicated from dejfatman VB6 source & Romhacking.net)')"><b>H</b>elp</div>
     </div>
     
     <div class="window-body">
-        <!-- General Section -->
-        <fieldset class="fieldset-win95">
-            <legend>General</legend>
-            <div class="row">
-                <label>#:</label> <input type="text" id="txtNbr" value="28" style="width: 35px;">
-                <label>Last Name:</label> <input type="text" id="txtName" value="Lang" style="width: 120px;">
-                <label>First Name:</label> <input type="text" id="txtFirst" value="Andrew" style="width: 120px;">
+        <!-- Navigation / Selector Bar -->
+        <div class="nav-bar">
+            <div>
+                <b>Player (0 - 469):</b>
+                <select id="playerSelect" onchange="loadPlayer(this.value)" style="width: 250px;"></select>
             </div>
-            <div class="row">
-                <label>Position:</label>
-                <select id="cPosition" style="width: 130px;">
-                    <option value="0">Center</option>
-                    <option value="1">Power Forward</option>
-                    <option value="2">Small Forward</option>
-                    <option value="3">Shooting Guard</option>
-                    <option value="4">Point Guard</option>
-                </select>
-                <label>School:</label> <input type="text" id="cSchool" value="Arkansas" style="width: 120px;">
+            <div>
+                <button class="btn-win95" onclick="saveCurrentPlayer()">SAVE</button>
             </div>
-        </fieldset>
+        </div>
 
-        <!-- Appearance Section -->
-        <fieldset class="fieldset-win95">
-            <legend>Appearance</legend>
-            <div class="row">
-                <label>Ht.:</label> <input type="text" id="txtHeight" value="83" style="width: 45px;">
-                <label>Wt.:</label> <input type="text" id="txtWeight" value="250" style="width: 45px;">
-                <label>Skin Tone:</label>
-                <select id="cSkin" style="width: 100px;">
-                    <option value="0">Darkest</option>
-                    <option value="1">Dark</option>
-                    <option value="2">Light</option>
-                    <option value="3">Lightest</option>
-                </select>
-            </div>
-        </fieldset>
+        <div class="main-layout">
+            <!-- LEFT COLUMN: General, Appearance, Abilities -->
+            <div>
+                <!-- General Fieldset -->
+                <fieldset class="fieldset-win95">
+                    <legend>General</legend>
+                    <div class="row">
+                        <label style="width: 25px;">#:</label>
+                        <input type="text" id="f_nbr" style="width: 35px;" value="21">
+                        <label style="width: 40px;">Name:</label>
+                        <input type="text" id="f_last" style="width: 85px;" value="A. Lang">
+                        <label style="width: 60px;">First Name:</label>
+                        <input type="text" id="f_first" style="width: 95px;" value="Andrew">
+                    </div>
+                    <div class="row" style="margin-top: 5px;">
+                        <label style="width: 50px;">Position:</label>
+                        <select id="f_pos" style="width: 95px;">
+                            <option value="0">Center</option>
+                            <option value="1">Power Forward</option>
+                            <option value="2">Small Forward</option>
+                            <option value="3">Shooting Guard</option>
+                            <option value="4">Point Guard</option>
+                        </select>
+                        <label style="width: 45px;">School:</label>
+                        <input type="text" id="f_school" style="width: 142px;" value="Arkansas">
+                    </div>
+                </fieldset>
 
-        <!-- Abilities Section -->
-        <fieldset class="fieldset-win95">
-            <legend>Abilities</legend>
-            <div class="grid-stats" id="abilitiesGrid">
-               <div><label>FG</label><br><input type="text" value="70"></div>
-               <div><label>3P</label><br><input type="text" value="55"></div>
-               <div><label>FT</label><br><input type="text" value="80"></div>
-               <div><label>DNK</label><br><input type="text" value="80"></div>
-               <div><label>STL</label><br><input type="text" value="67"></div>
-               <div><label>BLK</label><br><input type="text" value="80"></div>
-               <div><label>ORB</label><br><input type="text" value="75"></div>
-               <div><label>DRB</label><br><input type="text" value="79"></div>
-               <div><label>BCT</label><br><input type="text" value="68"></div>
-               <div><label>DAW</label><br><input type="text" value="85"></div>
-               <div><label>SPD</label><br><input type="text" value="72"></div>
-               <div><label>AGI</label><br><input type="text" value="70"></div>
-            </div>
-        </fieldset>
+                <!-- Appearance Fieldset -->
+                <fieldset class="fieldset-win95">
+                    <legend>Appearance</legend>
+                    <div class="row">
+                        <label style="width: 25px;">Ht.:</label>
+                        <input type="text" id="f_ht" style="width: 35px;" value="83">
+                        <label style="width: 25px;">Wt.:</label>
+                        <input type="text" id="f_wt" style="width: 40px;" value="250">
+                        <label style="width: 60px;">Skin Tone:</label>
+                        <select id="f_skin" style="width: 75px;">
+                            <option value="0">Darkest</option>
+                            <option value="1">Dark</option>
+                            <option value="2">Light</option>
+                            <option value="3">Lightest</option>
+                        </select>
+                        <label style="width: 18px;">??:</label>
+                        <input type="text" id="f_face" style="width: 28px;" value="5">
+                        <label style="width: 18px;">??:</label>
+                        <input type="text" id="f_hair" style="width: 28px;" value="0">
+                    </div>
+                </fieldset>
 
-        <!-- Action Buttons -->
-        <div style="text-align: center; margin-top: 15px; margin-bottom: 10px;">
-            <button class="btn-win95" onclick="alert('Changes saved to ROM buffer in memory!')">SAVE</button>
-            <button class="btn-win95" onclick="alert('Exporting player data to CSV...');">EXPORT CSV</button>
-            <button class="btn-win95" onclick="alert('Cancelled changes.')">CANCEL</button>
+                <!-- Abilities Fieldset -->
+                <fieldset class="fieldset-win95">
+                    <legend>Abilities</legend>
+                    <div class="grid-abilities" id="abilitiesContainer">
+                        <!-- Populated dynamically matching exact screenshot layout -->
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- RIGHT COLUMN: Unknown Top, Statistics, Unknown Bottom -->
+            <div>
+                <!-- Unknown Top Fieldset -->
+                <fieldset class="fieldset-win95">
+                    <legend>Unknown</legend>
+                    <div class="grid-unknown-top" id="unknownTopContainer">
+                        <!-- Populated dynamically -->
+                    </div>
+                </fieldset>
+
+                <!-- Statistics Fieldset -->
+                <fieldset class="fieldset-win95">
+                    <legend>Statistics</legend>
+                    <div class="grid-stats" id="statsContainer">
+                        <!-- Populated dynamically -->
+                    </div>
+                </fieldset>
+
+                <!-- Unknown Bottom Fieldset -->
+                <fieldset class="fieldset-win95">
+                    <legend>Unknown</legend>
+                    <div class="grid-unknown-bot" id="unknownBotContainer">
+                        <!-- Populated dynamically -->
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- Bottom Action Buttons -->
+        <div style="text-align: center; margin-top: 8px;">
+            <button class="btn-win95" style="width: 110px;" onclick="saveCurrentPlayer()">SAVE</button>
+            <button class="btn-win95" style="width: 110px; margin-left: 20px;" onclick="exportCSV()">EXPORT CSV</button>
         </div>
     </div>
     
     <div class="status-bar" id="statusBar">
-        Opening ROM... DONE. Total 470 players loaded from NBALIVE96OGROS.CSV.
+        Opening ROM... DONE. Loaded 470 player records successfully. Ready.
     </div>
 </div>
+
+<script>
+    let players = [];
+
+    const abilityLabels = [
+        "??", "FG", "3P", "FT", "DNK", "STL", "BLK", "ORB", "DRB", "BCT", 
+        "DAW", "DAW", "SPD", "AGI", "JMP", "??", "??", "OVA"
+    ];
+
+    const statLabels = [
+        "G", "GS", "MP", "FG", "FGA", "3P", "3PA", 
+        "FT", "FTA", "ORB", "DRB", "AST", "STL", "BLK", 
+        "TO", "PF", "PTS", "??", "??"
+    ];
+
+    function initEditor() {
+        const abDiv = document.getElementById('abilitiesContainer');
+        abDiv.innerHTML = '';
+        abilityLabels.forEach((lbl, i) => {
+            abDiv.innerHTML += `<div><label>${lbl}</label><input type="text" id="ab_${i}" value="75"></div>`;
+        });
+
+        const unTop = document.getElementById('unknownTopContainer');
+        unTop.innerHTML = '';
+        const defaultTop = [114, 22, 16, 7, 7, 6, 7, 0];
+        for(let i=0; i<8; i++) {
+            unTop.innerHTML += `<div><label>??</label><input type="text" id="un_top_${i}" value="${defaultTop[i]}"></div>`;
+        }
+
+        const stDiv = document.getElementById('statsContainer');
+        stDiv.innerHTML = '';
+        const defaultStats = [82, 63, 2340, 320, 677, 2, 3, 152, 188, 154, 302, 72, 45, 144, 108, 271, 794, 4, 1, 0, 0];
+        for(let i=0; i<21; i++) {
+            stDiv.innerHTML += `<div><label>${statLabels[i] || '??'}</label><input type="text" id="st_${i}" value="${defaultStats[i]}"></div>`;
+        }
+
+        const unBot = document.getElementById('unknownBotContainer');
+        unBot.innerHTML = '';
+        const defaultBot = [1056, 499, 4, 3, 253, 237, 224, 249, 112, 423, 76, 472, 3652, 68, 0, 0];
+        for(let i=0; i<16; i++) {
+            unBot.innerHTML += `<div><label>??</label><input type="text" id="un_bot_${i}" value="${defaultBot[i]}"></div>`;
+        }
+
+        for(let i=0; i<470; i++) {
+            players.push({
+                JerseyNumber: i === 21 ? 21 : (i % 99) + 1,
+                LastName: i === 21 ? "A. Lang" : `Player${i}`,
+                FirstName: i === 21 ? "Andrew" : `First${i}`,
+                Position: i === 21 ? 0 : i % 5,
+                School: i === 21 ? "Arkansas" : "College",
+                Height: i === 21 ? 83 : 78,
+                Weight: i === 21 ? 250 : 210,
+                SkinTone: i === 21 ? 0 : i % 4,
+                Face: 5,
+                Hair: 0,
+                unknownsTop: [...defaultTop],
+                abilities: [...Array(18).fill(75)],
+                stats: [...defaultStats],
+                unknownsBot: [...defaultBot]
+            });
+        }
+
+        populateSelector();
+        loadPlayer(21);
+    }
+
+    function populateSelector() {
+        const sel = document.getElementById('playerSelect');
+        sel.innerHTML = '';
+        players.forEach((p, idx) => {
+            let opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `${idx}: ${p.LastName}, ${p.FirstName} (#${p.JerseyNumber})`;
+            sel.appendChild(opt);
+        });
+    }
+
+    function loadPlayer(idx) {
+        idx = parseInt(idx);
+        let p = players[idx];
+        if(!p) return;
+
+        document.getElementById('playerSelect').value = idx;
+        document.getElementById('f_nbr').value = p.JerseyNumber;
+        document.getElementById('f_last').value = p.LastName;
+        document.getElementById('f_first').value = p.FirstName;
+        document.getElementById('f_pos').value = p.Position;
+        document.getElementById('f_school').value = p.School;
+        document.getElementById('f_ht').value = p.Height;
+        document.getElementById('f_wt').value = p.Weight;
+        document.getElementById('f_skin').value = p.SkinTone;
+        document.getElementById('f_face').value = p.Face;
+        document.getElementById('f_hair').value = p.Hair;
+
+        for(let i=0; i<18; i++) {
+            let el = document.getElementById(`ab_${i}`);
+            if(el) el.value = p.abilities[i];
+        }
+        for(let i=0; i<8; i++) {
+            let el = document.getElementById(`un_top_${i}`);
+            if(el) el.value = p.unknownsTop[i];
+        }
+        for(let i=0; i<21; i++) {
+            let el = document.getElementById(`st_${i}`);
+            if(el) el.value = p.stats[i];
+        }
+        for(let i=0; i<16; i++) {
+            let el = document.getElementById(`un_bot_${i}`);
+            if(el) el.value = p.unknownsBot[i];
+        }
+
+        document.getElementById('statusBar').textContent = `Loaded player ID ${idx} (${p.LastName}, ${p.FirstName}) from ROM buffer.`;
+    }
+
+    function saveCurrentPlayer() {
+        const idx = parseInt(document.getElementById('playerSelect').value);
+        let p = players[idx];
+
+        p.JerseyNumber = parseInt(document.getElementById('f_nbr').value) || 0;
+        p.LastName = document.getElementById('f_last').value;
+        p.FirstName = document.getElementById('f_first').value;
+        p.Position = parseInt(document.getElementById('f_pos').value) || 0;
+        p.School = document.getElementById('f_school').value;
+        p.Height = parseInt(document.getElementById('f_ht').value) || 78;
+        p.Weight = parseInt(document.getElementById('f_wt').value) || 200;
+        p.SkinTone = parseInt(document.getElementById('f_skin').value) || 0;
+        p.Face = parseInt(document.getElementById('f_face').value) || 0;
+        p.Hair = parseInt(document.getElementById('f_hair').value) || 0;
+
+        for(let i=0; i<18; i++) {
+            p.abilities[i] = parseInt(document.getElementById(`ab_${i}`).value) || 0;
+        }
+        for(let i=0; i<8; i++) {
+            p.unknownsTop[i] = parseInt(document.getElementById(`un_top_${i}`).value) || 0;
+        }
+        for(let i=0; i<21; i++) {
+            p.stats[i] = parseInt(document.getElementById(`st_${i}`).value) || 0;
+        }
+        for(let i=0; i<16; i++) {
+            p.unknownsBot[i] = parseInt(document.getElementById(`un_bot_${i}`).value) || 0;
+        }
+
+        alert(`Player sequence ${idx} (${p.LastName}, ${p.FirstName}) successfully updated in memory!`);
+        populateSelector();
+        document.getElementById('playerSelect').value = idx;
+        document.getElementById('statusBar').textContent = `Saved changes for player ID ${idx} (${p.LastName}).`;
+    }
+
+    function exportCSV() {
+        let rows = [];
+        let header = [
+            "JerseyNumber:1", "Position:1", "Height:1", "Weight:1:+100", "School:1", "SkinTone:1",
+            "?:1", "?:1", "Sequence:2", "?:1", "FieldGoal:1", "ThreePoint:1", "FreeThrow:1", "Dunk:1",
+            "Steal:1", "Block:1", "OffRebound:1", "DefRebound:1", "BallControl:1", "DefAware:1",
+            "Speed:1", "Agility:1", "Jump:1", "Dribble:1", "OffAware:1", "?:1", "?:1", "Overall:1",
+            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1",
+            "Games:1", "Starts:1", "Minutes:2", "FieldGoals:2", "FieldGoalAttempts:2", "ThreePointers:2",
+            "ThreePointAttempts:2", "FreeThrows:2", "FreeThrowAttempts:2", "OffRebounds:2", "DefRebounds:2",
+            "Assists:2", "Steals:2", "TurnOvers:2", "Blocks:2", "Points:2", "??:1", "??:1", "Fouls:2",
+            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1",
+            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1",
+            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "LastName:ascii", "FirstName:ascii"
+        ];
+        rows.push(header.join(","));
+
+        players.forEach((p, idx) => {
+            let r = [
+                p.JerseyNumber, p.Position, p.Height, p.Weight, p.School, p.SkinTone,
+                p.unknownsTop[0], p.unknownsTop[1], idx, p.unknownsTop[2],
+                ...p.abilities,
+                ...p.unknownsTop.slice(3),
+                ...p.stats,
+                ...p.unknownsBot,
+                p.LastName, p.FirstName
+            ];
+            rows.push(r.join(","));
+        });
+
+        let blob = new Blob([rows.join("\n")], { type: 'text/csv' });
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = 'NBALIVE96OGROS.CSV';
+        a.click();
+        document.getElementById('statusBar').textContent = "Successfully exported NBALIVE96OGROS.CSV.";
+    }
+
+    function importCSV(event) {
+        let file = event.target.files[0];
+        if(!file) return;
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let lines = e.target.result.split("\n");
+            let newPlayers = [];
+            for(let i=1; i<lines.length; i++) {
+                let cols = lines[i].split(",");
+                if(cols.length < 10) continue;
+                newPlayers.push({
+                    JerseyNumber: parseInt(cols[0]) || 0,
+                    Position: parseInt(cols[1]) || 0,
+                    Height: parseInt(cols[2]) || 78,
+                    Weight: parseInt(cols[3]) || 200,
+                    School: cols[4] || "",
+                    SkinTone: parseInt(cols[5]) || 0,
+                    Face: 5,
+                    Hair: 0,
+                    unknownsTop: [parseInt(cols[6])||114, parseInt(cols[7])||22, parseInt(cols[9])||16, 7, 7, 6, 7, 0],
+                    abilities: cols.slice(10, 28).map(v => parseInt(v) || 75),
+                    stats: cols.slice(37, 58).map(v => parseInt(v) || 0),
+                    unknownsBot: cols.slice(58, 74).map(v => parseInt(v) || 0),
+                    LastName: cols[84] || `Player${i}`,
+                    FirstName: cols[85] || `Name${i}`
+                });
+            }
+            if(newPlayers.length > 0) {
+                players = newPlayers;
+                populateSelector();
+                loadPlayer(21);
+                alert(`Successfully imported ${players.length} players from CSV!`);
+                document.getElementById('statusBar').textContent = `Imported ${players.length} records from CSV successfully.`;
+            } else {
+                alert("Error parsing CSV format.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    window.onload = initEditor;
+</script>
 
 </body>
 </html>
