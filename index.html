@@ -13,6 +13,7 @@
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
       --border: #334155;
+      --success: #16a34a;
     }
 
     body {
@@ -20,7 +21,7 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       margin: 0;
-      padding: 16px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -28,43 +29,51 @@
 
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 650px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 10px;
+      padding: 14px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
-      font-size: 1.25rem;
-      margin: 0 0 12px 0;
+      font-size: 1.15rem;
+      margin: 0 0 8px 0;
       text-align: center;
       color: var(--text-main);
     }
 
+    h3 {
+      font-size: 0.95rem;
+      margin: 12px 0 8px 0;
+      color: #60a5fa;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+
     label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--text-sub);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     input, select, button {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 8px;
+      border-radius: 6px;
       border: 1px solid var(--border);
       background-color: #0f172a;
       color: var(--text-main);
       box-sizing: border-box;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     button {
@@ -74,218 +83,85 @@
       border: none;
       cursor: pointer;
       margin-top: 8px;
+      padding: 10px;
     }
 
     button:hover {
       background-color: var(--accent-hover);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 
-    .hidden {
-      display: none;
-    }
+    .field-group { margin-bottom: 6px; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>NBA Live '96 Mobile Roster Editor</h1>
+  <h1>NBA Live '96 Pro Roster Editor</h1>
 
   <div class="card">
-    <label for="romFile">Load NBA Live '96 ROM (.bin / .md)</label>
+    <label for="romFile">Load Unmodified ROM File (.bin / .md)</label>
     <input type="file" id="romFile" accept=".bin,.md" />
   </div>
 
   <div id="editorCard" class="card hidden">
-    <label for="playerSelect">Select Player (470 Slots Available)</label>
+    <label for="playerSelect">Select Player Slot (0-469 Baseline)</label>
     <select id="playerSelect"></select>
 
-    <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;" />
-
-    <div class="grid">
-      <div>
+    <!-- GENERAL & BIO -->
+    <h3>General & Appearance</h3>
+    <div class="grid-2">
+      <div class="field-group">
         <label for="firstName">First Name</label>
         <input type="text" id="firstName" maxlength="13" />
       </div>
-      <div>
+      <div class="field-group">
         <label for="lastName">Last Name</label>
         <input type="text" id="lastName" maxlength="13" />
       </div>
     </div>
 
-    <div class="grid" style="margin-top: 12px;">
-      <div>
-        <label for="jerseyNum">Jersey Number</label>
+    <div class="grid-3">
+      <div class="field-group">
+        <label for="jerseyNum">Jersey #</label>
         <input type="number" id="jerseyNum" min="0" max="99" />
       </div>
-      <div>
+      <div class="field-group">
         <label for="position">Position Code</label>
         <input type="number" id="position" min="0" max="4" />
       </div>
-    </div>
-
-    <div class="grid" style="margin-top: 12px;">
-      <div>
-        <label for="speed">Speed (0-99)</label>
-        <input type="number" id="speed" min="0" max="99" />
-      </div>
-      <div>
-        <label for="threePoint">3-Pointer (0-99)</label>
-        <input type="number" id="threePoint" min="0" max="99" />
-      </div>
-    </div>
-
-    <div class="grid" style="margin-top: 12px;">
-      <div>
-        <label for="dunk">Dunk (0-99)</label>
-        <input type="number" id="dunk" min="0" max="99" />
-      </div>
-      <div>
+      <div class="field-group">
         <label for="overall">Overall Rating</label>
         <input type="number" id="overall" min="0" max="99" />
       </div>
     </div>
 
-    <button id="savePlayerBtn" style="margin-top: 16px;">Update Player Data in Memory</button>
-    <button id="downloadRomBtn" style="background-color: #16a34a; margin-top: 8px;">Download Modified ROM</button>
-  </div>
-</div>
+    <div class="grid-3">
+      <div class="field-group">
+        <label for="height">Height</label>
+        <input type="number" id="height" min="0" max="255" />
+      </div>
+      <div class="field-group">
+        <label for="weight">Weight</label>
+        <input type="number" id="weight" min="0" max="500" />
+      </div>
+      <div class="field-group">
+        <label for="skinTone">Skin Tone</label>
+        <input type="number" id="skinTone" min="0" max="15" />
+      </div>
+    </div>
 
-<script>
-  let romData = null;
-  const TOTAL_PLAYERS = 470;
-  const RECORD_SIZE = 126; // 100 attribute bytes + 13 bytes Last Name + 13 bytes First Name
-  let baseOffset = 0;
-
-  const fileInput = document.getElementById('romFile');
-  const editorCard = document.getElementById('editorCard');
-  const playerSelect = document.getElementById('playerSelect');
-
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      romData = new Uint8Array(evt.target.result);
-      
-      // Locate the player data block dynamically or using default offset
-      baseOffset = findPlayerDataOffset(romData);
-      
-      populatePlayerDropdown();
-      editorCard.classList.remove('hidden');
-      loadPlayerData(0);
-    };
-    reader.readAsArrayBuffer(file);
-  });
-
-  function findPlayerDataOffset(buf) {
-    // Search for known ASCII markers or fallback to default table base
-    for (let i = 0; i < buf.length - 2000; i += 2) {
-      // Searching for initial player records
-      if (buf[i + 100] === 0x41 && buf[i + 101] === 0x2e && buf[i + 102] === 0x20) { // "A. "
-        return i;
-      }
-    }
-    return 0x100000; // Default fallback offset if direct scan varies
-  }
-
-  function readAsciiString(buf, start, length) {
-    let str = "";
-    for (let i = 0; i < length; i++) {
-      let charCode = buf[start + i];
-      if (charCode === 0 || charCode === 0xFF) break;
-      if (charCode >= 32 && charCode <= 126) {
-        str += String.fromCharCode(charCode);
-      }
-    }
-    return str.trim();
-  }
-
-  function writeAsciiString(buf, start, length, text) {
-    for (let i = 0; i < length; i++) {
-      if (i < text.length) {
-        buf[start + i] = text.charCodeAt(i);
-      } else {
-        buf[start + i] = 0x20; // Pad with space
-      }
-    }
-  }
-
-  function getPlayerRecordOffset(index) {
-    return baseOffset + (index * RECORD_SIZE);
-  }
-
-  function populatePlayerDropdown() {
-    playerSelect.innerHTML = "";
-    for (let i = 0; i < TOTAL_PLAYERS; i++) {
-      let recStart = getPlayerRecordOffset(i);
-      let last = readAsciiString(romData, recStart + 100, 13);
-      let first = readAsciiString(romData, recStart + 113, 13);
-      
-      let name = (first || last) ? `${first} ${last}`.trim() : `Player ${i + 1}`;
-      let opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = `${i + 1}. ${name}`;
-      playerSelect.appendChild(opt);
-    }
-  }
-
-  playerSelect.addEventListener('change', (e) => {
-    loadPlayerData(parseInt(e.target.value));
-  });
-
-  function loadPlayerData(index) {
-    let offset = getPlayerRecordOffset(index);
-
-    document.getElementById('jerseyNum').value = romData[offset + 0];
-    document.getElementById('position').value = romData[offset + 1];
-    document.getElementById('overall').value = romData[offset + 3];
-    document.getElementById('speed').value = romData[offset + 20];
-    document.getElementById('threePoint').value = romData[offset + 11];
-    document.getElementById('dunk').value = romData[offset + 13];
-
-    document.getElementById('lastName').value = readAsciiString(romData, offset + 100, 13);
-    document.getElementById('firstName').value = readAsciiString(romData, offset + 113, 13);
-  }
-
-  document.getElementById('savePlayerBtn').addEventListener('click', () => {
-    let index = parseInt(playerSelect.value);
-    let offset = getPlayerRecordOffset(index);
-
-    romData[offset + 0] = parseInt(document.getElementById('jerseyNum').value) || 0;
-    romData[offset + 1] = parseInt(document.getElementById('position').value) || 0;
-    romData[offset + 3] = parseInt(document.getElementById('overall').value) || 0;
-    romData[offset + 20] = parseInt(document.getElementById('speed').value) || 0;
-    romData[offset + 11] = parseInt(document.getElementById('threePoint').value) || 0;
-    romData[offset + 13] = parseInt(document.getElementById('dunk').value) || 0;
-
-    writeAsciiString(romData, offset + 100, 13, document.getElementById('lastName').value);
-    writeAsciiString(romData, offset + 113, 13, document.getElementById('firstName').value);
-
-    // Refresh option display name
-    let last = document.getElementById('lastName').value;
-    let first = document.getElementById('firstName').value;
-    playerSelect.options[index].textContent = `${index + 1}. ${first} ${last}`.trim();
-
-    alert('Player updated in memory!');
-  });
-
-  document.getElementById('downloadRomBtn').addEventListener('click', () => {
-    const blob = new Blob([romData], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'nbalive96_edited.bin';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-</script>
-
-</body>
-</html>
+    <!-- ABILITIES & RATINGS -->
+    <h3>Player Abilities (0-99)</h3>
+    <div class="grid-4">
+      <div class="field-group"><label>Speed</label><input type="number" id="speed" min="0" max="99"></div>
+      <div class="field-group"><label>3-Point</label><input type="number" id="threePoint" min="0" max="99"></div>
+      <div class="field-group"><label>Field Goal</label><input type="number" id="fieldGoal" min="0" max="99"></div>
+      <div class="field-group"><label>Free Throw</label><input type="number" id="freeThrow" min="0" max="99"></div>
+      <div class="field-group"><label>Dunk</label><input type="number" id="dunk" min="0" max="99"></div>
+      <div class="field-group"><label>Steal</label><input type="number" id="steal" min="0" max="99"></div>
+      <div class="field-group
