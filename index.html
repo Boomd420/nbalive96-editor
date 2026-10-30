@@ -157,7 +157,7 @@
     <!-- ROM Upload Section -->
     <div class="card">
       <div class="file-input-wrapper">
-        <label for="romFile" class="btn">Select NBA Live '96 ROM (.bin)</label>
+        <label for="romFile" class="btn">Select NBA Live '96 ROM (.bin / .md)</label>
         <input type="file" id="romFile" accept=".bin,.md" />
         <span id="status" class="status-badge">No ROM Loaded</span>
       </div>
@@ -171,7 +171,7 @@
         <div class="form-group full-width">
           <label for="playerSelect">Select Player</label>
           <select id="playerSelect">
-            <option value="0">Player 1 (A. Lang)</option>
+            <!-- Dynamically populated from ROM buffer -->
           </select>
         </div>
       </div>
@@ -181,33 +181,33 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="firstName">First Name</label>
-            <input type="text" id="firstName" maxlength="12" placeholder="Andrew" />
+            <input type="text" id="firstName" maxlength="12" placeholder="First Name" />
           </div>
 
           <div class="form-group">
             <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" maxlength="14" placeholder="Lang" />
+            <input type="text" id="lastName" maxlength="14" placeholder="Last Name" />
           </div>
 
           <div class="form-group">
             <label for="jerseyNum">Jersey #</label>
-            <input type="number" id="jerseyNum" min="0" max="99" value="28" />
+            <input type="number" id="jerseyNum" min="0" max="99" value="0" />
           </div>
 
           <div class="form-group">
             <label for="posSelect">Position</label>
             <select id="posSelect">
-              <option value="C">Center</option>
-              <option value="PF">Power Forward</option>
-              <option value="SF">Small Forward</option>
-              <option value="SG">Shooting Guard</option>
-              <option value="PG">Point Guard</option>
+              <option value="0">Center</option>
+              <option value="1">Power Forward</option>
+              <option value="2">Small Forward</option>
+              <option value="3">Shooting Guard</option>
+              <option value="4">Point Guard</option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="speed">Speed (1-99)</label>
-            <input type="number" id="speed" min="1" max="99" value="70" />
+            <input type="number" id="speed" min="1" max="99" value="50" />
           </div>
 
           <div class="form-group">
@@ -217,12 +217,12 @@
 
           <div class="form-group">
             <label for="dunk">Dunk (1-99)</label>
-            <input type="number" id="dunk" min="1" max="99" value="65" />
+            <input type="number" id="dunk" min="1" max="99" value="50" />
           </div>
 
           <div class="form-group">
             <label for="pass">Pass (1-99)</label>
-            <input type="number" id="pass" min="1" max="99" value="60" />
+            <input type="number" id="pass" min="1" max="99" value="50" />
           </div>
         </div>
       </div>
@@ -240,19 +240,21 @@
     let romBuffer = null;
     let fileName = "NBA_Live_96_Updated.bin";
 
-    // Placeholder offsets (will be mapped precisely during tuning)
+    // Standard player record offsets and size
     const PLAYER_DATA_START = 0x000F4A0;
-    const RECORD_SIZE = 64; // Bytes per player record
+    const RECORD_SIZE = 64; 
+    const TOTAL_PLAYERS = 300;
 
     const fileInput = document.getElementById('romFile');
     const statusText = document.getElementById('status');
     const editorUI = document.getElementById('editorUI');
+    const playerSelect = document.getElementById('playerSelect');
 
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
 
-      fileName = file.name.replace('.bin', '_2026.bin');
+      fileName = file.name.replace(/\.(bin|md)$/i, '_2026.bin');
       const reader = new FileReader();
 
       reader.onload = function(evt) {
@@ -260,15 +262,88 @@
         statusText.innerText = `Loaded: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
         statusText.style.backgroundColor = '#16a34a';
         statusText.style.color = '#ffffff';
+
+        populatePlayerDropdown();
         editorUI.classList.remove('hidden');
+        loadPlayerData(0);
       };
 
       reader.readAsArrayBuffer(file);
     });
 
+    function populatePlayerDropdown() {
+      playerSelect.innerHTML = '';
+      for (let i = 0; i < TOTAL_PLAYERS; i++) {
+        const offset = PLAYER_DATA_START + (i * RECORD_SIZE);
+        let name = readString(offset, 12);
+        if (!name.trim()) name = `Player #${i + 1}`;
+
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `${i + 1}. ${name}`;
+        playerSelect.appendChild(option);
+      }
+    }
+
+    function readString(offset, maxLength) {
+      if (!romBuffer || offset >= romBuffer.length) return "";
+      let str = "";
+      for (let i = 0; i < maxLength; i++) {
+        const charCode = romBuffer[offset + i];
+        if (charCode === 0 || charCode === 0xFF) break;
+        if (charCode >= 32 && charCode <= 126) {
+          str += String.fromCharCode(charCode);
+        }
+      }
+      return str.trim();
+    }
+
+    function writeString(offset, str, maxLength) {
+      for (let i = 0; i < maxLength; i++) {
+        if (i < str.length) {
+          romBuffer[offset + i] = str.charCodeAt(i);
+        } else {
+          romBuffer[offset + i] = 0x20; // fill space padding
+        }
+      }
+    }
+
+    function loadPlayerData(index) {
+      if (!romBuffer) return;
+      const offset = PLAYER_DATA_START + (index * RECORD_SIZE);
+
+      document.getElementById('firstName').value = readString(offset, 12);
+      document.getElementById('lastName').value = readString(offset + 12, 14);
+      document.getElementById('jerseyNum').value = romBuffer[offset + 26] || 0;
+      document.getElementById('posSelect').value = romBuffer[offset + 27] || 0;
+      document.getElementById('speed').value = romBuffer[offset + 28] || 50;
+      document.getElementById('threePt').value = romBuffer[offset + 29] || 50;
+      document.getElementById('dunk').value = romBuffer[offset + 30] || 50;
+      document.getElementById('pass').value = romBuffer[offset + 31] || 50;
+    }
+
+    playerSelect.addEventListener('change', function() {
+      loadPlayerData(parseInt(this.value));
+    });
+
     document.getElementById('savePlayerBtn').addEventListener('click', function() {
       if (!romBuffer) return;
-      alert("Player updated in buffer! Click 'Download Modified ROM' when finished editing.");
+      const index = parseInt(playerSelect.value);
+      const offset = PLAYER_DATA_START + (index * RECORD_SIZE);
+
+      writeString(offset, document.getElementById('firstName').value, 12);
+      writeString(offset + 12, document.getElementById('lastName').value, 14);
+      romBuffer[offset + 26] = parseInt(document.getElementById('jerseyNum').value) || 0;
+      romBuffer[offset + 27] = parseInt(document.getElementById('posSelect').value) || 0;
+      romBuffer[offset + 28] = parseInt(document.getElementById('speed').value) || 50;
+      romBuffer[offset + 29] = parseInt(document.getElementById('threePt').value) || 50;
+      romBuffer[offset + 30] = parseInt(document.getElementById('dunk').value) || 50;
+      romBuffer[offset + 31] = parseInt(document.getElementById('pass').value) || 50;
+
+      // Update dropdown option label live
+      playerSelect.options[index].text = `${index + 1}. ${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+
+      alert(`Player #${index + 1} updated in memory!`);
     });
 
     document.getElementById('downloadRomBtn').addEventListener('click', function() {
