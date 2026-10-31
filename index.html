@@ -19,9 +19,8 @@
             --input-bg: #0a0a0a;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 20px; }
-        .container { max-width: 1550px; margin: 0 auto; }
+        .container { max-width: 1600px; margin: 0 auto; }
         
-        /* Top Navigation Bar Matching VB6 Menu Bar */
         .menubar { display: flex; background: #1a1a1a; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 15px; margin-bottom: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .menu-title { font-weight: bold; font-size: 1.2rem; color: #fff; }
         .menu-buttons { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -32,7 +31,6 @@
         button.btn-purple { background: var(--accent-purple); }
         input[type="file"] { display: none; }
         
-        /* Tab Navigation */
         .tabs { display: flex; gap: 5px; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
         .tab-btn { background: #222; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; color: #888; padding: 10px 20px; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: var(--bg-card); color: #fff; border-color: var(--accent-blue); border-bottom: 2px solid var(--bg-card); margin-bottom: -2px; }
@@ -40,26 +38,23 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Grid & Cards */
         .editor-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
-        .section-box { background: var(--section-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; }
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; }
+        .section-box { background: var(--section-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; margin-bottom: 15px; }
         .section-title { font-weight: bold; color: #fff; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 12px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
 
         .field-row { display: flex; align-items: center; margin-bottom: 8px; justify-content: space-between; gap: 10px; }
         .field-row label { font-size: 0.85rem; color: #ccc; flex: 1; }
-        .field-row input { background: var(--input-bg); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 0.9rem; max-width: 110px; text-align: right; }
-        .field-row input.wide { max-width: 200px; text-align: left; }
+        .field-row input, .field-row select { background: var(--input-bg); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 0.9rem; max-width: 140px; }
+        .field-row input.wide { max-width: 240px; text-align: left; }
 
-        .inline-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; }
-        .inline-field { display: flex; flex-direction: column; align-items: center; background: #111; padding: 6px; border-radius: 4px; border: 1px solid #282828; }
-        .inline-field label { font-size: 0.72rem; color: #aaa; margin-bottom: 4px; text-align: center; }
-        .inline-field input { background: var(--input-bg); border: 1px solid var(--border-color); color: #fff; width: 50px; text-align: center; padding: 4px; border-radius: 3px; font-size: 0.85rem; }
+        .inline-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+        .inline-field { display: flex; flex-direction: column; align-items: center; background: #111; padding: 4px; border-radius: 4px; border: 1px solid #282828; }
+        .inline-field label { font-size: 0.68rem; color: #aaa; margin-bottom: 2px; text-align: center; }
+        .inline-field input { background: var(--input-bg); border: 1px solid var(--border-color); color: #fff; width: 100%; text-align: center; padding: 3px 0; border-radius: 3px; font-size: 0.8rem; }
 
-        select { padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; font-size: 0.95rem; width: 100%; }
         .status-bar { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 4px; font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
 
-        /* Roster Table */
         .table-wrapper { overflow-x: auto; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-color); max-height: 450px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #282828; white-space: nowrap; }
@@ -83,7 +78,7 @@
                 <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileImport(event)">
             </label>
             <button class="btn-green" onclick="exportCSV()">💾 Export CSV</button>
-            <button onclick="loadFromGithub()">🔄 Reload CSV from Repo</button>
+            <button title="Convenience feature for web testing: fetches default CSV from repo" onclick="loadFromGithub()">🔄 Reload CSV from Repo</button>
         </div>
     </div>
 
@@ -107,119 +102,182 @@
 
         <div class="editor-card">
             <div class="grid-layout">
+                <!-- LEFT COLUMN: General, Appearance, Abilities -->
                 <div>
-                    <div class="section-box" style="margin-bottom: 15px;">
-                        <div class="section-title">General Information</div>
-                        <div class="field-row"><label>First Name</label><input type="text" class="wide" id="inp_FirstName:ascii" onchange="updateSelectedPlayer('FirstName:ascii', this.value)"></div>
-                        <div class="field-row"><label>Last Name</label><input type="text" class="wide" id="inp_LastName:ascii" onchange="updateSelectedPlayer('LastName:ascii', this.value)"></div>
-                        <div class="field-row"><label>Jersey Number</label><input type="number" id="inp_JerseyNumber:1" onchange="updateSelectedPlayer('JerseyNumber:1', this.value)"></div>
-                        <div class="field-row"><label>Position (0=C, 1=PF, 2=SF, 3=SG, 4=PG)</label><input type="number" id="inp_Position:1" onchange="updateSelectedPlayer('Position:1', this.value)"></div>
-                        <div class="field-row"><label>School Index</label><input type="number" id="inp_School:1" onchange="updateSelectedPlayer('School:1', this.value)"></div>
-                        <div class="field-row"><label>Sequence</label><input type="number" id="inp_Sequence:2" onchange="updateSelectedPlayer('Sequence:2', this.value)"></div>
-                    </div>
+                    <!-- GENERAL SECTION -->
                     <div class="section-box">
-                        <div class="section-title">Appearance & Header Unknowns</div>
-                        <div class="field-row"><label>Height (inches)</label><input type="number" id="inp_Height:1" onchange="updateSelectedPlayer('Height:1', this.value)"></div>
-                        <div class="field-row"><label>Weight (+100 lbs offset)</label><input type="number" id="inp_Weight:1:+100" onchange="updateSelectedPlayer('Weight:1:+100', this.value)"></div>
-                        <div class="field-row"><label>Skin Tone</label><input type="number" id="inp_SkinTone:1" onchange="updateSelectedPlayer('SkinTone:1', this.value)"></div>
-                        <div class="field-row"><label>Header Unknown 1 (?:1)</label><input type="number" id="inp_?:1" onchange="updateSelectedPlayer('?:1', this.value)"></div>
-                        <div class="field-row"><label>Header Unknown 2 (?:1.1)</label><input type="number" id="inp_?:1.1" onchange="updateSelectedPlayer('?:1.1', this.value)"></div>
-                        <div class="field-row"><label>Header Unknown 3 (?:1.2)</label><input type="number" id="inp_?:1.2" onchange="updateSelectedPlayer('?:1.2', this.value)"></div>
+                        <div class="section-title">General</div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="width: 70px;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">#</div>
+                                <input type="number" id="inp_JerseyNumber:1" onchange="updateSelectedPlayer('JerseyNumber:1', this.value)" style="width: 100%;">
+                            </div>
+                            <div style="flex: 2;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">Name (Last)</div>
+                                <input type="text" id="inp_LastName:ascii" onchange="updateSelectedPlayer('LastName:ascii', this.value)" style="width: 100%;">
+                            </div>
+                            <div style="flex: 2;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">First Name</div>
+                                <input type="text" id="inp_FirstName:ascii" onchange="updateSelectedPlayer('FirstName:ascii', this.value)" style="width: 100%;">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <div style="flex: 1;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">Position</div>
+                                <select id="inp_Position:1" onchange="updateSelectedPlayer('Position:1', this.value)">
+                                    <option value="0">Center</option>
+                                    <option value="1">Power Forward</option>
+                                    <option value="2">Small Forward</option>
+                                    <option value="3">Shooting Guard</option>
+                                    <option value="4">Point Guard</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">School</div>
+                                <input type="text" id="inp_School:1" onchange="updateSelectedPlayer('School:1', this.value)" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- APPEARANCE SECTION -->
+                    <div class="section-box">
+                        <div class="section-title">Appearance</div>
+                        <div style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">Ht</div>
+                                <input type="number" id="inp_Height:1" onchange="updateSelectedPlayer('Height:1', this.value)" style="width: 100%;">
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">Wt</div>
+                                <input type="number" id="inp_Weight:1:+100" onchange="updateSelectedPlayer('Weight:1:+100', this.value)" style="width: 100%;">
+                            </div>
+                            <div style="flex: 2;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">Skin Tone</div>
+                                <select id="inp_SkinTone:1" onchange="updateSelectedPlayer('SkinTone:1', this.value)">
+                                    <option value="0">Light</option>
+                                    <option value="1">Medium</option>
+                                    <option value="2">Dark</option>
+                                    <option value="3">Darkest</option>
+                                </select>
+                            </div>
+                            <div style="width: 50px;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">??</div>
+                                <input type="number" id="inp_?:1" onchange="updateSelectedPlayer('?:1', this.value)" style="width: 100%;">
+                            </div>
+                            <div style="width: 50px;">
+                                <div style="font-size:0.75rem; color:#aaa; margin-bottom:2px;">??</div>
+                                <input type="number" id="inp_?:1.1" onchange="updateSelectedPlayer('?:1.1', this.value)" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ABILITIES SECTION -->
+                    <div class="section-box">
+                        <div class="section-title">Abilities</div>
+                        <div class="inline-grid" style="margin-bottom: 8px;">
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.2" onchange="updateSelectedPlayer('?:1.2', this.value)"></div>
+                            <div class="inline-field"><label>FG</label><input type="number" id="inp_FieldGoal:1" onchange="updateSelectedPlayer('FieldGoal:1', this.value)"></div>
+                            <div class="inline-field"><label>3P</label><input type="number" id="inp_ThreePoint:1" onchange="updateSelectedPlayer('ThreePoint:1', this.value)"></div>
+                            <div class="inline-field"><label>FT</label><input type="number" id="inp_FreeThrow:1" onchange="updateSelectedPlayer('FreeThrow:1', this.value)"></div>
+                            <div class="inline-field"><label>DNK</label><input type="number" id="inp_Dunk:1" onchange="updateSelectedPlayer('Dunk:1', this.value)"></div>
+                            <div class="inline-field"><label>STL</label><input type="number" id="inp_Steal:1" onchange="updateSelectedPlayer('Steal:1', this.value)"></div>
+                            <div class="inline-field"><label>BLK</label><input type="number" id="inp_Block:1" onchange="updateSelectedPlayer('Block:1', this.value)"></div>
+                            <div class="inline-field"><label>ORB</label><input type="number" id="inp_OffRebound:1" onchange="updateSelectedPlayer('OffRebound:1', this.value)"></div>
+                            <div class="inline-field"><label>DRB</label><input type="number" id="inp_DefRebound:1" onchange="updateSelectedPlayer('DefRebound:1', this.value)"></div>
+                            <div class="inline-field"><label>BCT</label><input type="number" id="inp_BallControl:1" onchange="updateSelectedPlayer('BallControl:1', this.value)"></div>
+                        </div>
+                        <div class="inline-grid">
+                            <div class="inline-field"><label>OAW</label><input type="number" id="inp_OffAware:1" onchange="updateSelectedPlayer('OffAware:1', this.value)"></div>
+                            <div class="inline-field"><label>DAW</label><input type="number" id="inp_DefAware:1" onchange="updateSelectedPlayer('DefAware:1', this.value)"></div>
+                            <div class="inline-field"><label>SPD</label><input type="number" id="inp_Speed:1" onchange="updateSelectedPlayer('Speed:1', this.value)"></div>
+                            <div class="inline-field"><label>AGI</label><input type="number" id="inp_Agility:1" onchange="updateSelectedPlayer('Agility:1', this.value)"></div>
+                            <div class="inline-field"><label>JMP</label><input type="number" id="inp_Jump:1" onchange="updateSelectedPlayer('Jump:1', this.value)"></div>
+                            <div class="inline-field"><label>DRI</label><input type="number" id="inp_Dribble:1" onchange="updateSelectedPlayer('Dribble:1', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.3" onchange="updateSelectedPlayer('?:1.3', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.4" onchange="updateSelectedPlayer('?:1.4', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.5" onchange="updateSelectedPlayer('?:1.5', this.value)"></div>
+                            <div class="inline-field"><label>OVR</label><input type="number" id="inp_Overall:1" onchange="updateSelectedPlayer('Overall:1', this.value)"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="section-box">
-                    <div class="section-title">Player Ratings & Ability Unknowns</div>
-                    <div class="inline-grid">
-                        <div class="inline-field"><label>FG</label><input type="number" id="inp_FieldGoal:1" onchange="updateSelectedPlayer('FieldGoal:1', this.value)"></div>
-                        <div class="inline-field"><label>3PT</label><input type="number" id="inp_ThreePoint:1" onchange="updateSelectedPlayer('ThreePoint:1', this.value)"></div>
-                        <div class="inline-field"><label>FT</label><input type="number" id="inp_FreeThrow:1" onchange="updateSelectedPlayer('FreeThrow:1', this.value)"></div>
-                        <div class="inline-field"><label>DNK</label><input type="number" id="inp_Dunk:1" onchange="updateSelectedPlayer('Dunk:1', this.value)"></div>
-                        <div class="inline-field"><label>STL</label><input type="number" id="inp_Steal:1" onchange="updateSelectedPlayer('Steal:1', this.value)"></div>
-                        <div class="inline-field"><label>BLK</label><input type="number" id="inp_Block:1" onchange="updateSelectedPlayer('Block:1', this.value)"></div>
-                        <div class="inline-field"><label>ORB</label><input type="number" id="inp_OffRebound:1" onchange="updateSelectedPlayer('OffRebound:1', this.value)"></div>
-                        <div class="inline-field"><label>DRB</label><input type="number" id="inp_DefRebound:1" onchange="updateSelectedPlayer('DefRebound:1', this.value)"></div>
-                        <div class="inline-field"><label>BCT</label><input type="number" id="inp_BallControl:1" onchange="updateSelectedPlayer('BallControl:1', this.value)"></div>
-                        <div class="inline-field"><label>DAW</label><input type="number" id="inp_DefAware:1" onchange="updateSelectedPlayer('DefAware:1', this.value)"></div>
-                        <div class="inline-field"><label>SPD</label><input type="number" id="inp_Speed:1" onchange="updateSelectedPlayer('Speed:1', this.value)"></div>
-                        <div class="inline-field"><label>AGI</label><input type="number" id="inp_Agility:1" onchange="updateSelectedPlayer('Agility:1', this.value)"></div>
-                        <div class="inline-field"><label>JMP</label><input type="number" id="inp_Jump:1" onchange="updateSelectedPlayer('Jump:1', this.value)"></div>
-                        <div class="inline-field"><label>DRB</label><input type="number" id="inp_Dribble:1" onchange="updateSelectedPlayer('Dribble:1', this.value)"></div>
-                        <div class="inline-field"><label>OAW</label><input type="number" id="inp_OffAware:1" onchange="updateSelectedPlayer('OffAware:1', this.value)"></div>
-                        <div class="inline-field"><label>OVR</label><input type="number" id="inp_Overall:1" onchange="updateSelectedPlayer('Overall:1', this.value)"></div>
+                <!-- RIGHT COLUMN: Unknown Header, Statistics, Unknown Footer -->
+                <div>
+                    <!-- TOP UNKNOWN HEADER -->
+                    <div class="section-box">
+                        <div class="section-title">Unknown</div>
+                        <div class="inline-grid">
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.6" onchange="updateSelectedPlayer('?:1.6', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.7" onchange="updateSelectedPlayer('?:1.7', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.8" onchange="updateSelectedPlayer('?:1.8', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.9" onchange="updateSelectedPlayer('?:1.9', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.10" onchange="updateSelectedPlayer('?:1.10', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.11" onchange="updateSelectedPlayer('?:1.11', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.12" onchange="updateSelectedPlayer('?:1.12', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.13" onchange="updateSelectedPlayer('?:1.13', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.14" onchange="updateSelectedPlayer('?:1.14', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.15" onchange="updateSelectedPlayer('?:1.15', this.value)"></div>
+                        </div>
                     </div>
-                    <div class="section-title" style="margin-top: 15px;">Rating Unknowns</div>
-                    <div class="inline-grid">
-                        <div class="inline-field"><label>?:1.3</label><input type="number" id="inp_?:1.3" onchange="updateSelectedPlayer('?:1.3', this.value)"></div>
-                        <div class="inline-field"><label>?:1.4</label><input type="number" id="inp_?:1.4" onchange="updateSelectedPlayer('?:1.4', this.value)"></div>
-                        <div class="inline-field"><label>?:1.5</label><input type="number" id="inp_?:1.5" onchange="updateSelectedPlayer('?:1.5', this.value)"></div>
-                        <div class="inline-field"><label>?:1.6</label><input type="number" id="inp_?:1.6" onchange="updateSelectedPlayer('?:1.6', this.value)"></div>
-                        <div class="inline-field"><label>?:1.7</label><input type="number" id="inp_?:1.7" onchange="updateSelectedPlayer('?:1.7', this.value)"></div>
-                        <div class="inline-field"><label>?:1.8</label><input type="number" id="inp_?:1.8" onchange="updateSelectedPlayer('?:1.8', this.value)"></div>
-                        <div class="inline-field"><label>?:1.9</label><input type="number" id="inp_?:1.9" onchange="updateSelectedPlayer('?:1.9', this.value)"></div>
-                        <div class="inline-field"><label>?:1.10</label><input type="number" id="inp_?:1.10" onchange="updateSelectedPlayer('?:1.10', this.value)"></div>
-                        <div class="inline-field"><label>?:1.11</label><input type="number" id="inp_?:1.11" onchange="updateSelectedPlayer('?:1.11', this.value)"></div>
-                        <div class="inline-field"><label>?:1.12</label><input type="number" id="inp_?:1.12" onchange="updateSelectedPlayer('?:1.12', this.value)"></div>
-                        <div class="inline-field"><label>?:1.13</label><input type="number" id="inp_?:1.13" onchange="updateSelectedPlayer('?:1.13', this.value)"></div>
-                    </div>
-                </div>
 
-                <div class="section-box">
-                    <div class="section-title">Season Statistics</div>
-                    <div class="inline-grid">
-                        <div class="inline-field"><label>G</label><input type="number" id="inp_Games:1" onchange="updateSelectedPlayer('Games:1', this.value)"></div>
-                        <div class="inline-field"><label>GS</label><input type="number" id="inp_Starts:1" onchange="updateSelectedPlayer('Starts:1', this.value)"></div>
-                        <div class="inline-field"><label>MIN</label><input type="number" id="inp_Minutes:2" onchange="updateSelectedPlayer('Minutes:2', this.value)"></div>
-                        <div class="inline-field"><label>FG</label><input type="number" id="inp_FieldGoals:2" onchange="updateSelectedPlayer('FieldGoals:2', this.value)"></div>
-                        <div class="inline-field"><label>FGA</label><input type="number" id="inp_FieldGoalAttempts:2" onchange="updateSelectedPlayer('FieldGoalAttempts:2', this.value)"></div>
-                        <div class="inline-field"><label>3P</label><input type="number" id="inp_ThreePointers:2" onchange="updateSelectedPlayer('ThreePointers:2', this.value)"></div>
-                        <div class="inline-field"><label>3PA</label><input type="number" id="inp_ThreePointAttempts:2" onchange="updateSelectedPlayer('ThreePointAttempts:2', this.value)"></div>
-                        <div class="inline-field"><label>FT</label><input type="number" id="inp_FreeThrows:2" onchange="updateSelectedPlayer('FreeThrows:2', this.value)"></div>
-                        <div class="inline-field"><label>FTA</label><input type="number" id="inp_reeThrowAttempts:2" onchange="updateSelectedPlayer('reeThrowAttempts:2', this.value)"></div>
-                        <div class="inline-field"><label>ORB</label><input type="number" id="inp_OffRebounds:2" onchange="updateSelectedPlayer('OffRebounds:2', this.value)"></div>
-                        <div class="inline-field"><label>DRB</label><input type="number" id="inp_DefRebounds:2" onchange="updateSelectedPlayer('DefRebounds:2', this.value)"></div>
-                        <div class="inline-field"><label>AST</label><input type="number" id="inp_Assists:2" onchange="updateSelectedPlayer('Assists:2', this.value)"></div>
-                        <div class="inline-field"><label>STL</label><input type="number" id="inp_Steals:2" onchange="updateSelectedPlayer('Steals:2', this.value)"></div>
-                        <div class="inline-field"><label>TO</label><input type="number" id="inp_TurnOvers:2" onchange="updateSelectedPlayer('TurnOvers:2', this.value)"></div>
-                        <div class="inline-field"><label>BLK</label><input type="number" id="inp_Blocks:2" onchange="updateSelectedPlayer('Blocks:2', this.value)"></div>
-                        <div class="inline-field"><label>PTS</label><input type="number" id="inp_Points:2" onchange="updateSelectedPlayer('Points:2', this.value)"></div>
-                        <div class="inline-field"><label>PF</label><input type="number" id="inp_Fouls:2" onchange="updateSelectedPlayer('Fouls:2', this.value)"></div>
+                    <!-- STATISTICS SECTION -->
+                    <div class="section-box">
+                        <div class="section-title">Statistics</div>
+                        <div class="inline-grid" style="margin-bottom: 6px;">
+                            <div class="inline-field"><label>G</label><input type="number" id="inp_Games:1" onchange="updateSelectedPlayer('Games:1', this.value)"></div>
+                            <div class="inline-field"><label>GS</label><input type="number" id="inp_Starts:1" onchange="updateSelectedPlayer('Starts:1', this.value)"></div>
+                            <div class="inline-field" style="grid-column: span 2;"><label>MIN</label><input type="number" id="inp_Minutes:2" onchange="updateSelectedPlayer('Minutes:2', this.value)" style="width:100%;"></div>
+                            <div class="inline-field"><label>FG</label><input type="number" id="inp_FieldGoals:2" onchange="updateSelectedPlayer('FieldGoals:2', this.value)"></div>
+                            <div class="inline-field" style="grid-column: span 2;"><label>FGA</label><input type="number" id="inp_FieldGoalAttempts:2" onchange="updateSelectedPlayer('FieldGoalAttempts:2', this.value)" style="width:100%;"></div>
+                            <div class="inline-field"><label>3P</label><input type="number" id="inp_ThreePointers:2" onchange="updateSelectedPlayer('ThreePointers:2', this.value)"></div>
+                            <div class="inline-field" style="grid-column: span 2;"><label>3PA</label><input type="number" id="inp_ThreePointAttempts:2" onchange="updateSelectedPlayer('ThreePointAttempts:2', this.value)" style="width:100%;"></div>
+                        </div>
+                        <div class="inline-grid" style="margin-bottom: 6px;">
+                            <div class="inline-field"><label>FT</label><input type="number" id="inp_FreeThrows:2" onchange="updateSelectedPlayer('FreeThrows:2', this.value)"></div>
+                            <div class="inline-field" style="grid-column: span 2;"><label>FTA</label><input type="number" id="inp_reeThrowAttempts:2" onchange="updateSelectedPlayer('reeThrowAttempts:2', this.value)" style="width:100%;"></div>
+                            <div class="inline-field"><label>ORB</label><input type="number" id="inp_OffRebounds:2" onchange="updateSelectedPlayer('OffRebounds:2', this.value)"></div>
+                            <div class="inline-field"><label>DRB</label><input type="number" id="inp_DefRebounds:2" onchange="updateSelectedPlayer('DefRebounds:2', this.value)"></div>
+                            <div class="inline-field"><label>AST</label><input type="number" id="inp_Assists:2" onchange="updateSelectedPlayer('Assists:2', this.value)"></div>
+                            <div class="inline-field"><label>STL</label><input type="number" id="inp_Steals:2" onchange="updateSelectedPlayer('Steals:2', this.value)"></div>
+                            <div class="inline-field" style="grid-column: span 3;"><label>BLK</label><input type="number" id="inp_Blocks:2" onchange="updateSelectedPlayer('Blocks:2', this.value)" style="width:100%;"></div>
+                        </div>
+                        <div class="inline-grid">
+                            <div class="inline-field" style="grid-column: span 2;"><label>TO</label><input type="number" id="inp_TurnOvers:2" onchange="updateSelectedPlayer('TurnOvers:2', this.value)" style="width:100%;"></div>
+                            <div class="inline-field" style="grid-column: span 2;"><label>PF</label><input type="number" id="inp_Fouls:2" onchange="updateSelectedPlayer('Fouls:2', this.value)" style="width:100%;"></div>
+                            <div class="inline-field" style="grid-column: span 3;"><label>PTS</label><input type="number" id="inp_Points:2" onchange="updateSelectedPlayer('Points:2', this.value)" style="width:100%;"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.16" onchange="updateSelectedPlayer('?:1.16', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.17" onchange="updateSelectedPlayer('?:1.17', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.18" onchange="updateSelectedPlayer('?:1.18', this.value)"></div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="section-box" style="grid-column: 1 / -1;">
-                    <div class="section-title">Stats & Extended Unknowns Bytes (VB6 Form Alignment)</div>
-                    <div class="inline-grid" style="grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));">
-                        <div class="inline-field"><label>?:1.14</label><input type="number" id="inp_?:1.14" onchange="updateSelectedPlayer('?:1.14', this.value)"></div>
-                        <div class="inline-field"><label>?:1.15</label><input type="number" id="inp_?:1.15" onchange="updateSelectedPlayer('?:1.15', this.value)"></div>
-                        <div class="inline-field"><label>?:1.16</label><input type="number" id="inp_?:1.16" onchange="updateSelectedPlayer('?:1.16', this.value)"></div>
-                        <div class="inline-field"><label>?:1.17</label><input type="number" id="inp_?:1.17" onchange="updateSelectedPlayer('?:1.17', this.value)"></div>
-                        <div class="inline-field"><label>?:1.18</label><input type="number" id="inp_?:1.18" onchange="updateSelectedPlayer('?:1.18', this.value)"></div>
-                        <div class="inline-field"><label>?:1.19</label><input type="number" id="inp_?:1.19" onchange="updateSelectedPlayer('?:1.19', this.value)"></div>
-                        <div class="inline-field"><label>?:1.20</label><input type="number" id="inp_?:1.20" onchange="updateSelectedPlayer('?:1.20', this.value)"></div>
-                        <div class="inline-field"><label>?:1.21</label><input type="number" id="inp_?:1.21" onchange="updateSelectedPlayer('?:1.21', this.value)"></div>
-                        <div class="inline-field"><label>?:1.22</label><input type="number" id="inp_?:1.22" onchange="updateSelectedPlayer('?:1.22', this.value)"></div>
-                        <div class="inline-field"><label>?:1.23</label><input type="number" id="inp_?:1.23" onchange="updateSelectedPlayer('?:1.23', this.value)"></div>
-                        <div class="inline-field"><label>?:1.24</label><input type="number" id="inp_?:1.24" onchange="updateSelectedPlayer('?:1.24', this.value)"></div>
-                        <div class="inline-field"><label>?:1.25</label><input type="number" id="inp_?:1.25" onchange="updateSelectedPlayer('?:1.25', this.value)"></div>
-                        <div class="inline-field"><label>?:1.26</label><input type="number" id="inp_?:1.26" onchange="updateSelectedPlayer('?:1.26', this.value)"></div>
-                        <div class="inline-field"><label>?:1.27</label><input type="number" id="inp_?:1.27" onchange="updateSelectedPlayer('?:1.27', this.value)"></div>
-                        <div class="inline-field"><label>?:1.28</label><input type="number" id="inp_?:1.28" onchange="updateSelectedPlayer('?:1.28', this.value)"></div>
-                        <div class="inline-field"><label>?:1.29</label><input type="number" id="inp_?:1.29" onchange="updateSelectedPlayer('?:1.29', this.value)"></div>
-                        <div class="inline-field"><label>?:1.30</label><input type="number" id="inp_?:1.30" onchange="updateSelectedPlayer('?:1.30', this.value)"></div>
-                        <div class="inline-field"><label>?:1.31</label><input type="number" id="inp_?:1.31" onchange="updateSelectedPlayer('?:1.31', this.value)"></div>
-                        <div class="inline-field"><label>?:1.32</label><input type="number" id="inp_?:1.32" onchange="updateSelectedPlayer('?:1.32', this.value)"></div>
-                        <div class="inline-field"><label>?:1.33</label><input type="number" id="inp_?:1.33" onchange="updateSelectedPlayer('?:1.33', this.value)"></div>
-                        <div class="inline-field"><label>?:1.34</label><input type="number" id="inp_?:1.34" onchange="updateSelectedPlayer('?:1.34', this.value)"></div>
-                        <div class="inline-field"><label>?:1.35</label><input type="number" id="inp_?:1.35" onchange="updateSelectedPlayer('?:1.35', this.value)"></div>
-                        <div class="inline-field"><label>?:1.36</label><input type="number" id="inp_?:1.36" onchange="updateSelectedPlayer('?:1.36', this.value)"></div>
-                        <div class="inline-field"><label>?:1.37</label><input type="number" id="inp_?:1.37" onchange="updateSelectedPlayer('?:1.37', this.value)"></div>
-                        <div class="inline-field"><label>?:1.38</label><input type="number" id="inp_?:1.38" onchange="updateSelectedPlayer('?:1.38', this.value)"></div>
-                        <div class="inline-field"><label>?:1.39</label><input type="number" id="inp_?:1.39" onchange="updateSelectedPlayer('?:1.39', this.value)"></div>
-                        <div class="inline-field"><label>?:1.40</label><input type="number" id="inp_?:1.40" onchange="updateSelectedPlayer('?:1.40', this.value)"></div>
-                        <div class="inline-field"><label>?:1.41</label><input type="number" id="inp_?:1.41" onchange="updateSelectedPlayer('?:1.41', this.value)"></div>
-                        <div class="inline-field"><label>?:1.42</label><input type="number" id="inp_?:1.42" onchange="updateSelectedPlayer('?:1.42', this.value)"></div>
-                        <div class="inline-field"><label>?:1.43</label><input type="number" id="inp_?:1.43" onchange="updateSelectedPlayer('?:1.43', this.value)"></div>
+                    <!-- BOTTOM UNKNOWN SECTION -->
+                    <div class="section-box">
+                        <div class="section-title">Unknown</div>
+                        <div class="inline-grid" style="margin-bottom: 6px;">
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.19" onchange="updateSelectedPlayer('?:1.19', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.20" onchange="updateSelectedPlayer('?:1.20', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.21" onchange="updateSelectedPlayer('?:1.21', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.22" onchange="updateSelectedPlayer('?:1.22', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.23" onchange="updateSelectedPlayer('?:1.23', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.24" onchange="updateSelectedPlayer('?:1.24', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.25" onchange="updateSelectedPlayer('?:1.25', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.26" onchange="updateSelectedPlayer('?:1.26', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.27" onchange="updateSelectedPlayer('?:1.27', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.28" onchange="updateSelectedPlayer('?:1.28', this.value)"></div>
+                        </div>
+                        <div class="inline-grid">
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.29" onchange="updateSelectedPlayer('?:1.29', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.30" onchange="updateSelectedPlayer('?:1.30', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.31" onchange="updateSelectedPlayer('?:1.31', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.32" onchange="updateSelectedPlayer('?:1.32', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.33" onchange="updateSelectedPlayer('?:1.33', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.34" onchange="updateSelectedPlayer('?:1.34', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.35" onchange="updateSelectedPlayer('?:1.35', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.36" onchange="updateSelectedPlayer('?:1.36', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.37" onchange="updateSelectedPlayer('?:1.37', this.value)"></div>
+                            <div class="inline-field"><label>??</label><input type="number" id="inp_?:1.38" onchange="updateSelectedPlayer('?:1.38', this.value)"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -245,8 +303,8 @@
             <div class="grid-layout">
                 <div class="section-box">
                     <div class="section-title">Team Identity</div>
-                    <div class="field-row"><label>Name 1 (e.g. Hawks)</label><input type="text" class="wide" id="team_Name1"></div>
-                    <div class="field-row"><label>City (e.g. Atlanta)</label><input type="text" class="wide" id="team_City"></div>
+                    <div class="field-row"><label>Name 1</label><input type="text" class="wide" id="team_Name1"></div>
+                    <div class="field-row"><label>City</label><input type="text" class="wide" id="team_City"></div>
                     <div class="field-row"><label>Stadium</label><input type="text" class="wide" id="team_Stadium"></div>
                     <div class="field-row"><label>Location</label><input type="text" class="wide" id="team_Location"></div>
                     <div class="field-row"><label>Name 2</label><input type="text" class="wide" id="team_Name2"></div>
@@ -274,12 +332,10 @@
         </div>
     </div>
 
-    <!-- TAB 3: EDIT ROSTER (DUAL ROSTER 1 & ROSTER 2 COLUMNS MATCHING SCREENSHOT) -->
+    <!-- TAB 3: EDIT ROSTER -->
     <div id="rosterTab" class="tab-content">
         <div style="margin-bottom: 15px; display: flex; gap: 15px; align-items: center;">
-            <select id="rosterTeamSelect" onchange="onRosterTeamChange(this.value)" style="max-width: 350px;">
-                <!-- Populated with teams -->
-            </select>
+            <select id="rosterTeamSelect" onchange="onRosterTeamChange(this.value)" style="max-width: 350px;"></select>
             <button class="btn-green" onclick="saveTeamRosters()">💾 Save Roster Changes</button>
         </div>
 
@@ -287,16 +343,12 @@
             <div class="grid-layout">
                 <div class="section-box">
                     <div class="section-title">Roster 1 (Primary / Starters)</div>
-                    <div id="roster1Container">
-                        <!-- Populated dynamically with 14 dropdowns -->
-                    </div>
+                    <div id="roster1Container"></div>
                 </div>
 
                 <div class="section-box">
                     <div class="section-title">Roster 2 (Reserves / Expansion)</div>
-                    <div id="roster2Container">
-                        <!-- Populated dynamically with 14 dropdowns -->
-                    </div>
+                    <div id="roster2Container"></div>
                 </div>
             </div>
         </div>
@@ -309,28 +361,58 @@ let rosterData = [];
 let selectedIndex = 0;
 let romBuffer = null;
 
-const teamList = [
-    "Atlanta Hawks", "Boston Celtics", "Charlotte Hornets", "Chicago Bulls", "Cleveland Cavaliers",
-    "Dallas Mavericks", "Denver Nuggets", "Detroit Pistons", "Golden State Warriors", "Houston Rockets",
-    "Indiana Pacers", "LA Clippers", "LA Lakers", "Miami Heat", "Milwaukee Bucks",
-    "Minnesota Timberwolves", "New Jersey Nets", "New York Knicks", "Orlando Magic", "Philadelphia 76ers",
-    "Phoenix Suns", "Portland Trail Blazers", "Sacramento Kings", "San Antonio Spurs", "Seattle SuperSonics",
-    "Toronto Raptors", "Utah Jazz", "Vancouver Grizzlies", "Washington Bullets", "East All-Stars", "West All-Stars"
+const teamDataMap = [
+    { name: "Atlanta Hawks", city: "Atlanta", stadium: "Omni Coliseum", loc: "Atlanta, GA", abbr: "ATL" },
+    { name: "Boston Celtics", city: "Boston", stadium: "FleetCenter", loc: "Boston, MA", abbr: "BOS" },
+    { name: "Charlotte Hornets", city: "Charlotte", stadium: "Charlotte Coliseum", loc: "Charlotte, NC", abbr: "CHL" },
+    { name: "Chicago Bulls", city: "Chicago", stadium: "United Center", loc: "Chicago, IL", abbr: "CHI" },
+    { name: "Cleveland Cavaliers", city: "Cleveland", stadium: "Gund Arena", loc: "Cleveland, OH", abbr: "CLE" },
+    { name: "Dallas Mavericks", city: "Dallas", stadium: "Reunion Arena", loc: "Dallas, TX", abbr: "DAL" },
+    { name: "Denver Nuggets", city: "Denver", stadium: "McNichols Sports Arena", loc: "Denver, CO", abbr: "DEN" },
+    { name: "Detroit Pistons", city: "Detroit", stadium: "The Palace of Auburn Hills", loc: "Auburn Hills, MI", abbr: "DET" },
+    { name: "Golden State Warriors", city: "Oakland", stadium: "San Jose Arena", loc: "Oakland, CA", abbr: "GSW" },
+    { name: "Houston Rockets", city: "Houston", stadium: "The Summit", loc: "Houston, TX", abbr: "HOU" },
+    { name: "Indiana Pacers", city: "Indianapolis", stadium: "Market Square Arena", loc: "Indianapolis, IN", abbr: "IND" },
+    { name: "LA Clippers", city: "Los Angeles", stadium: "LA Memorial Sports Arena", loc: "Los Angeles, CA", abbr: "LAC" },
+    { name: "LA Lakers", city: "Inglewood", stadium: "Great Western Forum", loc: "Inglewood, CA", abbr: "LAL" },
+    { name: "Miami Heat", city: "Miami", stadium: "Miami Arena", loc: "Miami, FL", abbr: "MIA" },
+    { name: "Milwaukee Bucks", city: "Milwaukee", stadium: "Bradley Center", loc: "Milwaukee, WI", abbr: "MIL" },
+    { name: "Minnesota Timberwolves", city: "Minneapolis", stadium: "Target Center", loc: "Minneapolis, MN", abbr: "MIN" },
+    { name: "New Jersey Nets", city: "East Rutherford", stadium: "Brendan Byrne Arena", loc: "East Rutherford, NJ", abbr: "NJN" },
+    { name: "New York Knicks", city: "New York", stadium: "Madison Square Garden", loc: "New York, NY", abbr: "NYK" },
+    { name: "Orlando Magic", city: "Orlando", stadium: "Orlando Arena", loc: "Orlando, FL", abbr: "ORL" },
+    { name: "Philadelphia 76ers", city: "Philadelphia", stadium: "CoreStates Center", loc: "Philadelphia, PA", abbr: "PHI" },
+    { name: "Phoenix Suns", city: "Phoenix", stadium: "America West Arena", loc: "Phoenix, AZ", abbr: "PHX" },
+    { name: "Portland Trail Blazers", city: "Portland", stadium: "Rose Garden", loc: "Portland, OR", abbr: "POR" },
+    { name: "Sacramento Kings", city: "Sacramento", stadium: "ARCO Arena", loc: "Sacramento, CA", abbr: "SAC" },
+    { name: "San Antonio Spurs", city: "San Antonio", stadium: "Alamodome", loc: "San Antonio, TX", abbr: "SAS" },
+    { name: "Seattle SuperSonics", city: "Seattle", stadium: "KeyArena", loc: "Seattle, WA", abbr: "SEA" },
+    { name: "Toronto Raptors", city: "Toronto", stadium: "SkyDome", loc: "Toronto, ON", abbr: "TOR" },
+    { name: "Utah Jazz", city: "Salt Lake City", stadium: "Delta Center", loc: "Salt Lake City, UT", abbr: "UTA" },
+    { name: "Vancouver Grizzlies", city: "Vancouver", stadium: "General Motors Place", loc: "Vancouver, BC", abbr: "VAN" },
+    { name: "Washington Bullets", city: "Landover", stadium: "US Airways Arena", loc: "Landover, MD", abbr: "WSB" },
+    { name: "East All-Stars", city: "East", stadium: "Alamodome", loc: "San Antonio, TX", abbr: "EST" },
+    { name: "West All-Stars", city: "West", stadium: "Alamodome", loc: "San Antonio, TX", abbr: "WST" },
+    { name: "Custom Team 1", city: "Custom City 1", stadium: "Custom Arena 1", loc: "City 1, ST", abbr: "CU1" },
+    { name: "Custom Team 2", city: "Custom City 2", stadium: "Custom Arena 2", loc: "City 2, ST", abbr: "CU2" },
+    { name: "Custom Team 3", city: "Custom City 3", stadium: "Custom Arena 3", loc: "City 3, ST", abbr: "CU3" },
+    { name: "Custom Team 4", city: "Custom City 4", stadium: "Custom Arena 4", loc: "City 4, ST", abbr: "CU4" }
 ];
 
+const teamList = teamDataMap.map(t => t.name);
+
 const fieldsToBind = [
-    'FirstName:ascii', 'LastName:ascii', 'JerseyNumber:1', 'Position:1', 'School:1', 'Sequence:2',
+    'JerseyNumber:1', 'LastName:ascii', 'FirstName:ascii', 'Position:1', 'School:1',
     'Height:1', 'Weight:1:+100', 'SkinTone:1', '?:1', '?:1.1', '?:1.2',
     'FieldGoal:1', 'ThreePoint:1', 'FreeThrow:1', 'Dunk:1', 'Steal:1', 'Block:1',
-    'OffRebound:1', 'DefRebound:1', 'BallControl:1', 'DefAware:1', 'Speed:1', 'Agility:1',
-    'Jump:1', 'Dribble:1', 'OffAware:1', 'Overall:1',
-    '?:1.3', '?:1.4', '?:1.5', '?:1.6', '?:1.7', '?:1.8', '?:1.9', '?:1.10', '?:1.11', '?:1.12', '?:1.13',
+    'OffRebound:1', 'DefRebound:1', 'BallControl:1', 'OffAware:1', 'DefAware:1',
+    'Speed:1', 'Agility:1', 'Jump:1', 'Dribble:1', '?:1.3', '?:1.4', '?:1.5', 'Overall:1',
+    '?:1.6', '?:1.7', '?:1.8', '?:1.9', '?:1.10', '?:1.11', '?:1.12', '?:1.13', '?:1.14', '?:1.15',
     'Games:1', 'Starts:1', 'Minutes:2', 'FieldGoals:2', 'FieldGoalAttempts:2', 'ThreePointers:2',
     'ThreePointAttempts:2', 'FreeThrows:2', 'reeThrowAttempts:2', 'OffRebounds:2', 'DefRebounds:2',
-    'Assists:2', 'Steals:2', 'TurnOvers:2', 'Blocks:2', 'Points:2', 'Fouls:2',
-    '?:1.14', '?:1.15', '?:1.16', '?:1.17', '?:1.18', '?:1.19', '?:1.20', '?:1.21', '?:1.22', '?:1.23',
-    '?:1.24', '?:1.25', '?:1.26', '?:1.27', '?:1.28', '?:1.29', '?:1.30', '?:1.31', '?:1.32', '?:1.33',
-    '?:1.34', '?:1.35', '?:1.36', '?:1.37', '?:1.38', '?:1.39', '?:1.40', '?:1.41', '?:1.42', '?:1.43'
+    'Assists:2', 'Steals:2', 'Blocks:2', 'TurnOvers:2', 'Fouls:2', 'Points:2', '?:1.16', '?:1.17', '?:1.18',
+    '?:1.19', '?:1.20', '?:1.21', '?:1.22', '?:1.23', '?:1.24', '?:1.25', '?:1.26', '?:1.27', '?:1.28',
+    '?:1.29', '?:1.30', '?:1.31', '?:1.32', '?:1.33', '?:1.34', '?:1.35', '?:1.36', '?:1.37', '?:1.38'
 ];
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -341,7 +423,6 @@ window.addEventListener('DOMContentLoaded', () => {
 function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
     event.target.classList.add('active');
     document.getElementById(tabId).classList.add('active');
 }
@@ -351,10 +432,10 @@ function initTeamDropdowns() {
     tSels.forEach(sel => {
         if (!sel) return;
         sel.innerHTML = '';
-        teamList.forEach((t, i) => {
+        teamDataMap.forEach((t, i) => {
             const opt = document.createElement('option');
             opt.value = i;
-            opt.innerText = `${i + 1}. ${t}`;
+            opt.innerText = `${i + 1}. ${t.name}`;
             sel.appendChild(opt);
         });
     });
@@ -362,14 +443,14 @@ function initTeamDropdowns() {
 }
 
 function selectTeam(index) {
-    const name = teamList[index] || "Hawks";
-    const parts = name.split(" ");
+    const info = teamDataMap[index] || teamDataMap[0];
+    const parts = info.name.split(" ");
     document.getElementById('team_Name1').value = parts[parts.length - 1];
-    document.getElementById('team_City').value = parts.slice(0, parts.length - 1).join(" ") || "Atlanta";
-    document.getElementById('team_Stadium').value = "State Farm Arena";
-    document.getElementById('team_Location').value = document.getElementById('team_City').value + ", GA";
+    document.getElementById('team_City').value = info.city;
+    document.getElementById('team_Stadium').value = info.stadium;
+    document.getElementById('team_Location').value = info.loc;
     document.getElementById('team_Name2').value = parts[parts.length - 1];
-    document.getElementById('team_Abbr').value = parts[parts.length - 1].substring(0, 3).toUpperCase();
+    document.getElementById('team_Abbr').value = info.abbr;
 }
 
 function handleRomUpload(e) {
@@ -379,6 +460,10 @@ function handleRomUpload(e) {
     reader.onload = function(evt) {
         romBuffer = evt.target.result;
         updateStatus(`ROM File Loaded: ${file.name} (${romBuffer.byteLength} bytes). Ready for direct binary patching.`);
+        alert(`ROM Loaded Successfully: ${file.name} (${romBuffer.byteLength} bytes).`);
+    };
+    reader.onerror = function() {
+        alert("Error reading ROM file.");
     };
     reader.readAsArrayBuffer(file);
 }
@@ -448,20 +533,17 @@ function buildRosterUI() {
     r2.innerHTML = '';
 
     for (let i = 0; i < 14; i++) {
-        // Roster 1 row
         const row1 = document.createElement('div');
         row1.className = 'field-row';
         row1.innerHTML = `<label>Slot ${i + 1}</label><select id="r1_slot_${i}" class="r1-sel"></select>`;
         r1.appendChild(row1);
 
-        // Roster 2 row
         const row2 = document.createElement('div');
         row2.className = 'field-row';
         row2.innerHTML = `<label>Slot ${i + 1}</label><select id="r2_slot_${i}" class="r2-sel"></select>`;
         r2.appendChild(row2);
     }
 
-    // Populate all dropdowns with player list
     const allSels = document.querySelectorAll('.r1-sel, .r2-sel');
     allSels.forEach(sel => {
         sel.innerHTML = '';
@@ -475,7 +557,6 @@ function buildRosterUI() {
         });
     });
 
-    // Default select first 14 for Roster 1, next 14 for Roster 2
     for (let i = 0; i < 14; i++) {
         const s1 = document.getElementById(`r1_slot_${i}`);
         const s2 = document.getElementById(`r2_slot_${i}`);
@@ -489,7 +570,7 @@ function onRosterTeamChange(teamIdx) {
 }
 
 function saveTeamRosters() {
-    updateStatus("Roster slot assignments saved successfully! (Ready for CSV / ROM export)");
+    updateStatus("Roster slot assignments saved successfully!");
     alert("Roster assignments updated successfully.");
 }
 
