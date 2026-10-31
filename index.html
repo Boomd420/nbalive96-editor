@@ -3,628 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live '96 Editor - [Project1 - Player Editor]</title>
+    <title>NBA Live '96 Full Web Roster Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        body {
-            background-color: #008080;
-            font-family: "MS Sans Serif", Arial, sans-serif;
-            font-size: 11px;
-            margin: 0;
-            padding: 5px;
-            color: #000;
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            --border-color: #333;
+            --text-main: #e0e0e0;
+            --accent-blue: #007acc;
+            --accent-green: #28a745;
         }
-        .win95-window {
-            max-width: 780px;
-            background-color: #c0c0c0;
-            border-top: 2px solid #dfdfdf;
-            border-left: 2px solid #dfdfdf;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-            box-shadow: 4px 4px 16px rgba(0,0,0,0.7);
-            margin: 0 auto;
-        }
-        .title-bar {
-            background: linear-gradient(90deg, #000080, #1084d0);
-            color: white;
-            padding: 3px 5px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-        }
-        .title-bar-buttons button {
-            background-color: #c0c0c0;
-            border: 1px solid;
-            border-color: #dfdfdf #404040 #404040 #dfdfdf;
-            width: 16px;
-            height: 14px;
-            font-size: 9px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .menu-bar {
-            background-color: #c0c0c0;
-            padding: 2px 4px;
-            border-bottom: 1px solid #808080;
-            display: flex;
-            gap: 15px;
-            position: relative;
-        }
-        .menu-item {
-            cursor: pointer;
-            padding: 1px 6px;
-            position: relative;
-        }
-        .menu-item:hover {
-            background-color: #000080;
-            color: white;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 18px;
-            left: 0;
-            background-color: #c0c0c0;
-            border: 1px solid;
-            border-color: #dfdfdf #404040 #404040 #dfdfdf;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-            z-index: 1000;
-            min-width: 130px;
-        }
-        .dropdown-item {
-            padding: 4px 12px;
-            color: black;
-            cursor: pointer;
-        }
-        .dropdown-item:hover {
-            background-color: #000080;
-            color: white;
-        }
-        .window-body {
-            padding: 8px;
-        }
-        .nav-bar {
-            background: #d4d0c8;
-            border: 1px solid #808080;
-            border-top: 1px solid #404040;
-            border-left: 1px solid #404040;
-            padding: 5px 8px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        @media (max-width: 768px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-        .fieldset-win95 {
-            border: 1px solid #808080;
-            border-top: 1px solid #404040;
-            border-left: 1px solid #404040;
-            background-color: #c0c0c0;
-            padding: 6px 8px 8px 8px;
-            margin-bottom: 6px;
-        }
-        .fieldset-win95 legend {
-            font-weight: bold;
-            padding: 0 3px;
-        }
-        .row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 4px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        label {
-            display: inline-block;
-            text-align: right;
-            font-size: 10px;
-        }
-        input, select {
-            background-color: white;
-            border: 1px solid;
-            border-color: #404040 #dfdfdf #dfdfdf #404040;
-            padding: 2px 3px;
-            font-family: "MS Sans Serif", Arial, sans-serif;
-            font-size: 11px;
-        }
-        input:focus, select:focus {
-            outline: none;
-        }
-        .btn-win95 {
-            background-color: #c0c0c0;
-            border: 2px solid;
-            border-color: #dfdfdf #404040 #404040 #dfdfdf;
-            padding: 4px 14px;
-            font-family: "MS Sans Serif", Arial, sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-win95:active {
-            border-color: #404040 #dfdfdf #dfdfdf #dfdfdf;
-            padding: 5px 13px 3px 15px;
-        }
-        .grid-abilities {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 4px;
-            text-align: center;
-        }
-        .grid-abilities label {
-            font-size: 9px;
-            text-align: center;
-            display: block;
-        }
-        .grid-abilities input {
-            width: 36px;
-            text-align: center;
-        }
-        .grid-unknown-top {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 2px;
-            text-align: center;
-        }
-        .grid-unknown-top label {
-            font-size: 9px;
-            text-align: center;
-            display: block;
-        }
-        .grid-unknown-top input {
-            width: 28px;
-            text-align: center;
-        }
-        .grid-stats {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        .grid-stats label {
-            font-size: 9px;
-            text-align: center;
-            display: block;
-        }
-        .grid-stats input {
-            width: 34px;
-            text-align: center;
-        }
-        .grid-unknown-bot {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 3px;
-            text-align: center;
-        }
-        .grid-unknown-bot label {
-            font-size: 9px;
-            text-align: center;
-            display: block;
-        }
-        .grid-unknown-bot input {
-            width: 42px;
-            text-align: center;
-        }
-        .status-bar {
-            background-color: #c0c0c0;
-            border-top: 1px solid #808080;
-            padding: 3px 6px;
-            font-size: 10px;
-            border-left: 1px solid #404040;
-            border-right: 1px solid #dfdfdf;
-            border-bottom: 1px solid #dfdfdf;
-            margin-top: 5px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        h1 { margin: 0; font-size: 1.6rem; color: #fff; }
+        .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        button, label.btn { background: var(--accent-blue); color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; }
+        button:hover, label.btn:hover { opacity: 0.9; }
+        button.export-btn { background: var(--accent-green); }
+        input[type="file"] { display: none; }
+        .controls { display: flex; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        input[type="text"].search-input { width: 100%; max-width: 350px; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; }
+        .stats-badge { background: var(--bg-card); padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.85rem; color: #aaa; }
+        .table-wrapper { overflow-x: auto; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-color); max-height: 75vh; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #282828; white-space: nowrap; }
+        th { background: #252525; color: #fff; position: sticky; top: 0; z-index: 10; font-weight: 600; }
+        tr:hover { background: var(--bg-hover); }
+        input.cell-input { background: transparent; border: 1px solid transparent; color: #fff; width: 100%; max-width: 70px; padding: 4px; border-radius: 3px; font-family: inherit; }
+        input.cell-input:focus { background: #000; border-color: var(--accent-blue); outline: none; }
+        input.cell-input.name-input { max-width: 120px; }
     </style>
 </head>
 <body>
-
-<div class="win95-window">
-    <div class="title-bar">
-        <span>NBA Live '96 Editor - [Project1 - Player Editor]</span>
-        <div class="title-bar-buttons">
-            <button>_</button>
-            <button>□</button>
-            <button>×</button>
+<div class="container">
+    <header>
+        <h1>NBA Live '96 Web Roster Editor</h1>
+        <div class="toolbar">
+            <label class="btn">
+                📥 Import CSV File
+                <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileImport(event)">
+            </label>
+            <button onclick="loadFromGithub()">🔄 Reload from Repository</button>
+            <button class="export-btn" onclick="exportCSV()">💾 Export / Save CSV</button>
         </div>
+    </header>
+
+    <div class="controls">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search player by name..." onkeyup="filterTable()">
+        <div class="stats-badge" id="statusMsg">Loading data from repository...</div>
     </div>
-    
-    <!-- Menu Bar with working dropdowns -->
-    <div class="menu-bar">
-        <div class="menu-item" onclick="toggleMenu('fileMenu')">File
-            <div id="fileMenu" class="dropdown-menu">
-                <div class="dropdown-item" onclick="exportCSV()">Export CSV</div>
-                <div class="dropdown-item" onclick="document.getElementById('csvUpload').click()">Import CSV</div>
-            </div>
-        </div>
-        <div class="menu-item" onclick="toggleMenu('importExportMenu')">Import/Export
-            <div id="importExportMenu" class="dropdown-menu">
-                <div class="dropdown-item" onclick="exportCSV()">Export NBALIVE96OGROS.CSV</div>
-                <div class="dropdown-item" onclick="document.getElementById('csvUpload').click()">Import NBALIVE96OGROS.CSV</div>
-            </div>
-        </div>
-        <div class="menu-item" onclick="toggleMenu('helpMenu')">Help
-            <div id="helpMenu" class="dropdown-menu">
-                <div class="dropdown-item" onclick="alert('NBA Live 96 Editor (dejfatman / Win95 VB6 Replication)')">About</div>
-            </div>
-        </div>
-    </div>
-    <input type="file" id="csvUpload" style="display:none" onchange="importCSV(event)">
-    
-    <div class="window-body">
-        <!-- Navigation / Selector Bar -->
-        <div class="nav-bar">
-            <div>
-                <b>Player (0 - 469):</b>
-                <select id="playerSelect" onchange="loadPlayer(this.value)" style="width: 220px;"></select>
-            </div>
-            <div>
-                <button class="btn-win95" onclick="saveCurrentPlayer()">SAVE</button>
-            </div>
-        </div>
 
-        <div class="main-layout">
-            <!-- LEFT COLUMN: General, Appearance, Abilities -->
-            <div>
-                <!-- General Fieldset -->
-                <fieldset class="fieldset-win95">
-                    <legend>General</legend>
-                    <div class="row">
-                        <label style="width: 20px;">#:</label>
-                        <input type="text" id="f_nbr" style="width: 35px;" value="21">
-                        <label style="width: 35px;">Name:</label>
-                        <input type="text" id="f_last" style="width: 80px;" value="A. Lang">
-                        <label style="width: 55px;">First Name:</label>
-                        <input type="text" id="f_first" style="width: 85px;" value="Andrew">
-                    </div>
-                    <div class="row" style="margin-top: 5px;">
-                        <label style="width: 45px;">Position:</label>
-                        <select id="f_pos" style="width: 90px;">
-                            <option value="0">Center</option>
-                            <option value="1">Power Forward</option>
-                            <option value="2">Small Forward</option>
-                            <option value="3">Shooting Guard</option>
-                            <option value="4">Point Guard</option>
-                        </select>
-                        <label style="width: 45px;">School:</label>
-                        <input type="text" id="f_school" style="width: 110px;" value="Arkansas">
-                    </div>
-                </fieldset>
-
-                <!-- Appearance Fieldset -->
-                <fieldset class="fieldset-win95">
-                    <legend>Appearance</legend>
-                    <div class="row">
-                        <label style="width: 25px;">Ht.:</label>
-                        <input type="text" id="f_ht" style="width: 35px;" value="83">
-                        <label style="width: 25px;">Wt.:</label>
-                        <input type="text" id="f_wt" style="width: 40px;" value="250">
-                        <label style="width: 55px;">Skin Tone:</label>
-                        <select id="f_skin" style="width: 65px;">
-                            <option value="0">Darkest</option>
-                            <option value="1">Dark</option>
-                            <option value="2">Light</option>
-                            <option value="3">Lightest</option>
-                        </select>
-                        <label style="width: 15px;">??:</label>
-                        <input type="text" id="f_face" style="width: 24px;" value="5">
-                        <label style="width: 15px;">??:</label>
-                        <input type="text" id="f_hair" style="width: 24px;" value="0">
-                    </div>
-                </fieldset>
-
-                <!-- Abilities Fieldset -->
-                <fieldset class="fieldset-win95">
-                    <legend>Abilities</legend>
-                    <div class="grid-abilities" id="abilitiesContainer">
-                        <!-- Populated dynamically -->
-                    </div>
-                </fieldset>
-            </div>
-
-            <!-- RIGHT COLUMN: Unknown Top, Statistics, Unknown Bottom -->
-            <div>
-                <!-- Unknown Top Fieldset -->
-                <fieldset class="fieldset-win95">
-                    <legend>Unknown</legend>
-                    <div class="grid-unknown-top" id="unknownTopContainer">
-                        <!-- Populated dynamically -->
-                    </div>
-                </fieldset>
-
-                <!-- Statistics Fieldset -->
-                <fieldset class="fieldset-win95">
-                    <legend>Statistics</legend>
-                    <div class="grid-stats" id="statsContainer">
-                        <!-- Populated dynamically -->
-                    </div>
-                </fieldset>
-
-                <!-- Unknown Bottom Fieldset -->
-                <fieldset class="fieldset-win95">
-                    <legend>Unknown</legend>
-                    <div class="grid-unknown-bot" id="unknownBotContainer">
-                        <!-- Populated dynamically -->
-                    </div>
-                </fieldset>
-            </div>
-        </div>
-
-        <!-- Bottom Action Buttons matching screenshot exactly -->
-        <div style="text-align: center; margin-top: 8px;">
-            <button class="btn-win95" style="width: 90px;" onclick="saveCurrentPlayer()">SAVE</button>
-            <button class="btn-win95" style="width: 110px; margin-left: 15px;" onclick="exportCSV()">EXPORT CSV</button>
-            <button class="btn-win95" style="width: 90px; margin-left: 15px;" onclick="resetForm()">CANCEL</button>
-        </div>
-    </div>
-    
-    <div class="status-bar" id="statusBar">
-        Opening ROM... DONE. Total 470 players loaded from NBALIVE96OGROS.CSV.
+    <div class="table-wrapper">
+        <table id="rosterTable">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>No.</th>
+                    <th>Pos</th>
+                    <th>Height (in)</th>
+                    <th>Weight</th>
+                    <th>OVR</th>
+                    <th>Speed</th>
+                    <th>3PT</th>
+                    <th>Dunk</th>
+                    <th>Steal</th>
+                    <th>Block</th>
+                    <th>Points</th>
+                    <th>Assists</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    let players = [];
+let rawHeaders = [];
+let rosterData = [];
 
-    const abilityLabels = [
-        "??", "FG", "3P", "FT", "DNK", "STL", "BLK", "ORB", "DRB", "BCT", 
-        "DAW", "DAW", "SPD", "AGI", "JMP", "??", "??", "OVA"
-    ];
+// Load default file from repo on init
+window.addEventListener('DOMContentLoaded', () => {
+    loadFromGithub();
+});
 
-    const statLabels = [
-        "G", "GS", "MP", "FG", "FGA", "3P", "3PA", 
-        "FT", "FTA", "ORB", "DRB", "AST", "STL", "BLK", 
-        "TO", "PF", "PTS", "??", "??"
-    ];
+function loadFromGithub() {
+    updateStatus("Fetching NBALIVE96OGROS.CSV from server...");
+    Papa.parse("NBALIVE96OGROS.CSV", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            rawHeaders = results.meta.fields;
+            rosterData = results.data;
+            updateStatus(`Loaded ${rosterData.length} players from repo.`);
+            renderTable(rosterData);
+        },
+        error: function(err) {
+            updateStatus("Could not find NBALIVE96OGROS.CSV. Import a local file above.");
+        }
+    });
+}
 
-    function toggleMenu(menuId) {
-        ['fileMenu', 'importExportMenu', 'helpMenu'].forEach(id => {
-            if(id !== menuId) document.getElementById(id).style.display = 'none';
-        });
-        let m = document.getElementById(menuId);
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    updateStatus(`Parsing local file: ${file.name}...`);
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            rawHeaders = results.meta.fields;
+            rosterData = results.data;
+            updateStatus(`Successfully imported ${rosterData.length} players from ${file.name}`);
+            renderTable(rosterData);
+        }
+    });
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    data.forEach((player, index) => {
+        const tr = document.createElement('tr');
+        
+        tr.innerHTML = `
+            <td><input class="cell-input name-input" value="${player['FirstName:ascii'] || ''}" onchange="updateValue(${index}, 'FirstName:ascii', this.value)"></td>
+            <td><input class="cell-input name-input" value="${player['LastName:ascii'] || ''}" onchange="updateValue(${index}, 'LastName:ascii', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['JerseyNumber:1'] ?? ''}" onchange="updateValue(${index}, 'JerseyNumber:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Position:1'] ?? ''}" onchange="updateValue(${index}, 'Position:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Height:1'] ?? ''}" onchange="updateValue(${index}, 'Height:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Weight:1:+100'] ?? ''}" onchange="updateValue(${index}, 'Weight:1:+100', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Overall:1'] ?? ''}" onchange="updateValue(${index}, 'Overall:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Speed:1'] ?? ''}" onchange="updateValue(${index}, 'Speed:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['ThreePoint:1'] ?? ''}" onchange="updateValue(${index}, 'ThreePoint:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Dunk:1'] ?? ''}" onchange="updateValue(${index}, 'Dunk:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Steal:1'] ?? ''}" onchange="updateValue(${index}, 'Steal:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Block:1'] ?? ''}" onchange="updateValue(${index}, 'Block:1', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Points:2'] ?? ''}" onchange="updateValue(${index}, 'Points:2', this.value)"></td>
+            <td><input class="cell-input" type="number" value="${player['Assists:2'] ?? ''}" onchange="updateValue(${index}, 'Assists:2', this.value)"></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function updateValue(rowIndex, fieldName, value) {
+    rosterData[rowIndex][fieldName] = value;
+}
+
+function filterTable() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = rosterData.filter(p => {
+        const fname = (p['FirstName:ascii'] || '').toLowerCase();
+        const lname = (p['LastName:ascii'] || '').toLowerCase();
+        return fname.includes(query) || lname.includes(query);
+    });
+    renderTable(filtered);
+}
+
+function exportCSV() {
+    if (!rosterData || rosterData.length === 0) {
+        alert("No data available to export.");
+        return;
     }
+    const csvContent = Papa.unparse({
+        fields: rawHeaders,
+        data: rosterData
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "NBALIVE96OGROS.CSV");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    updateStatus("CSV exported successfully! Replace this file in your repo or use it in-game.");
+}
 
-    window.onclick = function(event) {
-        if (!event.target.matches('.menu-item')) {
-            ['fileMenu', 'importExportMenu', 'helpMenu'].forEach(id => {
-                document.getElementById(id).style.display = 'none';
-            });
-        }
-    }
-
-    function initEditor() {
-        const abDiv = document.getElementById('abilitiesContainer');
-        abDiv.innerHTML = '';
-        abilityLabels.forEach((lbl, i) => {
-            abDiv.innerHTML += `<div><label>${lbl}</label><input type="text" id="ab_${i}" value="75"></div>`;
-        });
-
-        const unTop = document.getElementById('unknownTopContainer');
-        unTop.innerHTML = '';
-        const defaultTop = [114, 22, 16, 7, 7, 6, 7, 0];
-        for(let i=0; i<8; i++) {
-            unTop.innerHTML += `<div><label>??</label><input type="text" id="un_top_${i}" value="${defaultTop[i]}"></div>`;
-        }
-
-        const stDiv = document.getElementById('statsContainer');
-        stDiv.innerHTML = '';
-        const defaultStats = [82, 63, 2340, 320, 677, 2, 3, 152, 188, 154, 302, 72, 45, 144, 108, 271, 794, 4, 1, 0, 0];
-        for(let i=0; i<21; i++) {
-            stDiv.innerHTML += `<div><label>${statLabels[i] || '??'}</label><input type="text" id="st_${i}" value="${defaultStats[i]}"></div>`;
-        }
-
-        const unBot = document.getElementById('unknownBotContainer');
-        unBot.innerHTML = '';
-        const defaultBot = [1056, 499, 4, 3, 253, 237, 224, 249, 112, 423, 76, 472, 3652, 68, 0, 0];
-        for(let i=0; i<16; i++) {
-            unBot.innerHTML += `<div><label>??</label><input type="text" id="un_bot_${i}" value="${defaultBot[i]}"></div>`;
-        }
-
-        for(let i=0; i<470; i++) {
-            players.push({
-                JerseyNumber: i === 21 ? 21 : (i % 99) + 1,
-                LastName: i === 21 ? "A. Lang" : `Player${i}`,
-                FirstName: i === 21 ? "Andrew" : `First${i}`,
-                Position: i === 21 ? 0 : i % 5,
-                School: i === 21 ? "Arkansas" : "College",
-                Height: i === 21 ? 83 : 78,
-                Weight: i === 21 ? 250 : 210,
-                SkinTone: i === 21 ? 0 : i % 4,
-                Face: 5,
-                Hair: 0,
-                unknownsTop: [...defaultTop],
-                abilities: [...Array(18).fill(75)],
-                stats: [...defaultStats],
-                unknownsBot: [...defaultBot]
-            });
-        }
-
-        populateSelector();
-        loadPlayer(21);
-    }
-
-    function populateSelector() {
-        const sel = document.getElementById('playerSelect');
-        sel.innerHTML = '';
-        players.forEach((p, idx) => {
-            let opt = document.createElement('option');
-            opt.value = idx;
-            opt.textContent = `${idx}: ${p.LastName}, ${p.FirstName} (#${p.JerseyNumber})`;
-            sel.appendChild(opt);
-        });
-    }
-
-    function loadPlayer(idx) {
-        idx = parseInt(idx);
-        let p = players[idx];
-        if(!p) return;
-
-        document.getElementById('playerSelect').value = idx;
-        document.getElementById('f_nbr').value = p.JerseyNumber;
-        document.getElementById('f_last').value = p.LastName;
-        document.getElementById('f_first').value = p.FirstName;
-        document.getElementById('f_pos').value = p.Position;
-        document.getElementById('f_school').value = p.School;
-        document.getElementById('f_ht').value = p.Height;
-        document.getElementById('f_wt').value = p.Weight;
-        document.getElementById('f_skin').value = p.SkinTone;
-        document.getElementById('f_face').value = p.Face;
-        document.getElementById('f_hair').value = p.Hair;
-
-        for(let i=0; i<18; i++) {
-            let el = document.getElementById(`ab_${i}`);
-            if(el) el.value = p.abilities[i];
-        }
-        for(let i=0; i<8; i++) {
-            let el = document.getElementById(`un_top_${i}`);
-            if(el) el.value = p.unknownsTop[i];
-        }
-        for(let i=0; i<21; i++) {
-            let el = document.getElementById(`st_${i}`);
-            if(el) el.value = p.stats[i];
-        }
-        for(let i=0; i<16; i++) {
-            let el = document.getElementById(`un_bot_${i}`);
-            if(el) el.value = p.unknownsBot[i];
-        }
-
-        document.getElementById('statusBar').textContent = `Loaded player ID ${idx} (${p.LastName}, ${p.FirstName}) from ROM buffer.`;
-    }
-
-    function saveCurrentPlayer() {
-        const idx = parseInt(document.getElementById('playerSelect').value);
-        let p = players[idx];
-
-        p.JerseyNumber = parseInt(document.getElementById('f_nbr').value) || 0;
-        p.LastName = document.getElementById('f_last').value;
-        p.FirstName = document.getElementById('f_first').value;
-        p.Position = parseInt(document.getElementById('f_pos').value) || 0;
-        p.School = document.getElementById('f_school').value;
-        p.Height = parseInt(document.getElementById('f_ht').value) || 78;
-        p.Weight = parseInt(document.getElementById('f_wt').value) || 200;
-        p.SkinTone = parseInt(document.getElementById('f_skin').value) || 0;
-        p.Face = parseInt(document.getElementById('f_face').value) || 0;
-        p.Hair = parseInt(document.getElementById('f_hair').value) || 0;
-
-        for(let i=0; i<18; i++) {
-            p.abilities[i] = parseInt(document.getElementById(`ab_${i}`).value) || 0;
-        }
-        for(let i=0; i<8; i++) {
-            p.unknownsTop[i] = parseInt(document.getElementById(`un_top_${i}`).value) || 0;
-        }
-        for(let i=0; i<21; i++) {
-            p.stats[i] = parseInt(document.getElementById(`st_${i}`).value) || 0;
-        }
-        for(let i=0; i<16; i++) {
-            p.unknownsBot[i] = parseInt(document.getElementById(`un_bot_${i}`).value) || 0;
-        }
-
-        alert(`Player sequence ${idx} (${p.LastName}, ${p.FirstName}) successfully updated in memory!`);
-        populateSelector();
-        document.getElementById('playerSelect').value = idx;
-        document.getElementById('statusBar').textContent = `Saved changes for player ID ${idx} (${p.LastName}).`;
-    }
-
-    function resetForm() {
-        const idx = parseInt(document.getElementById('playerSelect').value);
-        loadPlayer(idx);
-        document.getElementById('statusBar').textContent = `Changes cancelled for player ID ${idx}.`;
-    }
-
-    function exportCSV() {
-        let rows = [];
-        let header = [
-            "JerseyNumber:1", "Position:1", "Height:1", "Weight:1:+100", "School:1", "SkinTone:1",
-            "?:1", "?:1", "Sequence:2", "?:1", "FieldGoal:1", "ThreePoint:1", "FreeThrow:1", "Dunk:1",
-            "Steal:1", "Block:1", "OffRebound:1", "DefRebound:1", "BallControl:1", "DefAware:1",
-            "Speed:1", "Agility:1", "Jump:1", "Dribble:1", "OffAware:1", "?:1", "?:1", "Overall:1",
-            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1",
-            "Games:1", "Starts:1", "Minutes:2", "FieldGoals:2", "FieldGoalAttempts:2", "ThreePointers:2",
-            "ThreePointAttempts:2", "FreeThrows:2", "FreeThrowAttempts:2", "OffRebounds:2", "DefRebounds:2",
-            "Assists:2", "Steals:2", "TurnOvers:2", "Blocks:2", "Points:2", "??:1", "??:1", "Fouls:2",
-            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1",
-            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "??:1",
-            "??:1", "??:1", "??:1", "??:1", "??:1", "??:1", "LastName:ascii", "FirstName:ascii"
-        ];
-        rows.push(header.join(","));
-
-        players.forEach((p, idx) => {
-            let r = [
-                p.JerseyNumber, p.Position, p.Height, p.Weight, p.School, p.SkinTone,
-                p.unknownsTop[0], p.unknownsTop[1], idx, p.unknownsTop[2],
-                ...p.abilities,
-                ...p.unknownsTop.slice(3),
-                ...p.stats,
-                ...p.unknownsBot,
-                p.LastName, p.FirstName
-            ];
-            rows.push(r.join(","));
-        });
-
-        let blob = new Blob([rows.join("\n")], { type: 'text/csv' });
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = 'NBALIVE96OGROS.CSV';
-        a.click();
-        document.getElementById('statusBar').textContent = "Successfully exported NBALIVE96OGROS.CSV.";
-    }
-
-    function importCSV(event) {
-        let file = event.target.files[0];
-        if(!file) return;
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            let lines = e.target.result.split("\n");
-            let newPlayers = [];
-            for(let i=1; i<lines.length; i++) {
-                let cols = lines[i].split(",");
-                if(cols.length < 10) continue;
-                newPlayers.push({
-                    JerseyNumber: parseInt(cols[0]) || 0,
-                    Position: parseInt(cols[1]) || 0,
-                    Height: parseInt(cols[2]) || 78,
-                    Weight: parseInt(cols[3]) || 200,
-                    School: cols[4] || "",
-                    SkinTone: parseInt(cols[5]) || 0,
-                    Face: 5,
-                    Hair: 0,
-                    unknownsTop: [parseInt(cols[6])||114, parseInt(cols[7])||22, parseInt(cols[9])||16, 7, 7, 6, 7, 0],
-                    abilities: cols.slice(10, 28).map(v => parseInt(v) || 75),
-                    stats: cols.slice(37, 58).map(v => parseInt(v) || 0),
-                    unknownsBot: cols.slice(58, 74).map(v => parseInt(v) || 0),
-                    LastName: cols[84] || `Player${i}`,
-                    FirstName: cols[85] || `Name${i}`
-                });
-            }
-            if(newPlayers.length > 0) {
-                players = newPlayers;
-                populateSelector();
-                loadPlayer(21);
-                alert(`Successfully imported ${players.length} players from CSV!`);
-                document.getElementById('statusBar').textContent = `Imported ${players.length} records from CSV successfully.`;
-            } else {
-                alert("Error parsing CSV format.");
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    window.onload = initEditor;
+function updateStatus(msg) {
+    document.getElementById('statusMsg').innerText = msg;
+}
 </script>
-
 </body>
 </html>
