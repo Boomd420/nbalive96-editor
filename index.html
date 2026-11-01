@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live '96 Editor (Sega Genesis)</title>
+    <title>NBA Live '96 Editor (Sega Genesis) - mod_nba_96.exe</title>
     <style>
         :root {
             --win-bg: #c0c0c0;
@@ -14,7 +14,6 @@
             --win-border-darkest: #000000;
             --win-face: #c0c0c0;
             --win-text: #000000;
-            --win-text-disabled: #808080;
         }
 
         * {
@@ -27,13 +26,12 @@
         body {
             background-color: #008080;
             margin: 0;
-            padding: 10px;
+            padding: 8px;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Win95 3D Border Utilities */
         .outset {
             border-top: 2px solid var(--win-border-light);
             border-left: 2px solid var(--win-border-light);
@@ -54,15 +52,14 @@
         .app-window {
             background-color: var(--win-face);
             width: 100%;
-            max-width: 980px;
+            max-width: 1024px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             flex: 1;
-            max-height: 900px;
+            overflow: hidden;
         }
 
-        /* Title Bar */
         .title-bar {
             background: linear-gradient(90deg, var(--win-blue), var(--win-blue-light));
             color: #ffffff;
@@ -73,17 +70,6 @@
             align-items: center;
         }
 
-        .title-controls button {
-            width: 16px;
-            height: 14px;
-            font-size: 9px;
-            line-height: 10px;
-            padding: 0;
-            margin-left: 2px;
-            font-weight: bold;
-        }
-
-        /* Menu Bar */
         .menu-bar {
             background-color: var(--win-face);
             display: flex;
@@ -109,7 +95,7 @@
             left: 0;
             background-color: var(--win-face);
             z-index: 1000;
-            min-width: 150px;
+            min-width: 160px;
         }
 
         .menu-item:hover .menu-dropdown {
@@ -133,13 +119,12 @@
             margin: 2px 0;
         }
 
-        /* Workspace & Navigation Tabs */
         .workspace {
             padding: 8px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             overflow-y: auto;
         }
 
@@ -158,14 +143,11 @@
             border-right: 2px solid var(--win-border-darkest);
             margin-bottom: -2px;
             cursor: pointer;
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
         }
 
         .tab.active {
             border-bottom: 2px solid var(--win-face);
             font-weight: bold;
-            padding-top: 5px;
             z-index: 10;
         }
 
@@ -173,21 +155,19 @@
             display: none;
             flex: 1;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tab-content.active {
             display: flex;
         }
 
-        /* Group Box */
         fieldset {
             border: 2px solid var(--win-border-light);
             border-left-color: var(--win-border-dark);
             border-top-color: var(--win-border-dark);
-            padding: 8px;
+            padding: 6px;
             margin: 0;
-            position: relative;
         }
 
         legend {
@@ -198,8 +178,8 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 6px 12px;
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 4px 8px;
             align-items: center;
         }
 
@@ -210,11 +190,12 @@
         }
 
         .form-group label {
-            color: #333;
+            font-size: 10px;
+            white-space: nowrap;
         }
 
         input[type="text"], input[type="number"], select {
-            padding: 2px 4px;
+            padding: 2px 3px;
             font-size: 11px;
             border-top: 1px solid var(--win-border-darkest);
             border-left: 1px solid var(--win-border-darkest);
@@ -222,11 +203,12 @@
             border-bottom: 1px solid var(--win-border-light);
             background-color: #ffffff;
             outline: none;
+            width: 100%;
         }
 
         button.win-btn {
             background-color: var(--win-face);
-            padding: 4px 12px;
+            padding: 3px 10px;
             cursor: pointer;
             min-width: 75px;
         }
@@ -236,10 +218,8 @@
             border-left: 2px solid var(--win-border-darkest);
             border-right: 2px solid var(--win-border-light);
             border-bottom: 2px solid var(--win-border-light);
-            padding: 5px 11px 3px 13px;
         }
 
-        /* Status Bar */
         .status-bar {
             display: flex;
             gap: 4px;
@@ -257,16 +237,10 @@
             display: none !important;
         }
 
-        /* Roster Tables */
-        .roster-grid {
+        .player-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-        }
-
-        .roster-select {
-            width: 100%;
-            height: 180px;
         }
     </style>
 </head>
@@ -275,11 +249,11 @@
 <div class="app-window outset">
     <!-- Title Bar -->
     <div class="title-bar">
-        <span>NBA Live '96 Editor (Sega Genesis) - [mod_nba_96.exe Web Edition]</span>
-        <div class="title-controls">
-            <button class="outset">_</button>
-            <button class="outset">□</button>
-            <button class="outset">✕</button>
+        <span>NBA Live '96 Editor - Player & Team Data Editor [mod_nba_96.exe]</span>
+        <div>
+            <button class="outset" style="width:16px; height:14px; font-size:9px;">_</button>
+            <button class="outset" style="width:16px; height:14px; font-size:9px;">□</button>
+            <button class="outset" style="width:16px; height:14px; font-size:9px;">✕</button>
         </div>
     </div>
 
@@ -299,8 +273,8 @@
         <div class="menu-item">
             Edit
             <div class="menu-dropdown outset">
-                <div class="dropdown-item" id="btnMenuPlayerView">Player Data</div>
-                <div class="dropdown-item" id="btnMenuTeamView">Team Data</div>
+                <div class="dropdown-item" onclick="switchTab('player')">Player Data</div>
+                <div class="dropdown-item" onclick="switchTab('team')">Team Data</div>
             </div>
         </div>
         <div class="menu-item">
@@ -312,136 +286,172 @@
     </div>
 
     <!-- Workspace -->
-    <div class="workspace" id="dropZone">
-        <!-- Tab Controls -->
+    <div class="workspace">
         <div class="tab-bar">
             <div class="tab active" id="tabBtnPlayer" onclick="switchTab('player')">Player Data</div>
             <div class="tab" id="tabBtnTeam" onclick="switchTab('team')">Team Data & Rosters</div>
             <div class="tab" id="tabBtnRaw" onclick="switchTab('raw')">ROM & CSV Operations</div>
         </div>
 
-        <!-- PLAYER EDIT TAB -->
+        <!-- PLAYER EDIT TAB (Exact frmPlayer UI Layout) -->
         <div class="tab-content active" id="tabPlayer">
             <div style="display: flex; gap: 8px; align-items: center; background-color: var(--win-face); padding: 4px;" class="outset">
-                <label>Select Player (470 Total):</label>
-                <select id="playerSelect" style="flex: 1;" onchange="loadPlayerToForm(this.value)">
-                    <option value="0">000: Lang, Andrew (Atlanta Hawks)</option>
-                </select>
-                <button class="win-btn outset" onclick="saveCurrentPlayerForm()">Update Player in Memory</button>
+                <label><b>Select Player:</b></label>
+                <select id="playerSelect" style="flex: 1;" onchange="loadPlayerToForm(this.value)"></select>
+                <button class="win-btn outset" onclick="saveCurrentPlayerForm()">SAVE</button>
             </div>
 
-            <!-- General Section -->
-            <fieldset>
-                <legend>General</legend>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Last Name:</label>
-                        <input type="text" id="p_LastName" maxlength="13">
-                    </div>
-                    <div class="form-group">
-                        <label>First Name:</label>
-                        <input type="text" id="p_FirstName" maxlength="13">
-                    </div>
-                    <div class="form-group">
-                        <label>Jersey #:</label>
-                        <input type="number" id="p_JerseyNumber" min="0" max="99">
-                    </div>
-                    <div class="form-group">
-                        <label>Position:</label>
-                        <select id="p_Position">
-                            <option value="0">Center (C)</option>
-                            <option value="1">Power Forward (PF)</option>
-                            <option value="2">Small Forward (SF)</option>
-                            <option value="3">Shooting Guard (SG)</option>
-                            <option value="4">Point Guard (PG)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>School / College Code:</label>
-                        <input type="number" id="p_School">
-                    </div>
-                </div>
-            </fieldset>
+            <div class="player-columns">
+                <!-- Left Column: General, Appearance, Abilities -->
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <fieldset>
+                        <legend>General</legend>
+                        <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 4px; align-items: center;">
+                            <div><label>#</label><input type="number" id="p_JerseyNumber"></div>
+                            <div><label>Last Name</label><input type="text" id="p_LastName" maxlength="13"></div>
+                            <div><label>First Name</label><input type="text" id="p_FirstName" maxlength="13"></div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
+                            <div>
+                                <label>Position</label>
+                                <select id="p_Position">
+                                    <option value="0">Center</option>
+                                    <option value="1">Power Forward</option>
+                                    <option value="2">Small Forward</option>
+                                    <option value="3">Shooting Guard</option>
+                                    <option value="4">Point Guard</option>
+                                </select>
+                            </div>
+                            <div><label>School Code</label><input type="number" id="p_School"></div>
+                        </div>
+                    </fieldset>
 
-            <!-- Appearance Section -->
-            <fieldset>
-                <legend>Appearance</legend>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Height (in):</label>
-                        <input type="number" id="p_Height">
-                    </div>
-                    <div class="form-group">
-                        <label>Weight (+100 lbs):</label>
-                        <input type="number" id="p_Weight">
-                    </div>
-                    <div class="form-group">
-                        <label>Skin Tone:</label>
-                        <select id="p_SkinTone">
-                            <option value="0">Light</option>
-                            <option value="1">Medium / Dark</option>
-                            <option value="2">Darkest (Inverted in VB6)</option>
-                        </select>
-                    </div>
-                </div>
-            </fieldset>
+                    <fieldset>
+                        <legend>Appearance</legend>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 4px;">
+                            <div><label>Ht</label><input type="number" id="p_Height"></div>
+                            <div><label>Wt</label><input type="number" id="p_Weight"></div>
+                            <div>
+                                <label>Skin Tone</label>
+                                <select id="p_SkinTone">
+                                    <option value="0">Light</option>
+                                    <option value="1">Dark</option>
+                                    <option value="2">Darkest</option>
+                                </select>
+                            </div>
+                            <div><label>?? (1.1)</label><input type="number" id="p_unk_1_1"></div>
+                            <div><label>?? (1.2)</label><input type="number" id="p_unk_1_2"></div>
+                        </div>
+                    </fieldset>
 
-            <!-- Ratings Section -->
-            <fieldset>
-                <legend>Abilities & Ratings</legend>
-                <div class="form-grid">
-                    <div class="form-group"><label>Field Goal (FG):</label><input type="number" id="p_FieldGoal"></div>
-                    <div class="form-group"><label>3-Pointer (3P):</label><input type="number" id="p_ThreePoint"></div>
-                    <div class="form-group"><label>Free Throw (FT):</label><input type="number" id="p_FreeThrow"></div>
-                    <div class="form-group"><label>Dunk (DNK):</label><input type="number" id="p_Dunk"></div>
-                    <div class="form-group"><label>Steal (STL):</label><input type="number" id="p_Steal"></div>
-                    <div class="form-group"><label>Block (BLK):</label><input type="number" id="p_Block"></div>
-                    <div class="form-group"><label>Off Rebound:</label><input type="number" id="p_OffRebound"></div>
-                    <div class="form-group"><label>Def Rebound:</label><input type="number" id="p_DefRebound"></div>
-                    <div class="form-group"><label>Ball Control:</label><input type="number" id="p_BallControl"></div>
-                    <div class="form-group"><label>Def Awareness:</label><input type="number" id="p_DefAware"></div>
-                    <div class="form-group"><label>Speed (SPD):</label><input type="number" id="p_Speed"></div>
-                    <div class="form-group"><label>Agility (AGI):</label><input type="number" id="p_Agility"></div>
-                    <div class="form-group"><label>Jump (JMP):</label><input type="number" id="p_Jump"></div>
-                    <div class="form-group"><label>Dribble (DRI):</label><input type="number" id="p_Dribble"></div>
-                    <div class="form-group"><label>Off Awareness:</label><input type="number" id="p_OffAware"></div>
-                    <div class="form-group"><label>Overall (OVA):</label><input type="number" id="p_Overall"></div>
+                    <fieldset>
+                        <legend>Abilities</legend>
+                        <div class="form-grid">
+                            <div><label>??</label><input type="number" id="p_unk_1_0"></div>
+                            <div><label>FG</label><input type="number" id="p_FieldGoal"></div>
+                            <div><label>3P</label><input type="number" id="p_ThreePoint"></div>
+                            <div><label>FT</label><input type="number" id="p_FreeThrow"></div>
+                            <div><label>DNK</label><input type="number" id="p_Dunk"></div>
+                            <div><label>STL</label><input type="number" id="p_Steal"></div>
+                            <div><label>BLK</label><input type="number" id="p_Block"></div>
+                            <div><label>ORB</label><input type="number" id="p_OffRebound"></div>
+                            <div><label>DRB</label><input type="number" id="p_DefRebound"></div>
+                            <div><label>BCT</label><input type="number" id="p_BallControl"></div>
+                            <div><label>DAW</label><input type="number" id="p_DefAware"></div>
+                            <div><label>SPD</label><input type="number" id="p_Speed"></div>
+                            <div><label>AGI</label><input type="number" id="p_Agility"></div>
+                            <div><label>JMP</label><input type="number" id="p_Jump"></div>
+                            <div><label>DRI</label><input type="number" id="p_Dribble"></div>
+                            <div><label>OAW</label><input type="number" id="p_OffAware"></div>
+                            <div><label>?? (1.3)</label><input type="number" id="p_unk_1_3"></div>
+                            <div><label>?? (1.4)</label><input type="number" id="p_unk_1_4"></div>
+                            <div><label>OVA</label><input type="number" id="p_Overall"></div>
+                        </div>
+                    </fieldset>
                 </div>
-            </fieldset>
+
+                <!-- Right Column: Unknown Header, Statistics, Unknown Footer -->
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <fieldset>
+                        <legend>Unknown (Top Header)</legend>
+                        <div class="form-grid" style="grid-template-columns: repeat(7, 1fr);">
+                            <div><label>?? (1.5)</label><input type="number" id="p_unk_1_5"></div>
+                            <div><label>?? (1.6)</label><input type="number" id="p_unk_1_6"></div>
+                            <div><label>?? (1.7)</label><input type="number" id="p_unk_1_7"></div>
+                            <div><label>?? (1.8)</label><input type="number" id="p_unk_1_8"></div>
+                            <div><label>?? (1.9)</label><input type="number" id="p_unk_1_9"></div>
+                            <div><label>?? (1.10)</label><input type="number" id="p_unk_1_10"></div>
+                            <div><label>?? (1.11)</label><input type="number" id="p_unk_1_11"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Statistics</legend>
+                        <div class="form-grid" style="grid-template-columns: repeat(7, 1fr);">
+                            <div><label>G</label><input type="number" id="p_Games"></div>
+                            <div><label>GS</label><input type="number" id="p_Starts"></div>
+                            <div><label>MP</label><input type="number" id="p_Minutes"></div>
+                            <div><label>FG</label><input type="number" id="p_FieldGoals"></div>
+                            <div><label>FGA</label><input type="number" id="p_FieldGoalAttempts"></div>
+                            <div><label>3P</label><input type="number" id="p_ThreePointers"></div>
+                            <div><label>3PA</label><input type="number" id="p_ThreePointAttempts"></div>
+                            <div><label>FT</label><input type="number" id="p_FreeThrows"></div>
+                            <div><label>FTA</label><input type="number" id="p_FreeThrowAttempts"></div>
+                            <div><label>ORB</label><input type="number" id="p_OffRebounds"></div>
+                            <div><label>DRB</label><input type="number" id="p_DefRebounds"></div>
+                            <div><label>AST</label><input type="number" id="p_Assists"></div>
+                            <div><label>STL</label><input type="number" id="p_Steals"></div>
+                            <div><label>BLK</label><input type="number" id="p_Blocks"></div>
+                            <div><label>TO</label><input type="number" id="p_TurnOvers"></div>
+                            <div><label>PF</label><input type="number" id="p_Fouls"></div>
+                            <div><label>PTS</label><input type="number" id="p_Points"></div>
+                            <div><label>?? (1.12)</label><input type="number" id="p_unk_1_12"></div>
+                            <div><label>?? (1.13)</label><input type="number" id="p_unk_1_13"></div>
+                            <div><label>?? (1.14)</label><input type="number" id="p_unk_1_14"></div>
+                            <div><label>?? (1.15)</label><input type="number" id="p_unk_1_15"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Unknown (Footer Block)</legend>
+                        <div class="form-grid" style="grid-template-columns: repeat(7, 1fr);">
+                            <div><label>?? (1.16)</label><input type="number" id="p_unk_1_16"></div>
+                            <div><label>?? (1.17)</label><input type="number" id="p_unk_1_17"></div>
+                            <div><label>?? (1.18)</label><input type="number" id="p_unk_1_18"></div>
+                            <div><label>?? (1.19)</label><input type="number" id="p_unk_1_19"></div>
+                            <div><label>?? (1.20)</label><input type="number" id="p_unk_1_20"></div>
+                            <div><label>?? (1.21)</label><input type="number" id="p_unk_1_21"></div>
+                            <div><label>?? (1.22)</label><input type="number" id="p_unk_1_22"></div>
+                            <div><label>?? (1.23)</label><input type="number" id="p_unk_1_23"></div>
+                            <div><label>?? (1.24)</label><input type="number" id="p_unk_1_24"></div>
+                            <div><label>?? (1.25)</label><input type="number" id="p_unk_1_25"></div>
+                            <div><label>?? (1.26)</label><input type="number" id="p_unk_1_26"></div>
+                            <div><label>?? (1.27)</label><input type="number" id="p_unk_1_27"></div>
+                            <div><label>?? (1.28)</label><input type="number" id="p_unk_1_28"></div>
+                            <div><label>?? (1.29)</label><input type="number" id="p_unk_1_29"></div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
         </div>
 
         <!-- TEAM & ROSTER EDIT TAB -->
         <div class="tab-content" id="tabTeam">
             <div style="display: flex; gap: 8px; align-items: center; background-color: var(--win-face); padding: 4px;" class="outset">
-                <label>Select Team:</label>
+                <label><b>Select Team:</b></label>
                 <select id="teamSelect" style="flex: 1;" onchange="loadTeamToForm(this.value)">
                     <option value="0">Atlanta Hawks</option>
                 </select>
-                <button class="win-btn outset" onclick="saveCurrentTeamForm()">Update Team in Memory</button>
             </div>
 
             <fieldset>
                 <legend>Team Details</legend>
-                <div class="form-grid">
-                    <div class="form-group"><label>Team Name 1:</label><input type="text" id="t_Name1"></div>
-                    <div class="form-group"><label>City / Location:</label><input type="text" id="t_City"></div>
-                    <div class="form-group"><label>Arena / Stadium:</label><input type="text" id="t_Stadium"></div>
-                    <div class="form-group"><label>Team Name 2:</label><input type="text" id="t_Name2"></div>
-                    <div class="form-group"><label>Abbreviation:</label><input type="text" id="t_Abbr" maxlength="4"></div>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Rosters (Dual Roster Structure)</legend>
-                <div class="roster-grid">
-                    <div>
-                        <label><b>Primary Roster (Roster 1 - 14 Players)</b></label>
-                        <select id="roster1List" class="roster-select inset" size="14"></select>
-                    </div>
-                    <div>
-                        <label><b>Expansion/Draft Roster (Roster 2 - 13 Players)</b></label>
-                        <select id="roster2List" class="roster-select inset" size="14"></select>
-                    </div>
+                <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div><label>Name 1</label><input type="text" id="t_Name1"></div>
+                    <div><label>City</label><input type="text" id="t_City"></div>
+                    <div><label>Stadium</label><input type="text" id="t_Stadium"></div>
+                    <div><label>Name 2</label><input type="text" id="t_Name2"></div>
+                    <div><label>Abbreviation</label><input type="text" id="t_Abbr" maxlength="4"></div>
                 </div>
             </fieldset>
         </div>
@@ -449,15 +459,12 @@
         <!-- ROM & CSV OPERATIONS TAB -->
         <div class="tab-content" id="tabRaw">
             <fieldset>
-                <legend>File Operations</legend>
-                <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px;">
-                    <p>Load a Sega Genesis <b>NBA Live '96 BIN ROM</b> file or import/export player databases using the 86-column CSV structure.</p>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="win-btn outset" id="btnActionOpenRom">Open ROM (.BIN)</button>
-                        <button class="win-btn outset" id="btnActionImportCsv">Import CSV Data</button>
-                        <button class="win-btn outset" id="btnActionExportCsv">Export CSV Data</button>
-                        <button class="win-btn outset" id="btnActionSaveRom">Save Modified ROM (.BIN)</button>
-                    </div>
+                <legend>ROM & CSV Operations</legend>
+                <div style="display: flex; gap: 10px; padding: 10px;">
+                    <button class="win-btn outset" id="btnActionOpenRom">Open ROM (.BIN)</button>
+                    <button class="win-btn outset" id="btnActionImportCsv">Import CSV Data</button>
+                    <button class="win-btn outset" id="btnActionExportCsv">Export CSV Data</button>
+                    <button class="win-btn outset" id="btnActionSaveRom">Save ROM (.BIN)</button>
                 </div>
             </fieldset>
         </div>
@@ -465,50 +472,166 @@
 
     <!-- Status Bar -->
     <div class="status-bar">
-        <div class="status-pane inset" id="statusMsg">Ready. Load a Genesis BIN ROM or CSV file to begin.</div>
+        <div class="status-pane inset" id="statusMsg">Ready.</div>
         <div class="status-pane inset" style="max-width: 180px;" id="statusRom">ROM: Not Loaded</div>
     </div>
 </div>
 
-<!-- Hidden File Inputs -->
 <input type="file" id="romFileInput" class="hidden-file-input" accept=".bin,.rom">
 <input type="file" id="csvFileInput" class="hidden-file-input" accept=".csv">
 
 <script>
-    // System Data State
-    let romBuffer = null;
     let players = [];
-    let teams = [];
 
-    // Fallback Initializer so controls work even prior to uploading
     function initSampleData() {
         players = [];
         for (let i = 0; i < 470; i++) {
-            players.push({
+            let p = {
                 Index: i,
+                JerseyNumber: (i * 3) % 99, Position: i % 5, Height: 78 + (i % 8), Weight: 110 + (i % 40),
+                School: 7, SkinTone: i % 3, unk_1_0: 6, unk_1_1: 0, Sequence: i, unk_1_2: 75,
+                FieldGoal: 70 + (i % 20), ThreePoint: 50 + (i % 40), FreeThrow: 75, Dunk: 80, Steal: 67, Block: 80,
+                OffRebound: 75, DefRebound: 79, BallControl: 68, DefAware: 85, Speed: 72, Agility: 70, Jump: 77,
+                Dribble: 68, OffAware: 67, unk_1_3: 80, unk_1_4: 80, Overall: 73,
+                unk_1_5: 85, unk_1_6: 114, unk_1_7: 22, unk_1_8: 16, unk_1_9: 7, unk_1_10: 7, unk_1_11: 6,
+                Games: 82, Starts: 63, Minutes: 2340, FieldGoals: 320, FieldGoalAttempts: 677, ThreePointers: 2, ThreePointAttempts: 3,
+                FreeThrows: 152, FreeThrowAttempts: 188, OffRebounds: 154, DefRebounds: 302, Assists: 72, Steals: 45, Blocks: 144,
+                TurnOvers: 108, Points: 794, unk_1_12: 4, unk_1_13: 1, Fouls: 271,
+                unk_1_14: 4, unk_1_15: 32, unk_1_16: 1, unk_1_17: 243, unk_1_18: 0, unk_1_19: 4, unk_1_20: 0,
+                unk_1_21: 3, unk_1_22: 1, unk_1_23: 37, unk_1_24: 0, unk_1_25: 237, unk_1_26: 0, unk_1_27: 224, unk_1_28: 0, unk_1_29: 249,
                 LastName: i === 0 ? "Lang" : (i === 1 ? "Long" : "Player_" + i),
-                FirstName: i === 0 ? "Andrew" : (i === 1 ? "Grant" : "Bench"),
-                JerseyNumber: (i * 3) % 99,
-                Position: i % 5,
-                School: 7,
-                Height: 78 + (i % 8),
-                Weight: 110 + (i % 40),
-                SkinTone: i % 3,
-                FieldGoal: 70 + (i % 20),
-                ThreePoint: 50 + (i % 40),
-                FreeThrow: 75, Dunk: 80, Steal: 65, Block: 70, OffRebound: 70, DefRebound: 75,
-                BallControl: 70, DefAware: 75, Speed: 80, Agility: 75, Jump: 70, Dribble: 75,
-                OffAware: 80, Overall: 78
-            });
+                FirstName: i === 0 ? "Andrew" : (i === 1 ? "Grant" : "Bench")
+            };
+            players.push(p);
         }
         populatePlayerDropdown();
         loadPlayerToForm(0);
-        updateStatus("Sample data initialized. Ready to edit or load ROM.");
     }
 
-    function updateStatus(msg, romState) {
-        document.getElementById('statusMsg').innerText = msg;
-        if (romState) document.getElementById('statusRom').innerText = "ROM: " + romState;
+    function populatePlayerDropdown() {
+        const sel = document.getElementById('playerSelect');
+        sel.innerHTML = '';
+        players.forEach((p, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.innerText = `${String(idx).padStart(3, '0')}: ${p.LastName}, ${p.FirstName}`;
+            sel.appendChild(opt);
+        });
+    }
+
+    function loadPlayerToForm(idx) {
+        const p = players[idx];
+        if (!p) return;
+        
+        document.getElementById('p_JerseyNumber').value = p.JerseyNumber;
+        document.getElementById('p_LastName').value = p.LastName;
+        document.getElementById('p_FirstName').value = p.FirstName;
+        document.getElementById('p_Position').value = p.Position;
+        document.getElementById('p_School').value = p.School;
+        document.getElementById('p_Height').value = p.Height;
+        document.getElementById('p_Weight').value = p.Weight;
+        document.getElementById('p_SkinTone').value = p.SkinTone;
+
+        document.getElementById('p_FieldGoal').value = p.FieldGoal;
+        document.getElementById('p_ThreePoint').value = p.ThreePoint;
+        document.getElementById('p_FreeThrow').value = p.FreeThrow;
+        document.getElementById('p_Dunk').value = p.Dunk;
+        document.getElementById('p_Steal').value = p.Steal;
+        document.getElementById('p_Block').value = p.Block;
+        document.getElementById('p_OffRebound').value = p.OffRebound;
+        document.getElementById('p_DefRebound').value = p.DefRebound;
+        document.getElementById('p_BallControl').value = p.BallControl;
+        document.getElementById('p_DefAware').value = p.DefAware;
+        document.getElementById('p_Speed').value = p.Speed;
+        document.getElementById('p_Agility').value = p.Agility;
+        document.getElementById('p_Jump').value = p.Jump;
+        document.getElementById('p_Dribble').value = p.Dribble;
+        document.getElementById('p_OffAware').value = p.OffAware;
+        document.getElementById('p_Overall').value = p.Overall;
+
+        // Populate Unknown & Stats fields
+        document.getElementById('p_unk_1_0').value = p.unk_1_0;
+        document.getElementById('p_unk_1_1').value = p.unk_1_1;
+        document.getElementById('p_unk_1_2').value = p.unk_1_2;
+        document.getElementById('p_unk_1_3').value = p.unk_1_3;
+        document.getElementById('p_unk_1_4').value = p.unk_1_4;
+        document.getElementById('p_unk_1_5').value = p.unk_1_5;
+        document.getElementById('p_unk_1_6').value = p.unk_1_6;
+        document.getElementById('p_unk_1_7').value = p.unk_1_7;
+        document.getElementById('p_unk_1_8').value = p.unk_1_8;
+        document.getElementById('p_unk_1_9').value = p.unk_1_9;
+        document.getElementById('p_unk_1_10').value = p.unk_1_10;
+        document.getElementById('p_unk_1_11').value = p.unk_1_11;
+
+        document.getElementById('p_Games').value = p.Games;
+        document.getElementById('p_Starts').value = p.Starts;
+        document.getElementById('p_Minutes').value = p.Minutes;
+        document.getElementById('p_FieldGoals').value = p.FieldGoals;
+        document.getElementById('p_FieldGoalAttempts').value = p.FieldGoalAttempts;
+        document.getElementById('p_ThreePointers').value = p.ThreePointers;
+        document.getElementById('p_ThreePointAttempts').value = p.ThreePointAttempts;
+        document.getElementById('p_FreeThrows').value = p.FreeThrows;
+        document.getElementById('p_FreeThrowAttempts').value = p.FreeThrowAttempts;
+        document.getElementById('p_OffRebounds').value = p.OffRebounds;
+        document.getElementById('p_DefRebounds').value = p.DefRebounds;
+        document.getElementById('p_Assists').value = p.Assists;
+        document.getElementById('p_Steals').value = p.Steals;
+        document.getElementById('p_Blocks').value = p.Blocks;
+        document.getElementById('p_TurnOvers').value = p.TurnOvers;
+        document.getElementById('p_Fouls').value = p.Fouls;
+        document.getElementById('p_Points').value = p.Points;
+
+        document.getElementById('p_unk_1_12').value = p.unk_1_12;
+        document.getElementById('p_unk_1_13').value = p.unk_1_13;
+        document.getElementById('p_unk_1_14').value = p.unk_1_14;
+        document.getElementById('p_unk_1_15').value = p.unk_1_15;
+        document.getElementById('p_unk_1_16').value = p.unk_1_16;
+        document.getElementById('p_unk_1_17').value = p.unk_1_17;
+        document.getElementById('p_unk_1_18').value = p.unk_1_18;
+        document.getElementById('p_unk_1_19').value = p.unk_1_19;
+        document.getElementById('p_unk_1_20').value = p.unk_1_20;
+        document.getElementById('p_unk_1_21').value = p.unk_1_21;
+        document.getElementById('p_unk_1_22').value = p.unk_1_22;
+        document.getElementById('p_unk_1_23').value = p.unk_1_23;
+        document.getElementById('p_unk_1_24').value = p.unk_1_24;
+        document.getElementById('p_unk_1_25').value = p.unk_1_25;
+        document.getElementById('p_unk_1_26').value = p.unk_1_26;
+        document.getElementById('p_unk_1_27').value = p.unk_1_27;
+        document.getElementById('p_unk_1_28').value = p.unk_1_28;
+        document.getElementById('p_unk_1_29').value = p.unk_1_29;
+    }
+
+    function saveCurrentPlayerForm() {
+        const idx = parseInt(document.getElementById('playerSelect').value);
+        if (isNaN(idx) || !players[idx]) return;
+
+        let p = players[idx];
+        p.JerseyNumber = parseInt(document.getElementById('p_JerseyNumber').value) || 0;
+        p.LastName = document.getElementById('p_LastName').value;
+        p.FirstName = document.getElementById('p_FirstName').value;
+        p.Position = parseInt(document.getElementById('p_Position').value) || 0;
+        p.School = parseInt(document.getElementById('p_School').value) || 0;
+        p.Height = parseInt(document.getElementById('p_Height').value) || 0;
+        p.Weight = parseInt(document.getElementById('p_Weight').value) || 0;
+        p.SkinTone = parseInt(document.getElementById('p_SkinTone').value) || 0;
+
+        p.FieldGoal = parseInt(document.getElementById('p_FieldGoal').value) || 0;
+        p.ThreePoint = parseInt(document.getElementById('p_ThreePoint').value) || 0;
+        p.Overall = parseInt(document.getElementById('p_Overall').value) || 0;
+
+        p.unk_1_0 = parseInt(document.getElementById('p_unk_1_0').value) || 0;
+        p.unk_1_1 = parseInt(document.getElementById('p_unk_1_1').value) || 0;
+        p.unk_1_2 = parseInt(document.getElementById('p_unk_1_2').value) || 0;
+        p.unk_1_5 = parseInt(document.getElementById('p_unk_1_5').value) || 0;
+
+        p.Games = parseInt(document.getElementById('p_Games').value) || 0;
+        p.Starts = parseInt(document.getElementById('p_Starts').value) || 0;
+        p.Minutes = parseInt(document.getElementById('p_Minutes').value) || 0;
+        p.Points = parseInt(document.getElementById('p_Points').value) || 0;
+
+        populatePlayerDropdown();
+        document.getElementById('playerSelect').value = idx;
+        document.getElementById('statusMsg').innerText = `Player ${idx} (${p.LastName}) saved.`;
     }
 
     function switchTab(tabName) {
@@ -527,151 +650,17 @@
         }
     }
 
-    function populatePlayerDropdown() {
-        const sel = document.getElementById('playerSelect');
-        sel.innerHTML = '';
-        players.forEach((p, idx) => {
-            const opt = document.createElement('option');
-            opt.value = idx;
-            opt.innerText = `${String(idx).padStart(3, '0')}: ${p.LastName}, ${p.FirstName}`;
-            sel.appendChild(opt);
-        });
-    }
-
-    function loadPlayerToForm(index) {
-        const p = players[index];
-        if (!p) return;
-        document.getElementById('p_LastName').value = p.LastName || '';
-        document.getElementById('p_FirstName').value = p.FirstName || '';
-        document.getElementById('p_JerseyNumber').value = p.JerseyNumber || 0;
-        document.getElementById('p_Position').value = p.Position || 0;
-        document.getElementById('p_School').value = p.School || 0;
-        document.getElementById('p_Height').value = p.Height || 0;
-        document.getElementById('p_Weight').value = p.Weight || 0;
-        document.getElementById('p_SkinTone').value = p.SkinTone || 0;
-        document.getElementById('p_FieldGoal').value = p.FieldGoal || 0;
-        document.getElementById('p_ThreePoint').value = p.ThreePoint || 0;
-        document.getElementById('p_FreeThrow').value = p.FreeThrow || 0;
-        document.getElementById('p_Dunk').value = p.Dunk || 0;
-        document.getElementById('p_Steal').value = p.Steal || 0;
-        document.getElementById('p_Block').value = p.Block || 0;
-        document.getElementById('p_OffRebound').value = p.OffRebound || 0;
-        document.getElementById('p_DefRebound').value = p.DefRebound || 0;
-        document.getElementById('p_BallControl').value = p.BallControl || 0;
-        document.getElementById('p_DefAware').value = p.DefAware || 0;
-        document.getElementById('p_Speed').value = p.Speed || 0;
-        document.getElementById('p_Agility').value = p.Agility || 0;
-        document.getElementById('p_Jump').value = p.Jump || 0;
-        document.getElementById('p_Dribble').value = p.Dribble || 0;
-        document.getElementById('p_OffAware').value = p.OffAware || 0;
-        document.getElementById('p_Overall').value = p.Overall || 0;
-    }
-
-    function saveCurrentPlayerForm() {
-        const idx = parseInt(document.getElementById('playerSelect').value);
-        if (isNaN(idx) || !players[idx]) return;
-        
-        players[idx].LastName = document.getElementById('p_LastName').value;
-        players[idx].FirstName = document.getElementById('p_FirstName').value;
-        players[idx].JerseyNumber = parseInt(document.getElementById('p_JerseyNumber').value) || 0;
-        players[idx].Position = parseInt(document.getElementById('p_Position').value) || 0;
-        players[idx].School = parseInt(document.getElementById('p_School').value) || 0;
-        players[idx].Height = parseInt(document.getElementById('p_Height').value) || 0;
-        players[idx].Weight = parseInt(document.getElementById('p_Weight').value) || 0;
-        players[idx].SkinTone = parseInt(document.getElementById('p_SkinTone').value) || 0;
-        players[idx].FieldGoal = parseInt(document.getElementById('p_FieldGoal').value) || 0;
-        players[idx].ThreePoint = parseInt(document.getElementById('p_ThreePoint').value) || 0;
-        players[idx].Overall = parseInt(document.getElementById('p_Overall').value) || 0;
-
-        populatePlayerDropdown();
-        document.getElementById('playerSelect').value = idx;
-        updateStatus(`Player ${idx} (${players[idx].LastName}) updated in memory.`);
-    }
-
-    // CSV Handling Engine
-    function exportToCSV() {
-        let headers = ["JerseyNumber:1","Position:1","Height:1","Weight:1:+100","School:1","SkinTone:1","Sequence:2","FieldGoal:1","ThreePoint:1","FreeThrow:1","Dunk:1","Steal:1","Block:1","OffRebound:1","DefRebound:1","BallControl:1","DefAware:1","Speed:1","Agility:1","Jump:1","Dribble:1","OffAware:1","Overall:1","LastName:ascii","FirstName:ascii"];
-        let rows = [headers.join(",")];
-
-        players.forEach((p, idx) => {
-            let row = [
-                p.JerseyNumber, p.Position, p.Height, p.Weight, p.School, p.SkinTone, idx,
-                p.FieldGoal, p.ThreePoint, p.FreeThrow, p.Dunk, p.Steal, p.Block,
-                p.OffRebound, p.DefRebound, p.BallControl, p.DefAware, p.Speed, p.Agility,
-                p.Jump, p.Dribble, p.OffAware, p.Overall,
-                `"${p.LastName || ''}"`, `"${p.FirstName || ''}"`
-            ];
-            rows.push(row.join(","));
-        });
-
-        let csvBlob = new Blob([rows.join("\n")], { type: "text/csv" });
-        let url = URL.createObjectURL(csvBlob);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = "NBALIVE96_EXPORT.CSV";
-        a.click();
-        updateStatus("CSV exported successfully.");
-    }
-
-    function importCSV(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const lines = e.target.result.split(/\r?\n/);
-            if (lines.length < 2) return;
-            
-            let loadedCount = 0;
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                const cols = lines[i].split(",").map(c => c.replace(/^"|"$/g, '').trim());
-                if (cols.length >= 24) {
-                    if (!players[loadedCount]) players[loadedCount] = {};
-                    players[loadedCount].JerseyNumber = parseInt(cols[0]) || 0;
-                    players[loadedCount].Position = parseInt(cols[1]) || 0;
-                    players[loadedCount].Height = parseInt(cols[2]) || 0;
-                    players[loadedCount].Weight = parseInt(cols[3]) || 0;
-                    players[loadedCount].LastName = cols[23] || ("Player_" + loadedCount);
-                    players[loadedCount].FirstName = cols[24] || "Imported";
-                    loadedCount++;
-                }
-            }
-            populatePlayerDropdown();
-            loadPlayerToForm(0);
-            updateStatus(`Imported ${loadedCount} players from CSV.`);
-        };
-        reader.readAsText(file);
-    }
-
-    // Trigger Binding
     document.addEventListener("DOMContentLoaded", function() {
         initSampleData();
 
         const romInput = document.getElementById('romFileInput');
         const csvInput = document.getElementById('csvFileInput');
 
-        // File Trigger Handlers
-        const triggerRom = () => romInput.click();
-        const triggerCsv = () => csvInput.click();
+        document.getElementById('btnMenuOpenRom').onclick = () => romInput.click();
+        document.getElementById('btnActionOpenRom').onclick = () => romInput.click();
 
-        document.getElementById('btnMenuOpenRom').addEventListener('click', triggerRom);
-        document.getElementById('btnActionOpenRom').addEventListener('click', triggerRom);
-
-        document.getElementById('btnMenuImportCsv').addEventListener('click', triggerCsv);
-        document.getElementById('btnActionImportCsv').addEventListener('click', triggerCsv);
-
-        document.getElementById('btnMenuExportCsv').addEventListener('click', exportToCSV);
-        document.getElementById('btnActionExportCsv').addEventListener('click', exportToCSV);
-
-        romInput.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                updateStatus("Loaded ROM: " + e.target.files[0].name, "Loaded (" + e.target.files[0].name + ")");
-            }
-        });
-
-        csvInput.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-                importCSV(e.target.files[0]);
-            }
-        });
+        document.getElementById('btnMenuImportCsv').onclick = () => csvInput.click();
+        document.getElementById('btnActionImportCsv').onclick = () => csvInput.click();
     });
 </script>
 </body>
