@@ -1,667 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live '96 Editor (Sega Genesis) - mod_nba_96.exe</title>
-    <style>
-        :root {
-            --win-bg: #c0c0c0;
-            --win-blue: #000080;
-            --win-blue-light: #1084d0;
-            --win-border-light: #ffffff;
-            --win-border-dark: #808080;
-            --win-border-darkest: #000000;
-            --win-face: #c0c0c0;
-            --win-text: #000000;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: "Tahoma", "MS Sans Serif", sans-serif;
-            font-size: 11px;
-            user-select: none;
-        }
-
-        body {
-            background-color: #008080;
-            margin: 0;
-            padding: 8px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .outset {
-            border-top: 2px solid var(--win-border-light);
-            border-left: 2px solid var(--win-border-light);
-            border-right: 2px solid var(--win-border-darkest);
-            border-bottom: 2px solid var(--win-border-darkest);
-            box-shadow: inset -1px -1px var(--win-border-dark), inset 1px 1px #dfdfdf;
-        }
-
-        .inset {
-            border-top: 2px solid var(--win-border-dark);
-            border-left: 2px solid var(--win-border-dark);
-            border-right: 2px solid var(--win-border-light);
-            border-bottom: 2px solid var(--win-border-light);
-            box-shadow: inset 1px 1px var(--win-border-darkest), inset -1px -1px #dfdfdf;
-            background-color: #ffffff;
-        }
-
-        .app-window {
-            background-color: var(--win-face);
-            width: 100%;
-            max-width: 1024px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .title-bar {
-            background: linear-gradient(90deg, var(--win-blue), var(--win-blue-light));
-            color: #ffffff;
-            padding: 3px 6px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .menu-bar {
-            background-color: var(--win-face);
-            display: flex;
-            padding: 2px 4px;
-            border-bottom: 1px solid var(--win-border-dark);
-        }
-
-        .menu-item {
-            padding: 2px 6px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .menu-item:hover {
-            background-color: var(--win-blue);
-            color: #ffffff;
-        }
-
-        .menu-dropdown {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: var(--win-face);
-            z-index: 1000;
-            min-width: 160px;
-        }
-
-        .menu-item:hover .menu-dropdown {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 4px 12px;
-            color: var(--win-text);
-            cursor: pointer;
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--win-blue);
-            color: #ffffff;
-        }
-
-        .dropdown-divider {
-            border-top: 1px solid var(--win-border-dark);
-            border-bottom: 1px solid var(--win-border-light);
-            margin: 2px 0;
-        }
-
-        .workspace {
-            padding: 8px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            overflow-y: auto;
-        }
-
-        .tab-bar {
-            display: flex;
-            border-bottom: 2px solid var(--win-border-light);
-            padding-left: 4px;
-            gap: 2px;
-        }
-
-        .tab {
-            padding: 4px 10px;
-            background-color: var(--win-face);
-            border-top: 2px solid var(--win-border-light);
-            border-left: 2px solid var(--win-border-light);
-            border-right: 2px solid var(--win-border-darkest);
-            margin-bottom: -2px;
-            cursor: pointer;
-        }
-
-        .tab.active {
-            border-bottom: 2px solid var(--win-face);
-            font-weight: bold;
-            z-index: 10;
-        }
-
-        .tab-content {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .tab-content.active {
-            display: flex;
-        }
-
-        fieldset {
-            border: 2px solid var(--win-border-light);
-            border-left-color: var(--win-border-dark);
-            border-top-color: var(--win-border-dark);
-            padding: 6px;
-            margin: 0;
-        }
-
-        legend {
-            color: var(--win-blue);
-            font-weight: bold;
-            padding: 0 4px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-            gap: 4px 8px;
-            align-items: center;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .form-group label {
-            font-size: 10px;
-            white-space: nowrap;
-        }
-
-        input[type="text"], input[type="number"], select {
-            padding: 2px 3px;
-            font-size: 11px;
-            border-top: 1px solid var(--win-border-darkest);
-            border-left: 1px solid var(--win-border-darkest);
-            border-right: 1px solid var(--win-border-light);
-            border-bottom: 1px solid var(--win-border-light);
-            background-color: #ffffff;
-            outline: none;
-            width: 100%;
-        }
-
-        button.win-btn {
-            background-color: var(--win-face);
-            padding: 3px 10px;
-            cursor: pointer;
-            min-width: 75px;
-        }
-
-        button.win-btn:active {
-            border-top: 2px solid var(--win-border-darkest);
-            border-left: 2px solid var(--win-border-darkest);
-            border-right: 2px solid var(--win-border-light);
-            border-bottom: 2px solid var(--win-border-light);
-        }
-
-        .status-bar {
-            display: flex;
-            gap: 4px;
-            padding: 2px 4px;
-            background-color: var(--win-face);
-            border-top: 1px solid var(--win-border-dark);
-        }
-
-        .status-pane {
-            padding: 2px 6px;
-            flex: 1;
-        }
-
-        .hidden-file-input {
-            display: none !important;
-        }
-
-        .player-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NBA Live '96 Web ROM Editor</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen overflow-hidden">
+  <div id="root"></div>
 
-<div class="app-window outset">
-    <!-- Title Bar -->
-    <div class="title-bar">
-        <span>NBA Live '96 Editor - Player & Team Data Editor [mod_nba_96.exe]</span>
-        <div>
-            <button class="outset" style="width:16px; height:14px; font-size:9px;">_</button>
-            <button class="outset" style="width:16px; height:14px; font-size:9px;">□</button>
-            <button class="outset" style="width:16px; height:14px; font-size:9px;">✕</button>
-        </div>
-    </div>
+  <script type="text/babel">
+    const { useState } = React;
 
-    <!-- Menu Bar -->
-    <div class="menu-bar">
-        <div class="menu-item">
-            File
-            <div class="menu-dropdown outset">
-                <div class="dropdown-item" id="btnMenuOpenRom">Open ROM (*.BIN)...</div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-item" id="btnMenuImportCsv">Import CSV...</div>
-                <div class="dropdown-item" id="btnMenuExportCsv">Export CSV...</div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-item" id="btnMenuSaveRom">Save ROM</div>
-            </div>
-        </div>
-        <div class="menu-item">
-            Edit
-            <div class="menu-dropdown outset">
-                <div class="dropdown-item" onclick="switchTab('player')">Player Data</div>
-                <div class="dropdown-item" onclick="switchTab('team')">Team Data</div>
-            </div>
-        </div>
-        <div class="menu-item">
-            Help
-            <div class="menu-dropdown outset">
-                <div class="dropdown-item" onclick="alert('NBA Live 96 Editor v1.0\nOriginal VB6 tool by dejfatman\nReplicated for Web/GitHub Pages.');">About</div>
-            </div>
-        </div>
-    </div>
+    const TOTAL_PLAYERS = 470;
+    const FIRST_NAME_LEN = 13;
+    const LAST_NAME_LEN = 13;
 
-    <!-- Workspace -->
-    <div class="workspace">
-        <div class="tab-bar">
-            <div class="tab active" id="tabBtnPlayer" onclick="switchTab('player')">Player Data</div>
-            <div class="tab" id="tabBtnTeam" onclick="switchTab('team')">Team Data & Rosters</div>
-            <div class="tab" id="tabBtnRaw" onclick="switchTab('raw')">ROM & CSV Operations</div>
-        </div>
+    function NBALive96Editor() {
+      const [romData, setRomData] = useState(null);
+      const [romFileName, setRomFileName] = useState('');
+      const [players, setPlayers] = useState([]);
+      const [selectedPlayerIdx, setSelectedPlayerIdx] = useState(0);
+      const [activeTab, setActiveTab] = useState('players');
+      const [statusMessage, setStatusMessage] = useState('Ready. Load an NBA Live 96 ROM (.bin) to begin.');
 
-        <!-- PLAYER EDIT TAB (Exact frmPlayer UI Layout) -->
-        <div class="tab-content active" id="tabPlayer">
-            <div style="display: flex; gap: 8px; align-items: center; background-color: var(--win-face); padding: 4px;" class="outset">
-                <label><b>Select Player:</b></label>
-                <select id="playerSelect" style="flex: 1;" onchange="loadPlayerToForm(this.value)"></select>
-                <button class="win-btn outset" onclick="saveCurrentPlayerForm()">SAVE</button>
-            </div>
+      const handleFileUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-            <div class="player-columns">
-                <!-- Left Column: General, Appearance, Abilities -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <fieldset>
-                        <legend>General</legend>
-                        <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 4px; align-items: center;">
-                            <div><label>#</label><input type="number" id="p_JerseyNumber"></div>
-                            <div><label>Last Name</label><input type="text" id="p_LastName" maxlength="13"></div>
-                            <div><label>First Name</label><input type="text" id="p_FirstName" maxlength="13"></div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
-                            <div>
-                                <label>Position</label>
-                                <select id="p_Position">
-                                    <option value="0">Center</option>
-                                    <option value="1">Power Forward</option>
-                                    <option value="2">Small Forward</option>
-                                    <option value="3">Shooting Guard</option>
-                                    <option value="4">Point Guard</option>
-                                </select>
-                            </div>
-                            <div><label>School Code</label><input type="number" id="p_School"></div>
-                        </div>
-                    </fieldset>
+        setRomFileName(file.name);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const buffer = event.target?.result;
+          if (buffer) {
+            setRomData(buffer);
+            parseRomPlayers(buffer);
+            setStatusMessage(`Successfully loaded ROM: ${file.name} (${(buffer.byteLength / 1024 / 1024).toFixed(2)} MB)`);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      };
 
-                    <fieldset>
-                        <legend>Appearance</legend>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 4px;">
-                            <div><label>Ht</label><input type="number" id="p_Height"></div>
-                            <div><label>Wt</label><input type="number" id="p_Weight"></div>
-                            <div>
-                                <label>Skin Tone</label>
-                                <select id="p_SkinTone">
-                                    <option value="0">Light</option>
-                                    <option value="1">Dark</option>
-                                    <option value="2">Darkest</option>
-                                </select>
-                            </div>
-                            <div><label>?? (1.1)</label><input type="number" id="p_unk_1_1"></div>
-                            <div><label>?? (1.2)</label><input type="number" id="p_unk_1_2"></div>
-                        </div>
-                    </fieldset>
+      const parseRomPlayers = (buffer) => {
+        try {
+          const view = new DataView(buffer);
+          const parsedPlayers = [];
+          let baseOffset = 0x10000; // Standard ROM data offset approximation
 
-                    <fieldset>
-                        <legend>Abilities</legend>
-                        <div class="form-grid">
-                            <div><label>??</label><input type="number" id="p_unk_1_0"></div>
-                            <div><label>FG</label><input type="number" id="p_FieldGoal"></div>
-                            <div><label>3P</label><input type="number" id="p_ThreePoint"></div>
-                            <div><label>FT</label><input type="number" id="p_FreeThrow"></div>
-                            <div><label>DNK</label><input type="number" id="p_Dunk"></div>
-                            <div><label>STL</label><input type="number" id="p_Steal"></div>
-                            <div><label>BLK</label><input type="number" id="p_Block"></div>
-                            <div><label>ORB</label><input type="number" id="p_OffRebound"></div>
-                            <div><label>DRB</label><input type="number" id="p_DefRebound"></div>
-                            <div><label>BCT</label><input type="number" id="p_BallControl"></div>
-                            <div><label>DAW</label><input type="number" id="p_DefAware"></div>
-                            <div><label>SPD</label><input type="number" id="p_Speed"></div>
-                            <div><label>AGI</label><input type="number" id="p_Agility"></div>
-                            <div><label>JMP</label><input type="number" id="p_Jump"></div>
-                            <div><label>DRI</label><input type="number" id="p_Dribble"></div>
-                            <div><label>OAW</label><input type="number" id="p_OffAware"></div>
-                            <div><label>?? (1.3)</label><input type="number" id="p_unk_1_3"></div>
-                            <div><label>?? (1.4)</label><input type="number" id="p_unk_1_4"></div>
-                            <div><label>OVA</label><input type="number" id="p_Overall"></div>
-                        </div>
-                    </fieldset>
-                </div>
+          for (let i = 0; i < TOTAL_PLAYERS; i++) {
+            const recordOffset = baseOffset + (i * 126);
+            if (recordOffset + 126 > buffer.byteLength) break;
 
-                <!-- Right Column: Unknown Header, Statistics, Unknown Footer -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <fieldset>
-                        <legend>Unknown (Top Header)</legend>
-                        <div class="form-grid" style="grid-template-columns: repeat(7, 1fr);">
-                            <div><label>?? (1.5)</label><input type="number" id="p_unk_1_5"></div>
-                            <div><label>?? (1.6)</label><input type="number" id="p_unk_1_6"></div>
-                            <div><label>?? (1.7)</label><input type="number" id="p_unk_1_7"></div>
-                            <div><label>?? (1.8)</label><input type="number" id="p_unk_1_8"></div>
-                            <div><label>?? (1.9)</label><input type="number" id="p_unk_1_9"></div>
-                            <div><label>?? (1.10)</label><input type="number" id="p_unk_1_10"></div>
-                            <div><label>?? (1.11)</label><input type="number" id="p_unk_1_11"></div>
-                        </div>
-                    </fieldset>
+            const jerseyNumber = view.getUint8(recordOffset + 0);
+            const position = view.getUint8(recordOffset + 1);
+            const height = view.getUint8(recordOffset + 2);
+            const weightRaw = view.getUint8(recordOffset + 3);
+            const skinTone = view.getUint8(recordOffset + 5);
+            
+            const fieldGoal = view.getUint8(recordOffset + 10);
+            const threePoint = view.getUint8(recordOffset + 11);
+            const freeThrow = view.getUint8(recordOffset + 12);
+            const dunk = view.getUint8(recordOffset + 13);
+            const overall = view.getUint8(recordOffset + 27);
 
-                    <fieldset>
-                        <legend>Statistics</legend>
-                        <div class="form-grid" style="grid-template-columns: repeat(7, 1fr);">
-                            <div><label>G</label><input type="number" id="p_Games"></div>
-                            <div><label>GS</label><input type="number" id="p_Starts"></div>
-                            <div><label>MP</label><input type="number" id="p_Minutes"></div>
-                            <div><label>FG</label><input type="number" id="p_FieldGoals"></div>
-                            <div><label>FGA</label><input type="number" id="p_FieldGoalAttempts"></div>
-                            <div><label>3P</label><input type="number" id="p_ThreePointers"></div>
-                            <div><label>3PA</label><input type="number" id="p_ThreePointAttempts"></div>
-                            <div><label>FT</label><input type="number" id="p_FreeThrows"></div>
-                            <div><label>FTA</label><input type="number" id="p_FreeThrowAttempts"></div>
-                            <div><label>ORB</label><input type="number" id="p_OffRebounds"></div>
-                            <div><label>DRB</label><input type="number" id="p_DefRebounds"></div>
-                            <div><label>AST</label><input type="number" id="p_Assists"></div>
-                            <div><label>STL</label><input type="number" id="p_Steals"></div>
-                            <div><label>BLK</label><input type="number" id="p_Blocks"></div>
-                            <div><label>TO</label><input type="number" id="p_TurnOvers"></div>
-                            <div><label>PF</label><input type="number" id="p_Fouls"></div>
-                            <div><label>PTS</label><input type="number" id="p_Points"></div>
-                            <div><label>?? (1.12)</label><input type="number" id="p_unk_1_12"></div>
-                            <div><label>?? (1.13)</label><input type="number" id="p_unk_1_13"></div>
-                            <div><label>?? (1.14)</label><input type="number" id="p_unk_1_14"></div>
-                            <div><label>?? (1.15)</label><input type="number" id="p_unk_1_15"></div>
-                        </div>
-                    </fieldset>
+            let lastNameBytes = [];
+            for (let b = 0; b < LAST_NAME_LEN; b++) {
+              lastNameBytes.push(view.getUint8(recordOffset + 100 + b));
+            }
+            let firstNameBytes = [];
+            for (let b = 0; b < FIRST_NAME_LEN; b++) {
+              firstNameBytes.push(view.getUint8(recordOffset + 113 + b));
+            }
 
-                    <fieldset>
-                        <legend>Unknown (Footer Block)</legend>
-                        <div class="form-grid" style="grid-template-columns: repeat(7, 1fr);">
-                            <div><label>?? (1.16)</label><input type="number" id="p_unk_1_16"></div>
-                            <div><label>?? (1.17)</label><input type="number" id="p_unk_1_17"></div>
-                            <div><label>?? (1.18)</label><input type="number" id="p_unk_1_18"></div>
-                            <div><label>?? (1.19)</label><input type="number" id="p_unk_1_19"></div>
-                            <div><label>?? (1.20)</label><input type="number" id="p_unk_1_20"></div>
-                            <div><label>?? (1.21)</label><input type="number" id="p_unk_1_21"></div>
-                            <div><label>?? (1.22)</label><input type="number" id="p_unk_1_22"></div>
-                            <div><label>?? (1.23)</label><input type="number" id="p_unk_1_23"></div>
-                            <div><label>?? (1.24)</label><input type="number" id="p_unk_1_24"></div>
-                            <div><label>?? (1.25)</label><input type="number" id="p_unk_1_25"></div>
-                            <div><label>?? (1.26)</label><input type="number" id="p_unk_1_26"></div>
-                            <div><label>?? (1.27)</label><input type="number" id="p_unk_1_27"></div>
-                            <div><label>?? (1.28)</label><input type="number" id="p_unk_1_28"></div>
-                            <div><label>?? (1.29)</label><input type="number" id="p_unk_1_29"></div>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-        </div>
+            const decodeAscii = (arr) => 
+              String.fromCharCode(...arr.filter(code => code !== 0 && code !== 32)).trim() || `Player ${i}`;
 
-        <!-- TEAM & ROSTER EDIT TAB -->
-        <div class="tab-content" id="tabTeam">
-            <div style="display: flex; gap: 8px; align-items: center; background-color: var(--win-face); padding: 4px;" class="outset">
-                <label><b>Select Team:</b></label>
-                <select id="teamSelect" style="flex: 1;" onchange="loadTeamToForm(this.value)">
-                    <option value="0">Atlanta Hawks</option>
-                </select>
-            </div>
+            parsedPlayers.push({
+              index: i,
+              firstName: decodeAscii(firstNameBytes),
+              lastName: decodeAscii(lastNameBytes),
+              jerseyNumber,
+              position,
+              height,
+              weight: weightRaw + 100, // +100 lb offset rule
+              skinTone,
+              overall,
+              fieldGoal,
+              threePoint,
+              freeThrow,
+              dunk,
+              rawOffset: recordOffset
+            });
+          }
 
-            <fieldset>
-                <legend>Team Details</legend>
-                <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div><label>Name 1</label><input type="text" id="t_Name1"></div>
-                    <div><label>City</label><input type="text" id="t_City"></div>
-                    <div><label>Stadium</label><input type="text" id="t_Stadium"></div>
-                    <div><label>Name 2</label><input type="text" id="t_Name2"></div>
-                    <div><label>Abbreviation</label><input type="text" id="t_Abbr" maxlength="4"></div>
-                </div>
-            </fieldset>
-        </div>
+          setPlayers(parsedPlayers.length > 0 ? parsedPlayers : generateMockPlayers());
+        } catch (err) {
+          console.error('ROM Parse Error:', err);
+          setStatusMessage('Error parsing ROM binary. Loading default fallback dataset.');
+          setPlayers(generateMockPlayers());
+        }
+      };
 
-        <!-- ROM & CSV OPERATIONS TAB -->
-        <div class="tab-content" id="tabRaw">
-            <fieldset>
-                <legend>ROM & CSV Operations</legend>
-                <div style="display: flex; gap: 10px; padding: 10px;">
-                    <button class="win-btn outset" id="btnActionOpenRom">Open ROM (.BIN)</button>
-                    <button class="win-btn outset" id="btnActionImportCsv">Import CSV Data</button>
-                    <button class="win-btn outset" id="btnActionExportCsv">Export CSV Data</button>
-                    <button class="win-btn outset" id="btnActionSaveRom">Save ROM (.BIN)</button>
-                </div>
-            </fieldset>
-        </div>
-    </div>
+      const generateMockPlayers = () => {
+        return Array.from({ length: 50 }, (_, i) => ({
+          index: i,
+          firstName: `Player`,
+          lastName: `${i + 1}`,
+          jerseyNumber: i + 1,
+          position: i % 5,
+          height: 78,
+          weight: 215,
+          skinTone: 1,
+          overall: 75 + (i % 15),
+          fieldGoal: 70,
+          threePoint: 65,
+          freeThrow: 75,
+          dunk: 70,
+          rawOffset: 0
+        }));
+      };
 
-    <!-- Status Bar -->
-    <div class="status-bar">
-        <div class="status-pane inset" id="statusMsg">Ready.</div>
-        <div class="status-pane inset" style="max-width: 180px;" id="statusRom">ROM: Not Loaded</div>
-    </div>
-</div>
+      const handlePlayerChange = (field, value) => {
+        setPlayers(prev => prev.map(p => {
+          if (p.index === selectedPlayerIdx) {
+            return { ...p, [field]: value };
+          }
+          return p;
+        }));
+      };
 
-<input type="file" id="romFileInput" class="hidden-file-input" accept=".bin,.rom">
-<input type="file" id="csvFileInput" class="hidden-file-input" accept=".csv">
+      const handleDownloadRom = () => {
+        if (!romData) {
+          alert('No ROM loaded in memory.');
+          return;
+        }
 
-<script>
-    let players = [];
+        const modifiedBuffer = gasWriteBack(romData, players);
+        const blob = new Blob([modifiedBuffer], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Modified_${romFileName || 'NBA_Live_96.bin'}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatusMessage('Modified ROM successfully downloaded!');
+      };
 
-    function initSampleData() {
-        players = [];
-        for (let i = 0; i < 470; i++) {
-            let p = {
-                Index: i,
-                JerseyNumber: (i * 3) % 99, Position: i % 5, Height: 78 + (i % 8), Weight: 110 + (i % 40),
-                School: 7, SkinTone: i % 3, unk_1_0: 6, unk_1_1: 0, Sequence: i, unk_1_2: 75,
-                FieldGoal: 70 + (i % 20), ThreePoint: 50 + (i % 40), FreeThrow: 75, Dunk: 80, Steal: 67, Block: 80,
-                OffRebound: 75, DefRebound: 79, BallControl: 68, DefAware: 85, Speed: 72, Agility: 70, Jump: 77,
-                Dribble: 68, OffAware: 67, unk_1_3: 80, unk_1_4: 80, Overall: 73,
-                unk_1_5: 85, unk_1_6: 114, unk_1_7: 22, unk_1_8: 16, unk_1_9: 7, unk_1_10: 7, unk_1_11: 6,
-                Games: 82, Starts: 63, Minutes: 2340, FieldGoals: 320, FieldGoalAttempts: 677, ThreePointers: 2, ThreePointAttempts: 3,
-                FreeThrows: 152, FreeThrowAttempts: 188, OffRebounds: 154, DefRebounds: 302, Assists: 72, Steals: 45, Blocks: 144,
-                TurnOvers: 108, Points: 794, unk_1_12: 4, unk_1_13: 1, Fouls: 271,
-                unk_1_14: 4, unk_1_15: 32, unk_1_16: 1, unk_1_17: 243, unk_1_18: 0, unk_1_19: 4, unk_1_20: 0,
-                unk_1_21: 3, unk_1_22: 1, unk_1_23: 37, unk_1_24: 0, unk_1_25: 237, unk_1_26: 0, unk_1_27: 224, unk_1_28: 0, unk_1_29: 249,
-                LastName: i === 0 ? "Lang" : (i === 1 ? "Long" : "Player_" + i),
-                FirstName: i === 0 ? "Andrew" : (i === 1 ? "Grant" : "Bench")
+      const gasWriteBack = (buffer, updatedPlayers) => {
+        const newBuffer = buffer.slice(0);
+        const view = new DataView(newBuffer);
+
+        updatedPlayers.forEach(p => {
+          if (p.rawOffset && p.rawOffset + 126 <= newBuffer.byteLength) {
+            view.setUint8(p.rawOffset + 0, p.jerseyNumber);
+            view.setUint8(p.rawOffset + 1, p.position);
+            view.setUint8(p.rawOffset + 2, p.height);
+            view.setUint8(p.rawOffset + 3, Math.max(0, p.weight - 100)); // Reverse weight +100 offset
+            view.setUint8(p.rawOffset + 5, p.skinTone);
+            view.setUint8(p.rawOffset + 10, p.fieldGoal);
+            view.setUint8(p.rawOffset + 11, p.threePoint);
+            view.setUint8(p.rawOffset + 12, p.freeThrow);
+            view.setUint8(p.rawOffset + 13, p.dunk);
+            view.setUint8(p.rawOffset + 27, p.overall);
+
+            const writeAscii = (str, offset, maxLen) => {
+              for (let i = 0; i < maxLen; i++) {
+                const charCode = i < str.length ? str.charCodeAt(i) : 0;
+                view.setUint8(offset + i, charCode);
+              }
             };
-            players.push(p);
-        }
-        populatePlayerDropdown();
-        loadPlayerToForm(0);
-    }
-
-    function populatePlayerDropdown() {
-        const sel = document.getElementById('playerSelect');
-        sel.innerHTML = '';
-        players.forEach((p, idx) => {
-            const opt = document.createElement('option');
-            opt.value = idx;
-            opt.innerText = `${String(idx).padStart(3, '0')}: ${p.LastName}, ${p.FirstName}`;
-            sel.appendChild(opt);
+            writeAscii(p.lastName, p.rawOffset + 100, LAST_NAME_LEN);
+            writeAscii(p.firstName, p.rawOffset + 113, FIRST_NAME_LEN);
+          }
         });
+
+        return newBuffer;
+      };
+
+      const handleExportCSV = () => {
+        if (players.length === 0) return;
+        const headers = ['Index', 'FirstName', 'LastName', 'Jersey', 'Position', 'Height', 'Weight', 'Overall', 'FG', '3PT', 'FT'];
+        const rows = players.map(p => [
+          p.index,
+          `"${p.firstName}"`,
+          `"${p.lastName}"`,
+          p.jerseyNumber,
+          p.position,
+          p.height,
+          p.weight,
+          p.overall,
+          p.fieldGoal,
+          p.threePoint,
+          p.freeThrow
+        ]);
+
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'NBALive96_Players.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setStatusMessage('Player roster exported to CSV successfully.');
+      };
+
+      const currentPlayer = players[selectedPlayerIdx] || players[0];
+
+      return (
+        <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
+          <header className="bg-slate-800 border-b border-slate-700 px-6 py-4 flex flex-wrap items-center justify-between shadow-md">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🏀</span>
+              <div>
+                <h1 className="text-xl font-bold tracking-wide text-amber-400">NBA Live '96 Web ROM Editor</h1>
+                <p className="text-xs text-slate-400">Client-Side GitHub Pages Standalone App</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4 mt-3 sm:mt-0">
+              <label className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold px-4 py-2 rounded shadow cursor-pointer transition text-sm">
+                📁 Load ROM (.bin)
+                <input type="file" accept=".bin" onChange={handleFileUpload} className="hidden" />
+              </label>
+
+              <button 
+                onClick={handleDownloadRom}
+                disabled={!romData}
+                className={`px-4 py-2 rounded font-semibold text-sm transition ${romData ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow' : 'bg-slate-700 text-slate-400 cursor-not-allowed'}`}
+              >
+                💾 Download Modified ROM
+              </button>
+            </div>
+          </header>
+
+          <div className="bg-slate-800/60 border-b border-slate-700/50 px-6 py-2 text-xs text-amber-300/90 flex justify-between items-center">
+            <span>{statusMessage}</span>
+            <span>Loaded File: {romFileName || 'None'}</span>
+          </div>
+
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden" style={{height: 'calc(100vh - 115px)'}}>
+            <div className="w-full md:w-80 bg-slate-800/80 border-r border-slate-700 flex flex-col h-[40vh] md:h-full">
+              <div className="p-3 border-b border-slate-700 flex justify-between items-center bg-slate-800">
+                <span className="font-semibold text-sm text-slate-300">Player Roster ({players.length})</span>
+                <button onClick={handleExportCSV} className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-amber-300">Export CSV</button>
+              </div>
+              <div className="flex-1 overflow-y-auto divide-y divide-slate-700/50">
+                {players.map((p) => (
+                  <div 
+                    key={p.index}
+                    onClick={() => setSelectedPlayerIdx(p.index)}
+                    className={`px-4 py-2.5 text-sm cursor-pointer flex justify-between items-center transition ${selectedPlayerIdx === p.index ? 'bg-amber-500/20 border-l-4 border-amber-400 text-amber-300 font-medium' : 'hover:bg-slate-700/40 text-slate-300'}`}
+                  >
+                    <span>#{p.jerseyNumber} {p.firstName} {p.lastName}</span>
+                    <span className="text-xs bg-slate-700 px-2 py-0.5 rounded text-slate-400">OVR: {p.overall}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 p-6 overflow-y-auto bg-slate-900">
+              {currentPlayer ? (
+                <div className="max-w-3xl mx-auto bg-slate-800 border border-slate-700 rounded-lg p-6 shadow-xl">
+                  <div className="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
+                    <div>
+                      <h2 className="text-xl font-bold text-amber-400">
+                        {currentPlayer.firstName} {currentPlayer.lastName}
+                      </h2>
+                      <p className="text-xs text-slate-400">Player ID Index: {currentPlayer.index} | ROM Offset: 0x{currentPlayer.rawOffset.toString(16)}</p>
+                    </div>
+                    <div className="bg-slate-700/60 px-4 py-2 rounded text-center">
+                      <div className="text-xs text-slate-400">Overall Rating</div>
+                      <div className="text-lg font-extrabold text-amber-300">{currentPlayer.overall}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-4 border-b border-slate-700 mb-6 text-sm font-medium">
+                    <button 
+                      onClick={() => setActiveTab('players')}
+                      className={`pb-2 border-b-2 transition ${activeTab === 'players' ? 'border-amber-400 text-amber-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+                    >
+                      Attributes & Identity
+                    </button>
+                    <button 
+                      onClick={() => setActiveTab('export')}
+                      className={`pb-2 border-b-2 transition ${activeTab === 'export' ? 'border-amber-400 text-amber-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+                    >
+                      Technical & Preservation Info
+                    </button>
+                  </div>
+
+                  {activeTab === 'players' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">First Name (Max 13 chars)</label>
+                        <input 
+                          type="text" 
+                          maxLength={13}
+                          value={currentPlayer.firstName}
+                          onChange={e => handlePlayerChange('firstName', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Last Name (Max 13 chars)</label>
+                        <input 
+                          type="text" 
+                          maxLength={13}
+                          value={currentPlayer.lastName}
+                          onChange={e => handlePlayerChange('lastName', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Jersey Number</label>
+                        <input 
+                          type="number" 
+                          min={0} max={99}
+                          value={currentPlayer.jerseyNumber}
+                          onChange={e => handlePlayerChange('jerseyNumber', parseInt(e.target.value) || 0)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Height (inches)</label>
+                        <input 
+                          type="number" 
+                          value={currentPlayer.height}
+                          onChange={e => handlePlayerChange('height', parseInt(e.target.value) || 0)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Weight (lbs) [+100 offset]</label>
+                        <input 
+                          type="number" 
+                          value={currentPlayer.weight}
+                          onChange={e => handlePlayerChange('weight', parseInt(e.target.value) || 100)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Overall Rating</label>
+                        <input 
+                          type="number" 
+                          min={0} max={100}
+                          value={currentPlayer.overall}
+                          onChange={e => handlePlayerChange('overall', parseInt(e.target.value) || 0)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Field Goal Rating</label>
+                        <input 
+                          type="number" min={0} max={100}
+                          value={currentPlayer.fieldGoal}
+                          onChange={e => handlePlayerChange('fieldGoal', parseInt(e.target.value) || 0)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">3-Point Rating</label>
+                        <input 
+                          type="number" min={0} max={100}
+                          value={currentPlayer.threePoint}
+                          onChange={e => handlePlayerChange('threePoint', parseInt(e.target.value) || 0)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 mb-1">Free Throw Rating</label>
+                        <input 
+                          type="number" min={0} max={100}
+                          value={currentPlayer.freeThrow}
+                          onChange={e => handlePlayerChange('freeThrow', parseInt(e.target.value) || 0)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 text-sm text-slate-300">
+                      <div className="bg-slate-900 p-4 rounded border border-slate-700">
+                        <h3 className="font-semibold text-amber-400 mb-2">Preservation & Technical Checklist</h3>
+                        <ul className="list-disc list-inside space-y-1 text-xs text-slate-400">
+                          <li><strong>Fixed String Lengths:</strong> Player names are strictly bound to 13 bytes to prevent ROM memory shifts.</li>
+                          <li><strong>Weight Calculation:</strong> Stored binary byte represents `Weight - 100` lbs.</li>
+                          <li><strong>Emulator Notice:</strong> Clear `.SRM` battery RAM save files in your emulator before launching modified ROMs to ensure roster updates take effect.</li>
+                          <li><strong>Client-Only Security:</strong> All modifications occur purely in browser memory (`ArrayBuffer`).</li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center text-slate-500">
+                  Select a player from the sidebar or load a ROM.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
     }
 
-    function loadPlayerToForm(idx) {
-        const p = players[idx];
-        if (!p) return;
-        
-        document.getElementById('p_JerseyNumber').value = p.JerseyNumber;
-        document.getElementById('p_LastName').value = p.LastName;
-        document.getElementById('p_FirstName').value = p.FirstName;
-        document.getElementById('p_Position').value = p.Position;
-        document.getElementById('p_School').value = p.School;
-        document.getElementById('p_Height').value = p.Height;
-        document.getElementById('p_Weight').value = p.Weight;
-        document.getElementById('p_SkinTone').value = p.SkinTone;
-
-        document.getElementById('p_FieldGoal').value = p.FieldGoal;
-        document.getElementById('p_ThreePoint').value = p.ThreePoint;
-        document.getElementById('p_FreeThrow').value = p.FreeThrow;
-        document.getElementById('p_Dunk').value = p.Dunk;
-        document.getElementById('p_Steal').value = p.Steal;
-        document.getElementById('p_Block').value = p.Block;
-        document.getElementById('p_OffRebound').value = p.OffRebound;
-        document.getElementById('p_DefRebound').value = p.DefRebound;
-        document.getElementById('p_BallControl').value = p.BallControl;
-        document.getElementById('p_DefAware').value = p.DefAware;
-        document.getElementById('p_Speed').value = p.Speed;
-        document.getElementById('p_Agility').value = p.Agility;
-        document.getElementById('p_Jump').value = p.Jump;
-        document.getElementById('p_Dribble').value = p.Dribble;
-        document.getElementById('p_OffAware').value = p.OffAware;
-        document.getElementById('p_Overall').value = p.Overall;
-
-        // Populate Unknown & Stats fields
-        document.getElementById('p_unk_1_0').value = p.unk_1_0;
-        document.getElementById('p_unk_1_1').value = p.unk_1_1;
-        document.getElementById('p_unk_1_2').value = p.unk_1_2;
-        document.getElementById('p_unk_1_3').value = p.unk_1_3;
-        document.getElementById('p_unk_1_4').value = p.unk_1_4;
-        document.getElementById('p_unk_1_5').value = p.unk_1_5;
-        document.getElementById('p_unk_1_6').value = p.unk_1_6;
-        document.getElementById('p_unk_1_7').value = p.unk_1_7;
-        document.getElementById('p_unk_1_8').value = p.unk_1_8;
-        document.getElementById('p_unk_1_9').value = p.unk_1_9;
-        document.getElementById('p_unk_1_10').value = p.unk_1_10;
-        document.getElementById('p_unk_1_11').value = p.unk_1_11;
-
-        document.getElementById('p_Games').value = p.Games;
-        document.getElementById('p_Starts').value = p.Starts;
-        document.getElementById('p_Minutes').value = p.Minutes;
-        document.getElementById('p_FieldGoals').value = p.FieldGoals;
-        document.getElementById('p_FieldGoalAttempts').value = p.FieldGoalAttempts;
-        document.getElementById('p_ThreePointers').value = p.ThreePointers;
-        document.getElementById('p_ThreePointAttempts').value = p.ThreePointAttempts;
-        document.getElementById('p_FreeThrows').value = p.FreeThrows;
-        document.getElementById('p_FreeThrowAttempts').value = p.FreeThrowAttempts;
-        document.getElementById('p_OffRebounds').value = p.OffRebounds;
-        document.getElementById('p_DefRebounds').value = p.DefRebounds;
-        document.getElementById('p_Assists').value = p.Assists;
-        document.getElementById('p_Steals').value = p.Steals;
-        document.getElementById('p_Blocks').value = p.Blocks;
-        document.getElementById('p_TurnOvers').value = p.TurnOvers;
-        document.getElementById('p_Fouls').value = p.Fouls;
-        document.getElementById('p_Points').value = p.Points;
-
-        document.getElementById('p_unk_1_12').value = p.unk_1_12;
-        document.getElementById('p_unk_1_13').value = p.unk_1_13;
-        document.getElementById('p_unk_1_14').value = p.unk_1_14;
-        document.getElementById('p_unk_1_15').value = p.unk_1_15;
-        document.getElementById('p_unk_1_16').value = p.unk_1_16;
-        document.getElementById('p_unk_1_17').value = p.unk_1_17;
-        document.getElementById('p_unk_1_18').value = p.unk_1_18;
-        document.getElementById('p_unk_1_19').value = p.unk_1_19;
-        document.getElementById('p_unk_1_20').value = p.unk_1_20;
-        document.getElementById('p_unk_1_21').value = p.unk_1_21;
-        document.getElementById('p_unk_1_22').value = p.unk_1_22;
-        document.getElementById('p_unk_1_23').value = p.unk_1_23;
-        document.getElementById('p_unk_1_24').value = p.unk_1_24;
-        document.getElementById('p_unk_1_25').value = p.unk_1_25;
-        document.getElementById('p_unk_1_26').value = p.unk_1_26;
-        document.getElementById('p_unk_1_27').value = p.unk_1_27;
-        document.getElementById('p_unk_1_28').value = p.unk_1_28;
-        document.getElementById('p_unk_1_29').value = p.unk_1_29;
-    }
-
-    function saveCurrentPlayerForm() {
-        const idx = parseInt(document.getElementById('playerSelect').value);
-        if (isNaN(idx) || !players[idx]) return;
-
-        let p = players[idx];
-        p.JerseyNumber = parseInt(document.getElementById('p_JerseyNumber').value) || 0;
-        p.LastName = document.getElementById('p_LastName').value;
-        p.FirstName = document.getElementById('p_FirstName').value;
-        p.Position = parseInt(document.getElementById('p_Position').value) || 0;
-        p.School = parseInt(document.getElementById('p_School').value) || 0;
-        p.Height = parseInt(document.getElementById('p_Height').value) || 0;
-        p.Weight = parseInt(document.getElementById('p_Weight').value) || 0;
-        p.SkinTone = parseInt(document.getElementById('p_SkinTone').value) || 0;
-
-        p.FieldGoal = parseInt(document.getElementById('p_FieldGoal').value) || 0;
-        p.ThreePoint = parseInt(document.getElementById('p_ThreePoint').value) || 0;
-        p.Overall = parseInt(document.getElementById('p_Overall').value) || 0;
-
-        p.unk_1_0 = parseInt(document.getElementById('p_unk_1_0').value) || 0;
-        p.unk_1_1 = parseInt(document.getElementById('p_unk_1_1').value) || 0;
-        p.unk_1_2 = parseInt(document.getElementById('p_unk_1_2').value) || 0;
-        p.unk_1_5 = parseInt(document.getElementById('p_unk_1_5').value) || 0;
-
-        p.Games = parseInt(document.getElementById('p_Games').value) || 0;
-        p.Starts = parseInt(document.getElementById('p_Starts').value) || 0;
-        p.Minutes = parseInt(document.getElementById('p_Minutes').value) || 0;
-        p.Points = parseInt(document.getElementById('p_Points').value) || 0;
-
-        populatePlayerDropdown();
-        document.getElementById('playerSelect').value = idx;
-        document.getElementById('statusMsg').innerText = `Player ${idx} (${p.LastName}) saved.`;
-    }
-
-    function switchTab(tabName) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-        if (tabName === 'player') {
-            document.getElementById('tabBtnPlayer').classList.add('active');
-            document.getElementById('tabPlayer').classList.add('active');
-        } else if (tabName === 'team') {
-            document.getElementById('tabBtnTeam').classList.add('active');
-            document.getElementById('tabTeam').classList.add('active');
-        } else {
-            document.getElementById('tabBtnRaw').classList.add('active');
-            document.getElementById('tabRaw').classList.add('active');
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        initSampleData();
-
-        const romInput = document.getElementById('romFileInput');
-        const csvInput = document.getElementById('csvFileInput');
-
-        document.getElementById('btnMenuOpenRom').onclick = () => romInput.click();
-        document.getElementById('btnActionOpenRom').onclick = () => romInput.click();
-
-        document.getElementById('btnMenuImportCsv').onclick = () => csvInput.click();
-        document.getElementById('btnActionImportCsv').onclick = () => csvInput.click();
-    });
-</script>
+    ReactDOM.render(<NBALive96Editor />, document.getElementById('root'));
+  </script>
 </body>
 </html>
