@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let parsedTeams = {};
     let activePlayer = null;
 
-    // VB6 Mappings
+    // VB6 Mappings matching frmPlayer.frm
     const abilityNames = [
         "Speed", "Quickness", "Passing", "Dribbling", 
         "Rebounding", "Stealing", "Blocking", "Slam Dunk", 
@@ -140,9 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         lines.forEach((line, idx) => {
             if (!line.trim()) return;
+            
             const cols = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
             
-            if (cols.length >= 5) {
+            // Skip header rows if detected
+            if (idx === 0 && (cols[0].toLowerCase().includes('team') || cols[1].toLowerCase().includes('name') || isNaN(cols[3]))) {
+                return;
+            }
+
+            if (cols.length >= 2) {
                 let teamName = cols[0] || "Default Team";
                 let lastName = cols[1] || `Player ${idx}`;
                 let firstName = cols[2] || "";
@@ -156,10 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 parsedTeams[teamName].push({
                     firstName: firstName,
                     lastName: lastName,
-                    number: num,
+                    number: isNaN(num) ? 23 : num,
                     position: pos,
                     height: cols[5] || "6'6\"",
-                    weight: parseInt(cols[6]) || 215,
+                    weight: parseInt(cols[6]) || 210,
                     school: cols[7] || "College",
                     skin: parseInt(cols[8]) || 1,
                     hair: parseInt(cols[9]) || 1,
@@ -171,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Fallback demo teams if CSV format needs sample expansion
+        // Fallback if parsing yielded no teams
         if (Object.keys(parsedTeams).length === 0) {
             parsedTeams = {
                 "Chicago Bulls": [
