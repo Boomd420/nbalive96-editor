@@ -3,49 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live '96 Browser Editor</title>
-    <link rel="stylesheet" href="style.css">
+    <title>NBA Live '96 Roster Editor</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>NBA Live '96 Roster Editor</h1>
-        <p>Client-side binary editor for classic roster files (470 Players).</p>
-    </header>
-
-    <main>
-        <section class="file-control">
-            <label for="fileInput" class="btn">Open Roster File (.bin)</label>
-            <input type="file" id="fileInput" accept=".bin,.dat" style="display: none;">
-            <span id="fileNameDisplay">No file loaded</span>
-        </section>
-
-        <section id="editorWorkspace" style="display: none;">
-            <div class="toolbar">
-                <button id="saveBtn" class="btn primary">Save & Download Roster</button>
+    <div class="app-container">
+        <!-- Top Menu / File Bar -->
+        <header class="toolbar">
+            <h1>NBA Live '96 Web Editor</h1>
+            <div class="file-actions">
+                <input type="file" id="romFileInput" accept=".bin,.dat,.rost" style="display: none;">
+                <button id="btnOpen" class="btn">Open ROM</button>
+                <button id="btnSave" class="btn" disabled>Save ROM</button>
             </div>
-            
-            <div class="table-container">
-                <table id="playerTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Pos</th>
-                            <th>Jersey</th>
-                            <th>Ht</th>
-                            <th>Wt</th>
-                            <th>Speed</th>
-                            <th>Overall</th>
-                        </tr>
-                    </thead>
-                    <tbody id="playerTableBody">
-                        <!-- Populated dynamically via app.js -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="editor-workspace">
+            <!-- Navigation Sidebar (Teams & Players) -->
+            <aside class="sidebar">
+                <div class="control-group">
+                    <label for="cTeam">Team:</label>
+                    <select id="cTeam" disabled>
+                        <option value="">-- Load a ROM First --</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="cPlayer">Player:</label>
+                    <select id="cPlayer" disabled>
+                        <option value="">-- Select Team --</option>
+                    </select>
+                </div>
+                <div class="status-panel" id="statusText">
+                    Status: Waiting for file...
+                </div>
+            </aside>
+
+            <!-- Player Detail Form (Mirrors frmPlayer.frm) -->
+            <section class="player-form-panel">
+                <h2>Player Details</h2>
+                
+                <!-- Biographical Section -->
+                <fieldset class="form-section">
+                    <legend>Biographical Info</legend>
+                    <div class="input-grid">
+                        <div class="field">
+                            <label>First Name:</label>
+                            <input type="text" id="txtFirstName" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Last Name:</label>
+                            <input type="text" id="txtLastName" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Jersey Number:</label>
+                            <input type="number" id="txtNumber" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Position:</label>
+                            <input type="text" id="txtPosition" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Height:</label>
+                            <input type="text" id="txtHeight" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Weight:</label>
+                            <input type="number" id="txtWeight" disabled>
+                        </div>
+                        <div class="field">
+                            <label>School:</label>
+                            <input type="text" id="txtSchool" disabled>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Attributes & Ratings Section -->
+                <fieldset class="form-section">
+                    <legend>Abilities & Ratings</legend>
+                    <div id="abilitiesContainer" class="abilities-grid">
+                        <!-- Dynamically generated ability inputs will go here -->
+                    </div>
+                </fieldset>
+            </section>
+        </main>
+    </div>
 
     <script src="app.js"></script>
 </body>
