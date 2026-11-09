@@ -3,9 +3,9 @@ let dataView = null;
 let uint8Array = null;
 
 const PLAYER_CONFIG = {
-    baseOffset: 0x4000, // Update to your exact verified roster offset
-    recordSize: 64,     
-    totalPlayers: 50    // Adjust based on your test file capacity
+    baseOffset: 0x4000, // Standard PC roster offset
+    recordSize: 64,     // 64 bytes per player record
+    totalPlayers: 470   // Full database matching NBALIVE96OGROS.CSV
 };
 
 // File Ingestion Handler
@@ -31,7 +31,7 @@ function initEditorWorkspace() {
     renderPlayerTable();
 }
 
-// Render Table Data
+// Render Table Data for all 470 players
 function renderPlayerTable() {
     const tbody = document.getElementById('playerTableBody');
     tbody.innerHTML = '';
@@ -40,25 +40,31 @@ function renderPlayerTable() {
         const offset = PLAYER_CONFIG.baseOffset + (i * PLAYER_CONFIG.recordSize);
         if (offset + PLAYER_CONFIG.recordSize > globalArrayBuffer.byteLength) break;
 
+        // Field offsets derived from roster structure & CSV reference
         const firstName = readNullTerminatedString(offset + 0x00, 15);
         const lastName = readNullTerminatedString(offset + 0x0F, 15);
-        const ratingInside = dataView.getUint8(offset + 0x20);
-        const ratingOutside = dataView.getUint8(offset + 0x21);
-        const jerseyNumber = dataView.getUint16(offset + 0x24, true);
+        const jersey = dataView.getUint8(offset + 0x1E);
+        const position = dataView.getUint8(offset + 0x1F);
+        const height = dataView.getUint8(offset + 0x20);
+        const weight = dataView.getUint8(offset + 0x21);
+        const speed = dataView.getUint8(offset + 0x24);
+        const overall = dataView.getUint8(offset + 0x25);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${i}</td>
-            <td>${firstName}</td>
-            <td>${lastName}</td>
-            <td><input type="number" value="${ratingInside}" data-index="${i}" data-field="inside" min="0" max="99"></td>
-            <td><input type="number" value="${ratingOutside}" data-index="${i}" data-field="outside" min="0" max="99"></td>
-            <td><input type="number" value="${jerseyNumber}" data-index="${i}" data-field="jersey" min="0" max="99"></td>
+            <td><input type="text" value="${firstName}" data-index="${i}" data-field="firstName" style="width:90px;"></td>
+            <td><input type="text" value="${lastName}" data-index="${i}" data-field="lastName" style="width:90px;"></td>
+            <td><input type="number" value="${position}" data-index="${i}" data-field="position" min="0" max="5" style="width:50px;"></td>
+            <td><input type="number" value="${jersey}" data-index="${i}" data-field="jersey" min="0" max="99" style="width:50px;"></td>
+            <td><input type="number" value="${height}" data-index="${i}" data-field="height" min="0" max="255" style="width:50px;"></td>
+            <td><input type="number" value="${weight}" data-index="${i}" data-field="weight" min="0" max="255" style="width:60px;"></td>
+            <td><input type="number" value="${speed}" data-index="${i}" data-field="speed" min="0" max="99" style="width:50px;"></td>
+            <td><input type="number" value="${overall}" data-index="${i}" data-field="overall" min="0" max="99" style="width:50px;"></td>
         `;
         tbody.appendChild(tr);
     }
 
-    // Attach change listeners to inputs
     tbody.querySelectorAll('input').forEach(input => {
         input.addEventListener('change', handleAttributeChange);
     });
@@ -67,16 +73,25 @@ function renderPlayerTable() {
 function handleAttributeChange(e) {
     const index = parseInt(e.target.getAttribute('data-index'));
     const field = e.target.getAttribute('data-field');
-    const value = parseInt(e.target.value) || 0;
-    
+    const value = e.target.value;
     const offset = PLAYER_CONFIG.baseOffset + (index * PLAYER_CONFIG.recordSize);
 
-    if (field === 'inside') {
-        dataView.setUint8(offset + 0x20, value);
-    } else if (field === 'outside') {
-        dataView.setUint8(offset + 0x21, value);
+    if (field === 'firstName') {
+        writeNullTerminatedString(offset + 0x00, value, 15);
+    } else if (field === 'lastName') {
+        writeNullTerminatedString(offset + 0x0F, value, 15);
     } else if (field === 'jersey') {
-        dataView.setUint16(offset + 0x24, value, true);
+        dataView.setUint8(offset + 0x1E, parseInt(value) || 0);
+    } else if (field === 'position') {
+        dataView.setUint8(offset + 0x1F, parseInt(value) || 0);
+    } else if (field === 'height') {
+        dataView.setUint8(offset + 0x20, parseInt(value) || 0);
+    } else if (field === 'weight') {
+        dataView.setUint8(offset + 0x21, parseInt(value) || 0);
+    } else if (field === 'speed') {
+        dataView.setUint8(offset + 0x24, parseInt(value) || 0);
+    } else if (field === 'overall') {
+        dataView.setUint8(offset + 0x25, parseInt(value) || 0);
     }
 }
 
@@ -86,6 +101,18 @@ function readNullTerminatedString(offset, maxLength) {
     const terminator = slice.indexOf(0x00);
     const validBytes = terminator !== -1 ? slice.subarray(0, terminator) : slice;
     return new TextDecoder("windows-1252").decode(validBytes);
+}
+
+function writeNullTerminatedString(offset, str, maxLength) {
+    const encoder = new TextEncoder();
+    const encoded = encoder.encode(str);
+    for (let i = 0; i < maxLength; i++) {
+        if (i < encoded.length && i < maxLength - 1) {
+            uint8Array[offset + i] = encoded[i];
+        } else {
+            uint8Array[offset + i] = 0x00;
+        }
+    }
 }
 
 function recalculateAndPatchChecksum() {
