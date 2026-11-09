@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live '96 Roster Editor</title>
+    <title>NBA Live '96 Web Editor</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,9 +12,9 @@
         <header class="toolbar">
             <h1>NBA Live '96 Web Editor</h1>
             <div class="file-actions">
-                <input type="file" id="romFileInput" accept=".bin,.dat,.rost" style="display: none;">
-                <button id="btnOpen" class="btn">Open ROM</button>
-                <button id="btnSave" class="btn" disabled>Save ROM</button>
+                <input type="file" id="romFileInput" accept="*" style="display: none;">
+                <button id="btnOpen" class="btn">Open File (.bin, .csv, .dat)</button>
+                <button id="btnSave" class="btn" disabled>Save File</button>
             </div>
         </header>
 
@@ -25,7 +25,7 @@
                 <div class="control-group">
                     <label for="cTeam">Team:</label>
                     <select id="cTeam" disabled>
-                        <option value="">-- Load a ROM First --</option>
+                        <option value="">-- Load a File First --</option>
                     </select>
                 </div>
                 <div class="control-group">
@@ -78,12 +78,41 @@
                     </div>
                 </fieldset>
 
+                <!-- Appearance Section -->
+                <fieldset class="form-section">
+                    <legend>Appearance</legend>
+                    <div class="input-grid">
+                        <div class="field">
+                            <label>Skin Tone:</label>
+                            <input type="number" id="txtSkin" min="0" max="10" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Hair Style/Color:</label>
+                            <input type="number" id="txtHair" min="0" max="20" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Face ID:</label>
+                            <input type="number" id="txtFace" min="0" max="255" disabled>
+                        </div>
+                    </div>
+                </fieldset>
+
                 <!-- Attributes & Ratings Section -->
                 <fieldset class="form-section">
                     <legend>Abilities & Ratings</legend>
-                    <div id="abilitiesContainer" class="abilities-grid">
-                        <!-- Dynamically generated ability inputs will go here -->
-                    </div>
+                    <div id="abilitiesContainer" class="abilities-grid"></div>
+                </fieldset>
+
+                <!-- Performance Statistics Section -->
+                <fieldset class="form-section">
+                    <legend>Performance Statistics (txtStat)</legend>
+                    <div id="statsContainer" class="abilities-grid"></div>
+                </fieldset>
+
+                <!-- Unknown / Extra Data Section -->
+                <fieldset class="form-section">
+                    <legend>Extra / Unknown Data (txtUnknown)</legend>
+                    <div id="unknownContainer" class="abilities-grid"></div>
                 </fieldset>
             </section>
         </main>
