@@ -12,7 +12,7 @@ body {
 }
 
 .app-container {
-    max-width: 1250px;
+    max-width: 1300px;
     margin: 0 auto;
     background: #1e1e1e;
     border-radius: 8px;
@@ -96,12 +96,13 @@ body {
     border-radius: 4px;
     font-size: 0.85rem;
     color: #9cdcfe;
+    word-break: break-all;
 }
 
 .player-form-panel {
     padding: 25px;
     overflow-y: auto;
-    max-height: 750px;
+    max-height: 800px;
 }
 
 .player-form-panel h2 {
@@ -159,7 +160,7 @@ body {
 
 .abilities-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 12px;
 }
 
