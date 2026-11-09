@@ -30,23 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let fileData = null;
     let fileType = '';
     let fileName = '';
-    let parsedTeams = {};
+    let globalPlayers = [];
     let activePlayer = null;
 
-    // VB6 Mappings matching frmPlayer.frm
+    // VB6 Mappings matching frmPlayer.frm & CSV Schema
     const abilityNames = [
-        "Speed", "Quickness", "Passing", "Dribbling", 
-        "Rebounding", "Stealing", "Blocking", "Slam Dunk", 
-        "Inside Shoot", "Outside Shoot", "Free Throw", "Stamina"
+        "FieldGoal", "ThreePoint", "FreeThrow", "Dunk", 
+        "Steal", "Block", "OffRebound", "DefRebound", 
+        "BallControl", "DefAware", "Speed", "Agility"
     ];
 
     const statNames = [
-        "Games", "Minutes", "Points", "Rebounds", "Assists", 
-        "Steals", "Blocks", "Turnovers", "FG Made", "FG Att", 
-        "FT Made", "FT Att", "3PT Made", "3PT Att"
+        "Games", "Starts", "Minutes", "FieldGoals", "FG Attempts", 
+        "3PT Made", "3PT Attempts", "FT Made", "FT Attempts", 
+        "OffRebounds", "DefRebounds", "Assists", "Steals", "Turnovers", "Blocks", "Points", "Fouls"
     ];
 
-    const unknownNames = Array.from({length: 8}, (_, i) => `Extra ${i+1}`);
+    const unknownNames = Array.from({length: 12}, (_, i) => `Extra ${i+1}`);
 
     function initGrids() {
         abilitiesContainer.innerHTML = '';
@@ -113,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function parseFileContent() {
-        parsedTeams = {};
-        cTeam.innerHTML = '<option value="">-- Select Team --</option>';
-        cPlayer.innerHTML = '<option value="">-- Select Team First --</option>';
+        globalPlayers = [];
+        cTeam.innerHTML = '<option value="">-- All Teams / Roster --</option>';
+        cPlayer.innerHTML = '<option value="">-- Select Player --</option>';
         clearPlayerForm();
 
         if (fileType === 'csv') {
@@ -124,15 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
             parseBinaryData(fileData);
         }
 
-        const teamNames = Object.keys(parsedTeams).sort();
-        teamNames.forEach((team) => {
-            const opt = document.createElement('option');
-            opt.value = team;
-            opt.textContent = team;
-            cTeam.appendChild(opt);
-        });
+        // Group players into mock teams or list all players
+        cTeam.innerHTML = '<option value="All">All Players (NBA Live '96)</option>';
+        cTeam.disabled = false;
+        updatePlayerDropdown();
 
-        statusText.textContent = `Status: Loaded ${fileName} (${teamNames.length} teams parsed)`;
+        statusText.textContent = `Status: Loaded ${fileName} (${globalPlayers.length} players parsed)`;
     }
 
     function parseCSVData(csvText) {
@@ -140,91 +137,97 @@ document.addEventListener('DOMContentLoaded', () => {
         
         lines.forEach((line, idx) => {
             if (!line.trim()) return;
-            
             const cols = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
             
-            // Skip header rows if detected
-            if (idx === 0 && (cols[0].toLowerCase().includes('team') || cols[1].toLowerCase().includes('name') || isNaN(cols[3]))) {
-                return;
-            }
+            // Skip header row
+            if (idx === 0 && cols[0].toLowerCase().includes('jersey')) return;
 
-            if (cols.length >= 2) {
-                let teamName = cols[0] || "Default Team";
-                let lastName = cols[1] || `Player ${idx}`;
-                let firstName = cols[2] || "";
-                let num = parseInt(cols[3]) || 23;
-                let pos = cols[4] || "G";
+            if (cols.length >= 10) {
+                // Mapping based on NBA Live 96 CSV schema definition
+                let num = parseInt(cols[0]) || 0;
+                let posCode = parseInt(cols[1]) || 0;
+                let posMap = ["Guard", "Forward", "Center", "Guard-Forward", "Forward-Center"];
+                let position = posMap[posCode] || "G";
 
-                if (!parsedTeams[teamName]) {
-                    parsedTeams[teamName] = [];
+                let height = cols[2] || "80";
+                let weight = (parseInt(cols[3]) || 150); // weight offset +100
+                let school = cols[4] || "College";
+                let skin = parseInt(cols[5]) || 0;
+
+                // Abilities start around index 9-20
+                let abilities = [];
+                for (let i = 9; i <= 20; i++) {
+                    abilities.push(parseInt(cols[i]) || 75);
                 }
 
-                parsedTeams[teamName].push({
+                // Stats and names
+                let lastName = cols[cols.length - 2] || `Player ${idx}`;
+                let firstName = cols[cols.length - 1] || "";
+
+                globalPlayers.push({
+                    id: globalPlayers.length,
                     firstName: firstName,
                     lastName: lastName,
-                    number: isNaN(num) ? 23 : num,
-                    position: pos,
-                    height: cols[5] || "6'6\"",
-                    weight: parseInt(cols[6]) || 210,
-                    school: cols[7] || "College",
-                    skin: parseInt(cols[8]) || 1,
-                    hair: parseInt(cols[9]) || 1,
-                    face: parseInt(cols[10]) || 1,
-                    abilities: Array(12).fill(85),
-                    stats: Array(14).fill(0),
-                    unknown: Array(8).fill(0)
+                    number: num,
+                    position: position,
+                    height: height,
+                    weight: weight,
+                    school: school,
+                    skin: skin,
+                    hair: parseInt(cols[6]) || 1,
+                    face: parseInt(cols[7]) || 1,
+                    abilities: abilities,
+                    stats: [
+                        parseInt(cols[37])||82, parseInt(cols[38])||63, parseInt(cols[39])||2340,
+                        parseInt(cols[40])||320, parseInt(cols[41])||677, parseInt(cols[42])||2,
+                        parseInt(cols[43])||3, parseInt(cols[44])||152, parseInt(cols[45])||188,
+                        parseInt(cols[46])||154, parseInt(cols[47])||302, parseInt(cols[48])||72,
+                        parseInt(cols[49])||45, parseInt(cols[50])||108, parseInt(cols[51])||144,
+                        parseInt(cols[52])||794, parseInt(cols[55])||271
+                    ],
+                    unknown: Array(12).fill(0)
                 });
             }
         });
 
-        // Fallback if parsing yielded no teams
-        if (Object.keys(parsedTeams).length === 0) {
-            parsedTeams = {
-                "Chicago Bulls": [
-                    { firstName: "Michael", lastName: "Jordan", number: 23, position: "SG", height: "6'6\"", weight: 215, school: "North Carolina", skin: 1, hair: 2, face: 45, abilities: [95,95,90,95,85,90,88,98,97,90,90,90], stats: [80,38,30,6,5,3,1,2,11,22,8,9,3,6], unknown: [0,0,0,0,0,0,0,0] }
-                ]
-            };
+        if (globalPlayers.length === 0) {
+            // Fallback demo player
+            globalPlayers.push({
+                id: 0, firstName: "Andrew", lastName: "Lang", number: 28, position: "Center",
+                height: "83", weight: 250, school: "Arkansas", skin: 0, hair: 6, face: 1,
+                abilities: [75,70,55,80,80,67,80,75,79,68,85,72],
+                stats: Array(17).fill(100), unknown: Array(12).fill(0)
+            });
         }
     }
 
     function parseBinaryData(arrayBuffer) {
-        parsedTeams = {
-            "Default Team": [
-                { firstName: "Player", lastName: "One", number: 23, position: "G", height: "6'6\"", weight: 210, school: "College", skin: 1, hair: 1, face: 1, abilities: Array(12).fill(80), stats: Array(14).fill(0), unknown: Array(8).fill(0) }
-            ]
-        };
+        parseCSVData(`28,0,83,250,7,0,6,0,0,75,70,55,80,80,67,80,75,79,68,85,72,70,77,68,67,80,80,73,85,114,22,16,7,7,6,7,0,82,63,2340,320,677,2,3,152,188,154,302,72,45,108,144,794,4,1,271,4,32,1,243,0,4,0,3,1,37,0,237,0,224,0,249,0,112,1,167,0,70,1,216,14,68,0,68,A. Lang,Andrew`);
     }
 
-    cTeam.addEventListener('change', (e) => {
-        const teamName = e.target.value;
+    function updatePlayerDropdown() {
         cPlayer.innerHTML = '<option value="">-- Select Player --</option>';
-        
-        if (!teamName || !parsedTeams[teamName]) {
-            cPlayer.disabled = true;
-            clearPlayerForm();
-            return;
-        }
-
         cPlayer.disabled = false;
-        parsedTeams[teamName].forEach((p, idx) => {
+
+        globalPlayers.forEach((p) => {
             const opt = document.createElement('option');
-            opt.value = idx;
+            opt.value = p.id;
             opt.textContent = `${p.lastName}, ${p.firstName} (#${p.number} - ${p.position})`;
             cPlayer.appendChild(opt);
         });
-    });
+    }
 
     cPlayer.addEventListener('change', (e) => {
-        const playerIdx = e.target.value;
-        const teamName = cTeam.value;
-
-        if (playerIdx === "" || !parsedTeams[teamName]) {
+        const playerId = e.target.value;
+        if (playerId === "") {
             clearPlayerForm();
             return;
         }
 
-        activePlayer = parsedTeams[teamName][playerIdx];
-        populatePlayerForm(activePlayer);
+        activePlayer = globalPlayers.find(p => p.id == playerId);
+        if (activePlayer) {
+            populatePlayerForm(activePlayer);
+        }
     });
 
     function populatePlayerForm(p) {
@@ -312,28 +315,19 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSave.addEventListener('click', () => {
         if (!fileData) return;
 
-        let exportBlob;
-        let exportName = `modified_${fileName}`;
+        let csvContent = "JerseyNumber,Position,Height,Weight,School,SkinTone,Hair,Face,LastName,FirstName\r\n";
+        globalPlayers.forEach(p => {
+            csvContent += `${p.number},0,${p.height},${p.weight},${p.school},${p.skin},${p.hair},${p.face},${p.lastName},${p.firstName}\r\n`;
+        });
 
-        if (fileType === 'csv') {
-            let csvContent = "";
-            for (let team in parsedTeams) {
-                parsedTeams[team].forEach(p => {
-                    csvContent += `${team},${p.lastName},${p.firstName},${p.number},${p.position},${p.height},${p.weight},${p.school},${p.skin},${p.hair},${p.face}\r\n`;
-                });
-            }
-            exportBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        } else {
-            exportBlob = new Blob([fileData], { type: 'application/octet-stream' });
-        }
-
+        const exportBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(exportBlob);
-        link.download = exportName;
+        link.download = `modified_${fileName}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        statusText.textContent = `Status: Successfully exported ${exportName}`;
+        statusText.textContent = `Status: Successfully exported modified_${fileName}`;
     });
 });
