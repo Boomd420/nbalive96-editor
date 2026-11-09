@@ -12,8 +12,9 @@
         <header class="toolbar">
             <h1>NBA Live '96 Web Editor</h1>
             <div class="file-actions">
+                <!-- Native label-backed file input for mobile and desktop compatibility -->
+                <label for="romFileInput" class="btn file-label">Open File (.bin, .csv, .dat)</label>
                 <input type="file" id="romFileInput" accept="*" style="display: none;">
-                <button id="btnOpen" class="btn">Open File (.bin, .csv, .dat)</button>
                 <button id="btnSave" class="btn" disabled>Save File</button>
             </div>
         </header>
