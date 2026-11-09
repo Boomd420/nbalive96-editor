@@ -1,93 +1,188 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #121212;
     color: #e0e0e0;
-    margin: 0;
     padding: 20px;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-header h1 {
-    color: #ff9800;
-    margin-bottom: 0.5rem;
-}
-
-.file-control {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.btn {
-    background-color: #333;
-    color: #fff;
-    padding: 10px 20px;
-    border: 1px solid #555;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    display: inline-block;
-}
-
-.btn:hover {
-    background-color: #444;
-}
-
-.btn.primary {
-    background-color: #ff9800;
-    color: #121212;
-    font-weight: bold;
-    border: none;
-}
-
-.btn.primary:hover {
-    background-color: #e68900;
-}
-
-#editorWorkspace {
-    max-width: 1000px;
+.app-container {
+    max-width: 1250px;
     margin: 0 auto;
+    background: #1e1e1e;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    overflow: hidden;
+    border: 1px solid #333;
 }
 
 .toolbar {
-    margin-bottom: 1rem;
     display: flex;
-    justify-content: flex-end;
-}
-
-.table-container {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid #333;
-    border-radius: 4px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #1e1e1e;
-    text-align: left;
-}
-
-th, td {
-    padding: 12px;
+    justify-content: space-between;
+    align-items: center;
+    background: #252526;
+    padding: 15px 20px;
     border-bottom: 1px solid #333;
 }
 
-th {
-    background-color: #252525;
-    position: sticky;
-    top: 0;
+.toolbar h1 {
+    font-size: 1.25rem;
+    color: #ffffff;
 }
 
-input[type="text"], input[type="number"] {
-    background-color: #2a2a2a;
+.btn {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+    background: #1177bb;
+}
+
+.btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.editor-workspace {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 650px;
+}
+
+.sidebar {
+    background: #252526;
+    padding: 20px;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.control-group select {
+    width: 100%;
+    padding: 8px;
+    background: #333;
+    color: white;
     border: 1px solid #444;
-    color: #fff;
-    padding: 6px;
+    border-radius: 4px;
+}
+
+.status-panel {
+    margin-top: auto;
+    padding: 10px;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #9cdcfe;
+}
+
+.player-form-panel {
+    padding: 25px;
+    overflow-y: auto;
+    max-height: 750px;
+}
+
+.player-form-panel h2 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #4ec9b0;
+}
+
+.form-section {
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 20px;
+    background: #222;
+}
+
+.form-section legend {
+    padding: 0 8px;
+    color: #9cdcfe;
+    font-weight: 600;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.field input {
+    width: 100%;
+    padding: 7px 10px;
+    background: #2d2d2d;
+    border: 1px solid #3c3c3c;
+    color: white;
+    border-radius: 4px;
+}
+
+.field input:focus {
+    border-color: #0e639c;
+    outline: none;
+}
+
+.field input:disabled, .field select:disabled {
+    background: #1a1a1a;
+    color: #555;
+    border-color: #2a2a2a;
+}
+
+.abilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.ability-field {
+    background: #1a1a1a;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.ability-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #9cdcfe;
+    margin-bottom: 4px;
+}
+
+.ability-field input {
+    width: 100%;
+    padding: 5px;
+    background: #2d2d2d;
+    border: 1px solid #3c3c3c;
+    color: white;
     border-radius: 3px;
-    width: 80px;
+    text-align: center;
 }
