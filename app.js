@@ -1,164 +1,188 @@
-let globalArrayBuffer = null;
-let dataView = null;
-let uint8Array = null;
-
-const PLAYER_CONFIG = {
-    // We will scan for player records or use the correct base offset.
-    // Let's provide a dropdown or automatic detection if needed, 
-    // starting with a configurable base offset input box in the UI.
-    recordSize: 128,     // Full record size including stats and attributes
-    totalPlayers: 470   
-};
-
-// File Ingestion Handler
-document.getElementById('fileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    document.getElementById('fileNameDisplay').textContent = file.name;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        globalArrayBuffer = e.target.result;
-        dataView = new DataView(globalArrayBuffer);
-        uint8Array = new Uint8Array(globalArrayBuffer);
-        
-        // Auto-detect or default offset
-        detectPlayerOffset();
-        initEditorWorkspace();
-    };
-    reader.readAsArrayBuffer(file);
-});
-
-// Simple heuristic to find where readable ASCII player names start in the .bin file
-function detectPlayerOffset() {
-    // Search through potential offsets in increments of 512 bytes
-    for (let offset = 0; offset < globalArrayBuffer.byteLength - 2000; offset += 256) {
-        let sampleStr = readNullTerminatedString(offset, 10);
-        // Check if it looks like a valid name (alphanumeric, reasonable length)
-        if (/^[A-Z][a-z\. \-]{2,12}$/.test(sampleStr)) {
-            PLAYER_CONFIG.detectedOffset = offset;
-            console.log(`Found potential player data at offset: 0x${offset.toString(16)}`);
-            return offset;
-        }
-    }
-    // Fallback if auto-detect doesn't catch it immediately
-    PLAYER_CONFIG.detectedOffset = 0x2000; 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-function initEditorWorkspace() {
-    document.getElementById('editorWorkspace').style.display = 'block';
-    renderPlayerTable();
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    padding: 20px;
 }
 
-// Render Table Data for all 470 players
-function renderPlayerTable() {
-    const tbody = document.getElementById('playerTableBody');
-    tbody.innerHTML = '';
-    const baseOffset = PLAYER_CONFIG.detectedOffset || 0x2000;
-
-    for (let i = 0; i < PLAYER_CONFIG.totalPlayers; i++) {
-        const offset = baseOffset + (i * PLAYER_CONFIG.recordSize);
-        if (offset + PLAYER_CONFIG.recordSize > globalArrayBuffer.byteLength) break;
-
-        const firstName = readNullTerminatedString(offset + 0x00, 15);
-        const lastName = readNullTerminatedString(offset + 0x0F, 15);
-        const jersey = dataView.getUint8(offset + 0x1E) || 0;
-        const position = dataView.getUint8(offset + 0x1F) || 0;
-        const height = dataView.getUint8(offset + 0x20) || 0;
-        const weight = dataView.getUint8(offset + 0x21) || 0;
-        const speed = dataView.getUint8(offset + 0x24) || 0;
-        const overall = dataView.getUint8(offset + 0x25) || 0;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${i}</td>
-            <td><input type="text" value="${firstName}" data-index="${i}" data-field="firstName" style="width:90px;"></td>
-            <td><input type="text" value="${lastName}" data-index="${i}" data-field="lastName" style="width:90px;"></td>
-            <td><input type="number" value="${position}" data-index="${i}" data-field="position" min="0" max="5" style="width:50px;"></td>
-            <td><input type="number" value="${jersey}" data-index="${i}" data-field="jersey" min="0" max="99" style="width:50px;"></td>
-            <td><input type="number" value="${height}" data-index="${i}" data-field="height" min="0" max="255" style="width:50px;"></td>
-            <td><input type="number" value="${weight}" data-index="${i}" data-field="weight" min="0" max="255" style="width:60px;"></td>
-            <td><input type="number" value="${speed}" data-index="${i}" data-field="speed" min="0" max="99" style="width:50px;"></td>
-            <td><input type="number" value="${overall}" data-index="${i}" data-field="overall" min="0" max="99" style="width:50px;"></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    tbody.querySelectorAll('input').forEach(input => {
-        input.addEventListener('change', handleAttributeChange);
-    });
+.app-container {
+    max-width: 1250px;
+    margin: 0 auto;
+    background: #1e1e1e;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    overflow: hidden;
+    border: 1px solid #333;
 }
 
-function handleAttributeChange(e) {
-    const index = parseInt(e.target.getAttribute('data-index'));
-    const field = e.target.getAttribute('data-field');
-    const value = e.target.value;
-    const baseOffset = PLAYER_CONFIG.detectedOffset || 0x2000;
-    const offset = baseOffset + (index * PLAYER_CONFIG.recordSize);
-
-    if (field === 'firstName') {
-        writeNullTerminatedString(offset + 0x00, value, 15);
-    } else if (field === 'lastName') {
-        writeNullTerminatedString(offset + 0x0F, value, 15);
-    } else if (field === 'jersey') {
-        dataView.setUint8(offset + 0x1E, parseInt(value) || 0);
-    } else if (field === 'position') {
-        dataView.setUint8(offset + 0x1F, parseInt(value) || 0);
-    } else if (field === 'height') {
-        dataView.setUint8(offset + 0x20, parseInt(value) || 0);
-    } else if (field === 'weight') {
-        dataView.setUint8(offset + 0x21, parseInt(value) || 0);
-    } else if (field === 'speed') {
-        dataView.setUint8(offset + 0x24, parseInt(value) || 0);
-    } else if (field === 'overall') {
-        dataView.setUint8(offset + 0x25, parseInt(value) || 0);
-    }
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #252526;
+    padding: 15px 20px;
+    border-bottom: 1px solid #333;
 }
 
-// Helpers
-function readNullTerminatedString(offset, maxLength) {
-    const slice = uint8Array.subarray(offset, offset + maxLength);
-    const terminator = slice.indexOf(0x00);
-    const validBytes = terminator !== -1 ? slice.subarray(0, terminator) : slice;
-    return new TextDecoder("windows-1252", { fatal: false }).decode(validBytes).replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+.toolbar h1 {
+    font-size: 1.25rem;
+    color: #ffffff;
 }
 
-function writeNullTerminatedString(offset, str, maxLength) {
-    const encoder = new TextEncoder();
-    const encoded = encoder.encode(str);
-    for (let i = 0; i < maxLength; i++) {
-        if (i < encoded.length && i < maxLength - 1) {
-            uint8Array[offset + i] = encoded[i];
-        } else {
-            uint8Array[offset + i] = 0x00;
-        }
-    }
+.btn {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
 }
 
-function recalculateAndPatchChecksum() {
-    if (!globalArrayBuffer) return;
-    let checksum = 0;
-    const startOffset = 0x0800; 
-    const endOffset = globalArrayBuffer.byteLength;
-
-    for (let i = startOffset; i < endOffset; i++) {
-        checksum = (checksum + uint8Array[i]) >>> 0;
-    }
-    dataView.setUint32(0x0767, checksum, true);
+.btn:hover:not(:disabled) {
+    background: #1177bb;
 }
 
-// Save & Download Action
-document.getElementById('saveBtn').addEventListener('click', () => {
-    recalculateAndPatchChecksum();
+.btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
 
-    const blob = new Blob([globalArrayBuffer], { type: "application/octet-stream" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = "roster_edited.bin";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-});
+.editor-workspace {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 650px;
+}
+
+.sidebar {
+    background: #252526;
+    padding: 20px;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.control-group select {
+    width: 100%;
+    padding: 8px;
+    background: #333;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.status-panel {
+    margin-top: auto;
+    padding: 10px;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #9cdcfe;
+}
+
+.player-form-panel {
+    padding: 25px;
+    overflow-y: auto;
+    max-height: 750px;
+}
+
+.player-form-panel h2 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #4ec9b0;
+}
+
+.form-section {
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 20px;
+    background: #222;
+}
+
+.form-section legend {
+    padding: 0 8px;
+    color: #9cdcfe;
+    font-weight: 600;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.field input {
+    width: 100%;
+    padding: 7px 10px;
+    background: #2d2d2d;
+    border: 1px solid #3c3c3c;
+    color: white;
+    border-radius: 4px;
+}
+
+.field input:focus {
+    border-color: #0e639c;
+    outline: none;
+}
+
+.field input:disabled, .field select:disabled {
+    background: #1a1a1a;
+    color: #555;
+    border-color: #2a2a2a;
+}
+
+.abilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.ability-field {
+    background: #1a1a1a;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.ability-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #9cdcfe;
+    margin-bottom: 4px;
+}
+
+.ability-field input {
+    width: 100%;
+    padding: 5px;
+    background: #2d2d2d;
+    border: 1px solid #3c3c3c;
+    color: white;
+    border-radius: 3px;
+    text-align: center;
+}
