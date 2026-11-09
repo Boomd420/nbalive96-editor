@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
-    const btnOpen = document.getElementById('btnOpen');
     const btnSave = document.getElementById('btnSave');
     const romFileInput = document.getElementById('romFileInput');
     const cTeam = document.getElementById('cTeam');
@@ -79,10 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initGrids();
 
-    btnOpen.addEventListener('click', () => {
-        romFileInput.click();
-    });
-
+    // Directly listen to file selection changes from the native input
     romFileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -124,8 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             parseBinaryData(fileData);
         }
 
-        // Group players into mock teams or list all players
-        cTeam.innerHTML = '<option value="All">All Players (NBA Live '96)</option>';
+        cTeam.innerHTML = '<option value="All">All Players (NBA Live \'96)</option>';
         cTeam.disabled = false;
         updatePlayerDropdown();
 
@@ -139,28 +134,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!line.trim()) return;
             const cols = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
             
-            // Skip header row
             if (idx === 0 && cols[0].toLowerCase().includes('jersey')) return;
 
             if (cols.length >= 10) {
-                // Mapping based on NBA Live 96 CSV schema definition
                 let num = parseInt(cols[0]) || 0;
                 let posCode = parseInt(cols[1]) || 0;
                 let posMap = ["Guard", "Forward", "Center", "Guard-Forward", "Forward-Center"];
                 let position = posMap[posCode] || "G";
 
                 let height = cols[2] || "80";
-                let weight = (parseInt(cols[3]) || 150); // weight offset +100
+                let weight = (parseInt(cols[3]) || 150);
                 let school = cols[4] || "College";
                 let skin = parseInt(cols[5]) || 0;
 
-                // Abilities start around index 9-20
                 let abilities = [];
                 for (let i = 9; i <= 20; i++) {
                     abilities.push(parseInt(cols[i]) || 75);
                 }
 
-                // Stats and names
                 let lastName = cols[cols.length - 2] || `Player ${idx}`;
                 let firstName = cols[cols.length - 1] || "";
 
@@ -191,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (globalPlayers.length === 0) {
-            // Fallback demo player
             globalPlayers.push({
                 id: 0, firstName: "Andrew", lastName: "Lang", number: 28, position: "Center",
                 height: "83", weight: 250, school: "Arkansas", skin: 0, hair: 6, face: 1,
@@ -258,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Live updating bindings
     txtFirstName.addEventListener('input', () => { if (activePlayer) activePlayer.firstName = txtFirstName.value; });
     txtLastName.addEventListener('input', () => { if (activePlayer) activePlayer.lastName = txtLastName.value; });
     txtNumber.addEventListener('input', () => { if (activePlayer) activePlayer.number = Number(txtNumber.value); });
