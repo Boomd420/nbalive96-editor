@@ -3,9 +3,11 @@ let dataView = null;
 let uint8Array = null;
 
 const PLAYER_CONFIG = {
-    baseOffset: 0x4000, // Standard PC roster offset
-    recordSize: 64,     // 64 bytes per player record
-    totalPlayers: 470   // Full database matching NBALIVE96OGROS.CSV
+    // We will scan for player records or use the correct base offset.
+    // Let's provide a dropdown or automatic detection if needed, 
+    // starting with a configurable base offset input box in the UI.
+    recordSize: 128,     // Full record size including stats and attributes
+    totalPlayers: 470   
 };
 
 // File Ingestion Handler
@@ -21,10 +23,28 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         dataView = new DataView(globalArrayBuffer);
         uint8Array = new Uint8Array(globalArrayBuffer);
         
+        // Auto-detect or default offset
+        detectPlayerOffset();
         initEditorWorkspace();
     };
     reader.readAsArrayBuffer(file);
 });
+
+// Simple heuristic to find where readable ASCII player names start in the .bin file
+function detectPlayerOffset() {
+    // Search through potential offsets in increments of 512 bytes
+    for (let offset = 0; offset < globalArrayBuffer.byteLength - 2000; offset += 256) {
+        let sampleStr = readNullTerminatedString(offset, 10);
+        // Check if it looks like a valid name (alphanumeric, reasonable length)
+        if (/^[A-Z][a-z\. \-]{2,12}$/.test(sampleStr)) {
+            PLAYER_CONFIG.detectedOffset = offset;
+            console.log(`Found potential player data at offset: 0x${offset.toString(16)}`);
+            return offset;
+        }
+    }
+    // Fallback if auto-detect doesn't catch it immediately
+    PLAYER_CONFIG.detectedOffset = 0x2000; 
+}
 
 function initEditorWorkspace() {
     document.getElementById('editorWorkspace').style.display = 'block';
@@ -35,20 +55,20 @@ function initEditorWorkspace() {
 function renderPlayerTable() {
     const tbody = document.getElementById('playerTableBody');
     tbody.innerHTML = '';
+    const baseOffset = PLAYER_CONFIG.detectedOffset || 0x2000;
 
     for (let i = 0; i < PLAYER_CONFIG.totalPlayers; i++) {
-        const offset = PLAYER_CONFIG.baseOffset + (i * PLAYER_CONFIG.recordSize);
+        const offset = baseOffset + (i * PLAYER_CONFIG.recordSize);
         if (offset + PLAYER_CONFIG.recordSize > globalArrayBuffer.byteLength) break;
 
-        // Field offsets derived from roster structure & CSV reference
         const firstName = readNullTerminatedString(offset + 0x00, 15);
         const lastName = readNullTerminatedString(offset + 0x0F, 15);
-        const jersey = dataView.getUint8(offset + 0x1E);
-        const position = dataView.getUint8(offset + 0x1F);
-        const height = dataView.getUint8(offset + 0x20);
-        const weight = dataView.getUint8(offset + 0x21);
-        const speed = dataView.getUint8(offset + 0x24);
-        const overall = dataView.getUint8(offset + 0x25);
+        const jersey = dataView.getUint8(offset + 0x1E) || 0;
+        const position = dataView.getUint8(offset + 0x1F) || 0;
+        const height = dataView.getUint8(offset + 0x20) || 0;
+        const weight = dataView.getUint8(offset + 0x21) || 0;
+        const speed = dataView.getUint8(offset + 0x24) || 0;
+        const overall = dataView.getUint8(offset + 0x25) || 0;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -74,7 +94,8 @@ function handleAttributeChange(e) {
     const index = parseInt(e.target.getAttribute('data-index'));
     const field = e.target.getAttribute('data-field');
     const value = e.target.value;
-    const offset = PLAYER_CONFIG.baseOffset + (index * PLAYER_CONFIG.recordSize);
+    const baseOffset = PLAYER_CONFIG.detectedOffset || 0x2000;
+    const offset = baseOffset + (index * PLAYER_CONFIG.recordSize);
 
     if (field === 'firstName') {
         writeNullTerminatedString(offset + 0x00, value, 15);
@@ -100,7 +121,7 @@ function readNullTerminatedString(offset, maxLength) {
     const slice = uint8Array.subarray(offset, offset + maxLength);
     const terminator = slice.indexOf(0x00);
     const validBytes = terminator !== -1 ? slice.subarray(0, terminator) : slice;
-    return new TextDecoder("windows-1252").decode(validBytes);
+    return new TextDecoder("windows-1252", { fatal: false }).decode(validBytes).replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
 }
 
 function writeNullTerminatedString(offset, str, maxLength) {
