@@ -1,188 +1,194 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const btnOpen = document.getElementById('btnOpen');
+    const btnSave = document.getElementById('btnSave');
+    const romFileInput = document.getElementById('romFileInput');
+    const cTeam = document.getElementById('cTeam');
+    const cPlayer = document.getElementById('cPlayer');
+    const statusText = document.getElementById('statusText');
+    
+    // Biographical Inputs
+    const txtFirstName = document.getElementById('txtFirstName');
+    const txtLastName = document.getElementById('txtLastName');
+    const txtNumber = document.getElementById('txtNumber');
+    const txtPosition = document.getElementById('txtPosition');
+    const txtHeight = document.getElementById('txtHeight');
+    const txtWeight = document.getElementById('txtWeight');
+    const txtSchool = document.getElementById('txtSchool');
+    const abilitiesContainer = document.getElementById('abilitiesContainer');
 
-body {
-    background-color: #121212;
-    color: #e0e0e0;
-    padding: 20px;
-}
+    // Application State
+    let fileBuffer = null;
+    let fileName = '';
+    
+    // Standard NBA Live '96 Ability Names (matching typical VB6 control array)
+    const abilityNames = [
+        "Speed", "Quickness", "Passing", "Dribbling", 
+        "Rebounding", "Stealing", "Blocking", "Slam Dunk", 
+        "Inside Shoot", "Outside Shoot", "Free Throw", "Stamina"
+    ];
 
-.app-container {
-    max-width: 1250px;
-    margin: 0 auto;
-    background: #1e1e1e;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-    overflow: hidden;
-    border: 1px solid #333;
-}
+    // Initialize Ability Inputs in UI
+    function initAbilityInputs() {
+        abilitiesContainer.innerHTML = '';
+        abilityNames.forEach((name, index) => {
+            const div = document.createElement('div');
+            div.className = 'ability-field';
+            div.innerHTML = `
+                <label>${name}</label>
+                <input type="number" id="ability_${index}" min="0" max="99" disabled>
+            `;
+            abilitiesContainer.appendChild(div);
+        });
+    }
+    
+    initAbilityInputs();
 
-.toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #252526;
-    padding: 15px 20px;
-    border-bottom: 1px solid #333;
-}
+    // Trigger file picker
+    btnOpen.addEventListener('click', () => {
+        romFileInput.click();
+    });
 
-.toolbar h1 {
-    font-size: 1.25rem;
-    color: #ffffff;
-}
+    // Handle file load
+    romFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-.btn {
-    background: #0e639c;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.2s;
-}
+        fileName = file.name;
+        const reader = new FileReader();
 
-.btn:hover:not(:disabled) {
-    background: #1177bb;
-}
+        reader.onload = function(e) {
+            fileBuffer = e.target.result;
+            statusText.textContent = `Status: Loaded ${fileName} (${fileBuffer.byteLength} bytes)`;
+            
+            // Enable UI controls
+            btnSave.disabled = false;
+            cTeam.disabled = false;
+            
+            parseROMStructure();
+        };
 
-.btn:disabled {
-    background: #333;
-    color: #666;
-    cursor: not-allowed;
-}
+        reader.onerror = function(err) {
+            console.error("Error reading file:", err);
+            statusText.textContent = "Status: Error reading file.";
+        };
 
-.editor-workspace {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    min-height: 650px;
-}
+        reader.readAsArrayBuffer(file);
+    });
 
-.sidebar {
-    background: #252526;
-    padding: 20px;
-    border-right: 1px solid #333;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+    // Placeholder ROM Parser logic mapping VB6 structures
+    function parseROMStructure() {
+        cTeam.innerHTML = '<option value="">-- Select Team --</option>';
+        
+        const sampleTeams = [
+            "Atlanta Hawks", "Boston Celtics", "Charlotte Hornets", "Chicago Bulls", 
+            "Cleveland Cavaliers", "Dallas Mavericks", "Denver Nuggets", "Detroit Pistons",
+            "Golden State Warriors", "Houston Rockets", "Indiana Pacers", "Los Angeles Clippers",
+            "Los Angeles Lakers", "Miami Heat", "Milwaukee Bucks", "Minnesota Timberwolves",
+            "New York Knicks", "Orlando Magic", "Philadelphia 76ers", "Phoenix Suns",
+            "Portland Trail Blazers", "Sacramento Kings", "San Antonio Spurs", "Seattle SuperSonics",
+            "Utah Jazz", "Washington Bullets", "Vancouver Grizzlies", "Toronto Raptors"
+        ];
 
-.control-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: #ccc;
-    font-weight: 500;
-}
+        sampleTeams.forEach((team, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = team;
+            cTeam.appendChild(opt);
+        });
+    }
 
-.control-group select {
-    width: 100%;
-    padding: 8px;
-    background: #333;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 4px;
-}
+    // Team selection handler
+    cTeam.addEventListener('change', (e) => {
+        const teamId = e.target.value;
+        cPlayer.innerHTML = '<option value="">-- Select Player --</option>';
+        
+        if (teamId === "") {
+            cPlayer.disabled = true;
+            clearPlayerForm();
+            return;
+        }
 
-.status-panel {
-    margin-top: auto;
-    padding: 10px;
-    background: #1e1e1e;
-    border: 1px solid #333;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: #9cdcfe;
-}
+        cPlayer.disabled = false;
+        
+        const samplePlayers = [
+            { id: 1, first: "Star", last: "Player", num: 23, pos: "G", height: "6'6\"", weight: 215, school: "College" },
+            { id: 2, first: "Starting", last: "Forward", num: 33, pos: "F", height: "6'8\"", weight: 225, school: "University" },
+            { id: 3, first: "Center", last: "Anchor", num: 34, pos: "C", height: "7'1\"", weight: 260, school: "State" }
+        ];
 
-.player-form-panel {
-    padding: 25px;
-    overflow-y: auto;
-    max-height: 750px;
-}
+        samplePlayers.forEach((p) => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = `${p.last}, ${p.first} (#${p.num} - ${p.pos})`;
+            cPlayer.appendChild(opt);
+        });
+    });
 
-.player-form-panel h2 {
-    margin-bottom: 15px;
-    font-size: 1.1rem;
-    color: #4ec9b0;
-}
+    // Player selection handler
+    cPlayer.addEventListener('change', (e) => {
+        const playerId = e.target.value;
+        if (playerId === "") {
+            clearPlayerForm();
+            return;
+        }
 
-.form-section {
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 18px;
-    margin-bottom: 20px;
-    background: #222;
-}
+        enablePlayerForm(true);
+        txtFirstName.value = "Michael";
+        txtLastName.value = "Jordan";
+        txtNumber.value = 23;
+        txtPosition.value = "SG";
+        txtHeight.value = "6'6\"";
+        txtWeight.value = 215;
+        txtSchool.value = "North Carolina";
 
-.form-section legend {
-    padding: 0 8px;
-    color: #9cdcfe;
-    font-weight: 600;
-}
+        for (let i = 0; i < abilityNames.length; i++) {
+            const input = document.getElementById(`ability_${i}`);
+            if (input) input.value = Math.floor(Math.random() * 20) + 80;
+        }
+    });
 
-.input-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-}
+    function clearPlayerForm() {
+        enablePlayerForm(false);
+        txtFirstName.value = "";
+        txtLastName.value = "";
+        txtNumber.value = "";
+        txtPosition.value = "";
+        txtHeight.value = "";
+        txtWeight.value = "";
+        txtSchool.value = "";
+        for (let i = 0; i < abilityNames.length; i++) {
+            const input = document.getElementById(`ability_${i}`);
+            if (input) input.value = "";
+        }
+    }
 
-.field label {
-    display: block;
-    font-size: 0.8rem;
-    color: #aaa;
-    margin-bottom: 5px;
-}
+    function enablePlayerForm(enable) {
+        txtFirstName.disabled = !enable;
+        txtLastName.disabled = !enable;
+        txtNumber.disabled = !enable;
+        txtPosition.disabled = !enable;
+        txtHeight.disabled = !enable;
+        txtWeight.disabled = !enable;
+        txtSchool.disabled = !enable;
+        for (let i = 0; i < abilityNames.length; i++) {
+            const input = document.getElementById(`ability_${i}`);
+            if (input) input.disabled = !enable;
+        }
+    }
 
-.field input {
-    width: 100%;
-    padding: 7px 10px;
-    background: #2d2d2d;
-    border: 1px solid #3c3c3c;
-    color: white;
-    border-radius: 4px;
-}
+    // Save ROM back to file
+    btnSave.addEventListener('click', () => {
+        if (!fileBuffer) return;
 
-.field input:focus {
-    border-color: #0e639c;
-    outline: none;
-}
-
-.field input:disabled, .field select:disabled {
-    background: #1a1a1a;
-    color: #555;
-    border-color: #2a2a2a;
-}
-
-.abilities-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
-}
-
-.ability-field {
-    background: #1a1a1a;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #333;
-}
-
-.ability-field label {
-    display: block;
-    font-size: 0.75rem;
-    color: #9cdcfe;
-    margin-bottom: 4px;
-}
-
-.ability-field input {
-    width: 100%;
-    padding: 5px;
-    background: #2d2d2d;
-    border: 1px solid #3c3c3c;
-    color: white;
-    border-radius: 3px;
-    text-align: center;
-}
+        const blob = new Blob([fileBuffer], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `modified_${fileName}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        statusText.textContent = `Status: Successfully exported modified_${fileName}`;
+    });
+});
