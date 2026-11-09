@@ -35,6 +35,12 @@ body {
     color: #ffffff;
 }
 
+.file-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .btn {
     background: #0e639c;
     color: white;
@@ -44,6 +50,16 @@ body {
     cursor: pointer;
     font-weight: 600;
     transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.file-label {
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
 }
 
 .btn:hover:not(:disabled) {
