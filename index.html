@@ -1,366 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NBA Live '96 Web ROM Editor</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Live '96 Browser Editor</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none">
+<body>
+    <header>
+        <h1>NBA Live '96 Roster Editor</h1>
+        <p>Client-side binary editor for classic roster files.</p>
+    </header>
 
-  <!-- HEADER -->
-  <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex flex-wrap items-center justify-between shadow-md">
-    <div class="flex items-center space-x-3">
-      <span class="text-2xl">🏀</span>
-      <div>
-        <h1 class="text-xl font-bold tracking-wide text-amber-400">NBA Live '96 ROM Editor</h1>
-        <p class="text-xs text-slate-400">Client-Side GitHub Pages Vanilla Edition</p>
-      </div>
-    </div>
+    <main>
+        <section class="file-control">
+            <label for="fileInput" class="btn">Open Roster File (.bin)</label>
+            <input type="file" id="fileInput" accept=".bin,.dat" style="display: none;">
+            <span id="fileNameDisplay">No file loaded</span>
+        </section>
 
-    <div class="flex items-center space-x-3 mt-3 sm:mt-0">
-      <label class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold px-4 py-2 rounded shadow cursor-pointer transition text-sm">
-        📁 Load ROM (.bin)
-        <input type="file" id="romFileInput" accept=".bin" class="hidden" />
-      </label>
-
-      <button id="downloadBtn" disabled class="px-4 py-2 rounded font-semibold text-sm transition bg-slate-700 text-slate-400 cursor-not-allowed">
-        💾 Download Modified ROM
-      </button>
-
-      <button id="exportCsvBtn" disabled class="px-4 py-2 rounded font-semibold text-sm transition bg-slate-700 text-slate-400 cursor-not-allowed">
-        📊 Export CSV
-      </button>
-    </div>
-  </header>
-
-  <!-- STATUS BAR -->
-  <div class="bg-slate-800/60 border-b border-slate-700/50 px-6 py-2 text-xs text-amber-300/90 flex justify-between items-center">
-    <span id="statusMessage">Ready. Load an NBA Live 96 ROM (.bin) to begin.</span>
-    <span id="fileInfoLabel">Loaded File: None</span>
-  </div>
-
-  <!-- MAIN CONTAINER -->
-  <div class="flex-1 flex flex-col md:flex-row overflow-hidden" style="height: calc(100vh - 115px);">
-    
-    <!-- SIDEBAR: PLAYER LIST -->
-    <div class="w-full md:w-80 bg-slate-800/80 border-r border-slate-700 flex flex-col h-[40vh] md:h-full">
-      <div class="p-3 border-b border-slate-700 bg-slate-800 flex flex-col space-y-2">
-        <div class="flex justify-between items-center">
-          <span class="font-semibold text-sm text-slate-300" id="playerListHeader">Player Roster (0)</span>
-        </div>
-        <input type="text" id="searchInput" placeholder="Search player name..." class="bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-400" />
-      </div>
-      <div id="playerListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-700/50">
-        <div class="p-4 text-center text-slate-500 text-sm">No ROM loaded</div>
-      </div>
-    </div>
-
-    <!-- EDITOR PANEL -->
-    <div class="flex-1 p-6 overflow-y-auto bg-slate-900 flex items-center justify-center" id="editorPanel">
-      <div class="text-center text-slate-500 max-w-md">
-        <div class="text-4xl mb-3">🎮</div>
-        <p class="text-base font-medium text-slate-400">Please load an NBA Live '96 binary ROM (.bin) using the button above to view and edit player attributes.</p>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- JAVASCRIPT ENGINE -->
-  <script>
-    const TOTAL_PLAYERS = 470;
-    const FIRST_NAME_LEN = 13;
-    const LAST_NAME_LEN = 13;
-
-    let romData = null;
-    let romFileName = '';
-    let players = [];
-    let selectedPlayerIdx = 0;
-
-    const statusMessageEl = document.getElementById('statusMessage');
-    const fileInfoLabelEl = document.getElementById('fileInfoLabel');
-    const romFileInputEl = document.getElementById('romFileInput');
-    const downloadBtnEl = document.getElementById('downloadBtn');
-    const exportCsvBtnEl = document.getElementById('exportCsvBtn');
-    const playerListContainerEl = document.getElementById('playerListContainer');
-    const playerListHeaderEl = document.getElementById('playerListHeader');
-    const editorPanelEl = document.getElementById('editorPanel');
-    const searchInputEl = document.getElementById('searchInput');
-
-    romFileInputEl.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      romFileName = file.name;
-      fileInfoLabelEl.textContent = `Loaded File: ${romFileName}`;
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        romData = event.target.result;
-        parseRomPlayers(romData);
-        statusMessageEl.textContent = `Successfully loaded ROM: ${file.name} (${(romData.byteLength / 1024 / 1024).toFixed(2)} MB)`;
-        downloadBtnEl.disabled = false;
-        downloadBtnEl.className = "px-4 py-2 rounded font-semibold text-sm transition bg-emerald-600 hover:bg-emerald-500 text-white shadow cursor-pointer";
-        exportCsvBtnEl.disabled = false;
-        exportCsvBtnEl.className = "px-4 py-2 rounded font-semibold text-sm transition bg-slate-700 hover:bg-slate-600 text-amber-300 shadow cursor-pointer";
-        renderPlayerList();
-        renderEditor();
-      };
-      reader.readAsArrayBuffer(romData);
-    });
-
-    function parseRomPlayers(buffer) {
-      players = [];
-      try {
-        const view = new DataView(buffer);
-        let baseOffset = 0x10000; // Standard ROM data offset estimation
-
-        for (let i = 0; i < TOTAL_PLAYERS; i++) {
-          let recordOffset = baseOffset + (i * 126);
-          if (recordOffset + 126 > buffer.byteLength) break;
-
-          let jerseyNumber = view.getUint8(recordOffset + 0);
-          let position = view.getUint8(recordOffset + 1);
-          let height = view.getUint8(recordOffset + 2);
-          let weightRaw = view.getUint8(recordOffset + 3);
-          let skinTone = view.getUint8(recordOffset + 5);
-          
-          let fieldGoal = view.getUint8(recordOffset + 10);
-          let threePoint = view.getUint8(recordOffset + 11);
-          let freeThrow = view.getUint8(recordOffset + 12);
-          let dunk = view.getUint8(recordOffset + 13);
-          let overall = view.getUint8(recordOffset + 27);
-
-          let lastNameBytes = [];
-          for (let b = 0; b < LAST_NAME_LEN; b++) {
-            lastNameBytes.push(view.getUint8(recordOffset + 100 + b));
-          }
-          let firstNameBytes = [];
-          for (let b = 0; b < FIRST_NAME_LEN; b++) {
-            firstNameBytes.push(view.getUint8(recordOffset + 113 + b));
-          }
-
-          let decodeAscii = (arr) => arr.map(c => (c >= 32 && c <= 126) ? String.fromCharCode(c) : '').join('').trim() || `Player ${i}`;
-
-          players.push({
-            index: i,
-            firstName: decodeAscii(firstNameBytes),
-            lastName: decodeAscii(lastNameBytes),
-            jerseyNumber: jerseyNumber,
-            position: position,
-            height: height,
-            weight: weightRaw + 100, // +100 lb offset rule
-            skinTone: skinTone,
-            overall: overall,
-            fieldGoal: fieldGoal,
-            threePoint: threePoint,
-            freeThrow: freeThrow,
-            dunk: dunk,
-            rawOffset: recordOffset
-          });
-        }
-      } catch (err) {
-        console.error(err);
-        statusMessageEl.textContent = "Error parsing binary ROM.";
-      }
-    }
-
-    searchInputEl.addEventListener('input', () => {
-      renderPlayerList();
-    });
-
-    function renderPlayerList() {
-      const filter = searchInputEl.value.toLowerCase();
-      playerListHeaderEl.textContent = `Player Roster (${players.length})`;
-      playerListContainerEl.innerHTML = '';
-
-      const filtered = players.filter(p => 
-        p.firstName.toLowerCase().includes(filter) || 
-        p.lastName.toLowerCase().includes(filter) ||
-        p.jerseyNumber.toString().includes(filter)
-      );
-
-      if (filtered.length === 0) {
-        playerListContainerEl.innerHTML = '<div class="p-4 text-center text-slate-500 text-xs">No players found</div>';
-        return;
-      }
-
-      filtered.forEach(p => {
-        const item = document.createElement('div');
-        item.className = `px-4 py-2.5 text-sm cursor-pointer flex justify-between items-center transition ${selectedPlayerIdx === p.index ? 'bg-amber-500/20 border-l-4 border-amber-400 text-amber-300 font-medium' : 'hover:bg-slate-700/40 text-slate-300'}`;
-        item.innerHTML = `
-          <span>#${p.jerseyNumber} ${p.firstName} ${p.lastName}</span>
-          <span class="text-xs bg-slate-700 px-2 py-0.5 rounded text-slate-400">OVR: ${p.overall}</span>
-        `;
-        item.addEventListener('click', () => {
-          selectedPlayerIdx = p.index;
-          renderPlayerList();
-          renderEditor();
-        });
-        playerListContainerEl.appendChild(item);
-      });
-    }
-
-    function renderEditor() {
-      const p = players.find(x => x.index === selectedPlayerIdx);
-      if (!p) return;
-
-      editorPanelEl.innerHTML = `
-        <div class="max-w-3xl w-full bg-slate-800 border border-slate-700 rounded-lg p-6 shadow-xl">
-          <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
-            <div>
-              <h2 class="text-xl font-bold text-amber-400" id="titleName">${p.firstName} ${p.lastName}</h2>
-              <p class="text-xs text-slate-400">Player ID Index: ${p.index} | ROM Offset: 0x${p.rawOffset.toString(16)}</p>
+        <section id="editorWorkspace" style="display: none;">
+            <div class="toolbar">
+                <button id="saveBtn" class="btn primary">Save & Download Roster</button>
             </div>
-            <div class="bg-slate-700/60 px-4 py-2 rounded text-center">
-              <div class="text-xs text-slate-400">Overall Rating</div>
-              <div class="text-lg font-extrabold text-amber-300" id="ovrDisplay">${p.overall}</div>
+            
+            <div class="table-container">
+                <table id="playerTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Inside Rating</th>
+                            <th>Outside Rating</th>
+                            <th>Jersey #</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playerTableBody">
+                        <!-- Populated dynamically via app.js -->
+                    </tbody>
+                </table>
             </div>
-          </div>
+        </section>
+    </main>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">First Name (Max 13 chars)</label>
-              <input type="text" id="inpFirstName" maxlength="13" value="${p.firstName}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Last Name (Max 13 chars)</label>
-              <input type="text" id="inpLastName" maxlength="13" value="${p.lastName}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Jersey Number</label>
-              <input type="number" id="inpJersey" min="0" max="99" value="${p.jerseyNumber}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Height (inches)</label>
-              <input type="number" id="inpHeight" value="${p.height}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Weight (lbs) [+100 offset]</label>
-              <input type="number" id="inpWeight" value="${p.weight}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Overall Rating</label>
-              <input type="number" id="inpOverall" min="0" max="100" value="${p.overall}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Field Goal Rating</label>
-              <input type="number" id="inpFG" min="0" max="100" value="${p.fieldGoal}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">3-Point Rating</label>
-              <input type="number" id="inp3PT" min="0" max="100" value="${p.threePoint}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Free Throw Rating</label>
-              <input type="number" id="inpFT" min="0" max="100" value="${p.freeThrow}" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-400" />
-            </div>
-          </div>
-        </div>
-      `;
-
-      // Attach live binding listeners
-      const bindInput = (id, field, isNum = true) => {
-        document.getElementById(id).addEventListener('input', (e) => {
-          const val = isNum ? (parseInt(e.target.value) || 0) : e.target.value;
-          p[field] = val;
-          if (field === 'overall') document.getElementById('ovrDisplay').textContent = val;
-          if (field === 'firstName' || field === 'lastName') {
-            document.getElementById('titleName').textContent = `${p.firstName} ${p.lastName}`;
-          }
-          renderPlayerList();
-        });
-      };
-
-      bindInput('inpFirstName', 'firstName', false);
-      bindInput('inpLastName', 'lastName', false);
-      bindInput('inpJersey', 'jerseyNumber');
-      bindInput('inpHeight', 'height');
-      bindInput('inpWeight', 'weight');
-      bindInput('inpOverall', 'overall');
-      bindInput('inpFG', 'fieldGoal');
-      bindInput('inp3PT', 'threePoint');
-      bindInput('inpFT', 'freeThrow');
-    }
-
-    downloadBtnEl.addEventListener('click', () => {
-      if (!romData) return;
-
-      const newBuffer = romData.slice(0);
-      const view = new DataView(newBuffer);
-
-      players.forEach(p => {
-        if (p.rawOffset && p.rawOffset + 126 <= newBuffer.byteLength) {
-          view.setUint8(p.rawOffset + 0, p.jerseyNumber);
-          view.setUint8(p.rawOffset + 1, p.position);
-          view.setUint8(p.rawOffset + 2, p.height);
-          view.setUint8(p.rawOffset + 3, Math.max(0, p.weight - 100)); // Reverse weight +100 offset
-          view.setUint8(p.rawOffset + 5, p.skinTone);
-          view.setUint8(p.rawOffset + 10, p.fieldGoal);
-          view.setUint8(p.rawOffset + 11, p.threePoint);
-          view.setUint8(p.rawOffset + 12, p.freeThrow);
-          view.setUint8(p.rawOffset + 13, p.dunk);
-          view.setUint8(p.rawOffset + 27, p.overall);
-
-          const writeAscii = (str, offset, maxLen) => {
-            for (let i = 0; i < maxLen; i++) {
-              const charCode = i < str.length ? str.charCodeAt(i) : 0;
-              view.setUint8(offset + i, charCode);
-            }
-          };
-          writeAscii(p.lastName, p.rawOffset + 100, LAST_NAME_LEN);
-          writeAscii(p.firstName, p.rawOffset + 113, FIRST_NAME_LEN);
-        }
-      });
-
-      const blob = new Blob([newBuffer], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Modified_${romFileName || 'NBA_Live_96.bin'}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      statusMessageEl.textContent = 'Modified ROM successfully downloaded!';
-    });
-
-    exportCsvBtnEl.addEventListener('click', () => {
-      if (players.length === 0) return;
-      const headers = ['Index', 'FirstName', 'LastName', 'Jersey', 'Position', 'Height', 'Weight', 'Overall', 'FG', '3PT', 'FT'];
-      const rows = players.map(p => [
-        p.index,
-        `"${p.firstName}"`,
-        `"${p.lastName}"`,
-        p.jerseyNumber,
-        p.position,
-        p.height,
-        p.weight,
-        p.overall,
-        p.fieldGoal,
-        p.threePoint,
-        p.freeThrow
-      ]);
-
-      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
-      link.setAttribute('download', 'NBALive96_Players.csv');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      statusMessageEl.textContent = 'Player roster exported to CSV successfully.';
-    });
-  </script>
+    <script src="app.js"></script>
 </body>
 </html>
