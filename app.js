@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let globalPlayers = [];
     let activePlayer = null;
 
-    // VB6 Mappings matching frmPlayer.frm & CSV Schema
+    // VB6 Mappings matching frmPlayer.frm & CSV Schema (86 columns)
     const abilityNames = [
         "FieldGoal", "ThreePoint", "FreeThrow", "Dunk", 
         "Steal", "Block", "OffRebound", "DefRebound", 
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "OffRebounds", "DefRebounds", "Assists", "Steals", "Turnovers", "Blocks", "Points", "Fouls"
     ];
 
-    const unknownNames = Array.from({length: 12}, (_, i) => `Extra ${i+1}`);
+    const unknownNames = Array.from({length: 15}, (_, i) => `Extra ${i+1}`);
 
     function initGrids() {
         abilitiesContainer.innerHTML = '';
@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initGrids();
 
-    // Directly listen to file selection changes from the native input
     romFileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -120,11 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
             parseBinaryData(fileData);
         }
 
-        cTeam.innerHTML = '<option value="All">All Players (NBA Live \'96)</option>';
+        cTeam.innerHTML = `<option value="All">All Players (NBA Live '96 - ${globalPlayers.length} Loaded)</option>`;
         cTeam.disabled = false;
         updatePlayerDropdown();
 
-        statusText.textContent = `Status: Loaded ${fileName} (${globalPlayers.length} players parsed)`;
+        statusText.textContent = `Status: Loaded ${fileName} (${globalPlayers.length} players parsed successfully)`;
     }
 
     function parseCSVData(csvText) {
@@ -134,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!line.trim()) return;
             const cols = line.split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
             
-            if (idx === 0 && cols[0].toLowerCase().includes('jersey')) return;
+            // Skip header row
+            if (idx === 0 && (cols[0].toLowerCase().includes('jersey') || cols[0].toLowerCase().includes('name'))) return;
 
             if (cols.length >= 10) {
                 let num = parseInt(cols[0]) || 0;
@@ -146,12 +146,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 let weight = (parseInt(cols[3]) || 150);
                 let school = cols[4] || "College";
                 let skin = parseInt(cols[5]) || 0;
+                let hair = parseInt(cols[6]) || 1;
+                let face = parseInt(cols[7]) || 1;
 
+                // 12 Abilities ratings (indices 9 to 20)
                 let abilities = [];
                 for (let i = 9; i <= 20; i++) {
                     abilities.push(parseInt(cols[i]) || 75);
                 }
 
+                // 17 Performance Stats
+                let stats = [];
+                for (let i = 37; i <= 53; i++) {
+                    stats.push(parseInt(cols[i]) || 0);
+                }
+                while (stats.length < 17) stats.push(0);
+
+                // Unknown / Extra fields
+                let unknown = [];
+                for (let i = 54; i < cols.length - 2; i++) {
+                    unknown.push(parseInt(cols[i]) || 0);
+                }
+                while (unknown.length < 15) unknown.push(0);
+
+                // Names are in the last two columns
                 let lastName = cols[cols.length - 2] || `Player ${idx}`;
                 let firstName = cols[cols.length - 1] || "";
 
@@ -165,30 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     weight: weight,
                     school: school,
                     skin: skin,
-                    hair: parseInt(cols[6]) || 1,
-                    face: parseInt(cols[7]) || 1,
+                    hair: hair,
+                    face: face,
                     abilities: abilities,
-                    stats: [
-                        parseInt(cols[37])||82, parseInt(cols[38])||63, parseInt(cols[39])||2340,
-                        parseInt(cols[40])||320, parseInt(cols[41])||677, parseInt(cols[42])||2,
-                        parseInt(cols[43])||3, parseInt(cols[44])||152, parseInt(cols[45])||188,
-                        parseInt(cols[46])||154, parseInt(cols[47])||302, parseInt(cols[48])||72,
-                        parseInt(cols[49])||45, parseInt(cols[50])||108, parseInt(cols[51])||144,
-                        parseInt(cols[52])||794, parseInt(cols[55])||271
-                    ],
-                    unknown: Array(12).fill(0)
+                    stats: stats,
+                    unknown: unknown,
+                    rawCols: cols
                 });
             }
         });
-
-        if (globalPlayers.length === 0) {
-            globalPlayers.push({
-                id: 0, firstName: "Andrew", lastName: "Lang", number: 28, position: "Center",
-                height: "83", weight: 250, school: "Arkansas", skin: 0, hair: 6, face: 1,
-                abilities: [75,70,55,80,80,67,80,75,79,68,85,72],
-                stats: Array(17).fill(100), unknown: Array(12).fill(0)
-            });
-        }
     }
 
     function parseBinaryData(arrayBuffer) {
@@ -248,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Live updating bindings
     txtFirstName.addEventListener('input', () => { if (activePlayer) activePlayer.firstName = txtFirstName.value; });
     txtLastName.addEventListener('input', () => { if (activePlayer) activePlayer.lastName = txtLastName.value; });
     txtNumber.addEventListener('input', () => { if (activePlayer) activePlayer.number = Number(txtNumber.value); });
@@ -302,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     btnSave.addEventListener('click', () => {
-        if (!fileData) return;
+        if (globalPlayers.length === 0) return;
 
         let csvContent = "JerseyNumber,Position,Height,Weight,School,SkinTone,Hair,Face,LastName,FirstName\r\n";
         globalPlayers.forEach(p => {
