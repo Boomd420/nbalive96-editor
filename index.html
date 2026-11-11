@@ -3,205 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live 96 Editor & Roster Management Tool</title>
+    <title>NBA Live 96 Web Editor & Roster Replica</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-red: #ef4444;
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
             --accent-blue: #3b82f6;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
             --border-color: #334155;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
             margin: 0;
             padding: 0;
-            line-height: 1.6;
         }
 
         header {
-            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
-            border-bottom: 2px solid var(--accent-red);
-            padding: 3rem 1.5rem;
-            text-align: center;
+            background-color: #1b263b;
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--accent-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         header h1 {
-            font-size: 2.5rem;
-            margin: 0 0 0.5rem 0;
-            color: #ffffff;
-            letter-spacing: -0.025em;
+            margin: 0;
+            font-size: 1.4rem;
+            color: #fff;
         }
 
-        header p {
-            color: var(--text-muted);
-            font-size: 1.15rem;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-        }
-
-        .card h2 {
+        .status-badge {
+            background-color: rgba(59, 130, 246, 0.2);
             color: var(--accent-blue);
-            font-size: 1.3rem;
-            margin-top: 0;
-            margin-bottom: 0.75rem;
-        }
-
-        .card h3 {
-            color: #ffffff;
-            font-size: 1.1rem;
-            margin-top: 1rem;
-        }
-
-        ul {
-            padding-left: 1.25rem;
-            color: var(--text-muted);
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        .badge {
-            display: inline-block;
-            background-color: rgba(59, 130, 246, 0.1);
-            color: var(--accent-blue);
-            border: 1px solid var(--accent-blue);
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.2rem 0.6rem;
+            padding: 0.3rem 0.8rem;
             border-radius: 4px;
-            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
-        .btn-group {
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: calc(100vh - 65px);
+        }
+
+        .sidebar {
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-dark);
+            color: #fff;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .player-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            padding: 0.6rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .player-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .player-item.active {
+            background-color: var(--accent-blue);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .content-area {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--accent-blue);
+            background-color: rgba(59, 130, 246, 0.05);
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--panel-bg);
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .section-title {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
             margin-top: 1.5rem;
-            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+            font-size: 1.1rem;
         }
 
         .btn {
-            display: inline-block;
-            background-color: var(--accent-red);
-            color: #ffffff;
-            text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-        }
-
-        .btn:hover {
-            background-color: #dc2626;
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border-color);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem 1.5rem;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 3rem;
-        }
-
-        code {
-            background-color: #0f172a;
-            padding: 0.2rem 0.4rem;
+            background-color: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
             border-radius: 4px;
-            color: #f1f5f9;
-            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .btn-success { background-color: var(--accent-green); }
+        .btn-danger { background-color: var(--accent-red); }
+
+        .btn:hover { opacity: 0.9; }
+
+        .toolbar {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <span class="badge">Sega Genesis / EA Sports ROM Utility</span>
-        <h1>NBA Live 96 Editor & Roster Replica</h1>
-        <p>A reverse-engineering and documentation project focused on replicating the classic 1996 Visual Basic executable editor for binary ROM customization and external stat synchronization.</p>
+        <h1>NBA Live 96 Roster & ROM Web Editor</h1>
+        <div class="status-badge" id="appStatus">Ready - Load BIN or CSV File</div>
     </header>
 
-    <div class="container">
-        
-        <div class="grid">
-            <div class="card">
-                <h2>Project Purpose</h2>
-                <p>This repository provides a complete structural mapping and replica framework for the original <strong>NBA Live 96 Editor</strong>. It enables retro sports gaming enthusiasts to edit rosters, player attributes, biometrics, and team details directly in the binary ROM (<code>.BIN</code>) or via CSV stat imports.</p>
-            </div>
-
-            <div class="card">
-                <h2>Core Features</h2>
-                <ul>
-                    <li><strong>Manual Roster Editing:</strong> Modify individual player stats, jersey numbers, heights, weights, and appearance values.</li>
-                    <li><strong>CSV Export/Import Sync:</strong> Export full 470-player league datasets to CSV and re-inject modified external stats seamlessly.</li>
-                    <li><strong>1-to-1 UI Alignment:</strong> Recreates the exact layout and controls of the original Visual Basic form forms (<code>frmPlayer</code>, <code>frmTeam</code>, <code>frmRoster</code>).</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card" style="margin-bottom: 2rem;">
-            <h2>Binary Structure & Data Mapping</h2>
-            <p>Every column in the repository's <code>NBALIVE96OGROS.CSV</code> corresponds directly to the internal 2MB binary ROM structure used by EA Sports in 1996:</p>
-            <ul>
-                <li><code>JerseyNumber:1</code>, <code>Position:1</code>, <code>Height:1</code>, <code>Weight:1:+100</code> &mdash; Core biometric headers.</li>
-                <li><code>FieldGoal:1</code>, <code>ThreePoint:1</code>, <code>FreeThrow:1</code>, <code>Speed:1</code>, <code>Jump:1</code> &mdash; Ratings and player attributes (0&ndash;99 scale).</li>
-                <li><code>Minutes:2</code>, <code>Points:2</code>, <code>Assists:2</code>, <code>Rebounds:2</code> &mdash; 16-bit word values for career box score statistics.</li>
-                <li><code>LastName:ascii</code>, <code>FirstName:ascii</code> &mdash; Variable-length null-terminated ASCII strings at player offsets.</li>
+    <div class="main-layout">
+        <div class="sidebar">
+            <input type="text" id="searchBox" class="search-box" placeholder="Search player roster...">
+            <ul class="player-list" id="playerList">
+                <li style="padding:1rem; text-align:center; color: var(--text-dim);">No file loaded. Drag & drop your ROM or CSV to begin.</li>
             </ul>
         </div>
 
-        <div class="card">
-            <h2>Repository Files & Resources</h2>
-            <p>Access the core source modules, database exports, and user documentation directly inside this repository:</p>
-
-            <div class="btn-group">
-                <a href="NBALIVE96OGROS.CSV" class="btn">Download League CSV Data</a>
-                <a href="readme.txt" class="btn btn-secondary">View Original Readme</a>
+        <div class="content-area">
+            
+            <div class="drop-zone" id="dropZone">
+                <h2>Load ROM (.BIN) or Roster (.CSV) File</h2>
+                <p>Drag and drop <code>NBA Live 96.bin</code> or <code>NBALIVE96OGROS.CSV</code> here, or click to upload.</p>
+                <input type="file" id="fileInput" accept=".bin,.csv" style="display: none;">
             </div>
-        </div>
 
+            <div class="toolbar">
+                <button class="btn btn-success" id="btnDownloadCSV" disabled>Export Roster CSV</button>
+                <button class="btn btn-danger" id="btnDownloadBIN" disabled>Save & Download Updated .BIN ROM</button>
+                <a href="NBALIVE96OGROS.CSV" class="btn" download style="text-decoration:none; display:inline-block;">Download Default CSV</a>
+                <a href="readme.txt" class="btn" style="text-decoration:none; display:inline-block; background-color:#475569;">View Readme</a>
+            </div>
+
+            <div id="editorPanel" style="display: none;">
+                <h2 id="currentPlayerName" style="margin-top:0;">Player Details</h2>
+
+                <div class="section-title">Biometrics & Information</div>
+                <div class="editor-grid">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="pFirstName">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="pLastName">
+                    </div>
+                    <div class="form-group">
+                        <label>Jersey Number</label>
+                        <input type="number" id="pJersey">
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <select id="pPosition">
+                            <option value="0">Point Guard (PG)</option>
+                            <option value="1">Shooting Guard (SG)</option>
+                            <option value="2">Small Forward (SF)</option>
+                            <option value="3">Power Forward (PF)</option>
+                            <option value="4">Center (C)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Height (inches)</label>
+                        <input type="number" id="pHeight">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (+100 lbs)</label>
+                        <input type="number" id="pWeight">
+                    </div>
+                </div>
+
+                <div class="section-title">Player Attributes & Ratings (0-99)</div>
+                <div class="editor-grid">
+                    <div class="form-group"><label>Field Goal</label><input type="number" id="rFieldGoal" min="0" max="99"></div>
+                    <div class="form-group"><label>3-Pointer</label><input type="number" id="rThreePoint" min="0" max="99"></div>
+                    <div class="form-group"><label>Free Throw</label><input type="number" id="rFreeThrow" min="0" max="99"></div>
+                    <div class="form-group"><label>Dunk</label><input type="number" id="rDunk" min="0" max="99"></div>
+                    <div class="form-group"><label>Steal</label><input type="number" id="rSteal" min="0" max="99"></div>
+                    <div class="form-group"><label>Block</label><input type="number" id="rBlock" min="0" max="99"></div>
+                    <div class="form-group"><label>Speed</label><input type="number" id="rSpeed" min="0" max="99"></div>
+                    <div class="form-group"><label>Agility</label><input type="number" id="rAgility" min="0" max="99"></div>
+                    <div class="form-group"><label>Jump</label><input type="number" id="rJump" min="0" max="99"></div>
+                    <div class="form-group"><label>Off. Awareness</label><input type="number" id="rOffAware" min="0" max="99"></div>
+                    <div class="form-group"><label>Def. Awareness</label><input type="number" id="rDefAware" min="0" max="99"></div>
+                    <div class="form-group"><label>Overall</label><input type="number" id="rOverall" min="0" max="99"></div>
+                </div>
+
+                <div class="section-title">Career / Season Statistics</div>
+                <div class="editor-grid">
+                    <div class="form-group"><label>Games Played</label><input type="number" id="sGames"></div>
+                    <div class="form-group"><label>Games Started</label><input type="number" id="sStarts"></div>
+                    <div class="form-group"><label>Minutes</label><input type="number" id="sMinutes"></div>
+                    <div class="form-group"><label>Points</label><input type="number" id="sPoints"></div>
+                    <div class="form-group"><label>Assists</label><input type="number" id="sAssists"></div>
+                    <div class="form-group"><label>Rebounds (Off)</label><input type="number" id="sOffReb"></div>
+                    <div class="form-group"><label>Rebounds (Def)</label><input type="number" id="sDefReb"></div>
+                    <div class="form-group"><label>Steals</label><input type="number" id="sSteals"></div>
+                    <div class="form-group"><label>Blocks</label><input type="number" id="sBlocks"></div>
+                </div>
+
+                <button class="btn btn-success" id="btnSavePlayer" style="margin-top: 1rem; width: 100%; padding: 0.8rem;">Save Player Changes</button>
+            </div>
+
+        </div>
     </div>
 
-    <footer>
-        <p>NBA Live 96 Editor Replica Project &bull; Hosted on GitHub Pages</p>
-    </footer>
+    <script>
+        let playerData = [];
+        let selectedIndex = -1;
+        let rawBinBuffer = null;
 
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const playerList = document.getElementById('playerList');
+        const editorPanel = document.getElementById('editorPanel');
+        const appStatus = document.getElementById('appStatus');
+        const searchBox = document.getElementById('searchBox');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.15)'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.05)'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        searchBox.addEventListener('input', () => renderPlayerList(searchBox.value.toLowerCase()));
+
+        function handleFileSelect(e) {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        }
+
+        function handleFile(file) {
+            appStatus.innerText = "Loading " + file.name + "...";
+            if (file.name.toLowerCase().endsWith('.csv')) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    parseCSV(evt.target.result);
+                    appStatus.innerText = "Loaded CSV (" + playerData.length + " players)";
+                    document.getElementById('btnDownloadCSV').disabled = false;
+                };
+                reader.readAsText(file);
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    rawBinBuffer = evt.target.result;
+                    appStatus.innerText = "Loaded ROM Binary (" + file.name + ")";
+                    document.getElementById('btnDownloadBIN').disabled = false;
+                    document.getElementById('btnDownloadCSV').disabled = false;
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return;
+            playerData = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',');
+                if (cols.length < 10) continue;
+                playerData.push({
+                    jersey: parseInt(cols[0]) || 0,
+                    pos: parseInt(cols[1]) || 0,
+                    height: parseInt(cols[2]) || 0,
+                    weight: parseInt(cols[3]) || 0,
+                    fg: parseInt(cols[10]) || 0,
+                    tp: parseInt(cols[11]) || 0,
+                    ft: parseInt(cols[12]) || 0,
+                    dunk: parseInt(cols[13]) || 0,
+                    stl: parseInt(cols[14]) || 0,
+                    blk: parseInt(cols[15]) || 0,
+                    speed: parseInt(cols[20]) || 0,
+                    agility: parseInt(cols[21]) || 0,
+                    jump: parseInt(cols[22]) || 0,
+                    offAware: parseInt(cols[24]) || 0,
+                    defAware: parseInt(cols[19]) || 0,
+                    overall: parseInt(cols[27]) || 0,
+                    games: parseInt(cols[37]) || 0,
+                    starts: parseInt(cols[38]) || 0,
+                    minutes: parseInt(cols[39]) || 0,
+                    points: parseInt(cols[52]) || 0,
+                    assists: parseInt(cols[48]) || 0,
+                    offReb: parseInt(cols[46]) || 0,
+                    defReb: parseInt(cols[47]) || 0,
+                    steals: parseInt(cols[49]) || 0,
+                    blocks: parseInt(cols[51]) || 0,
+                    lastName: (cols[cols.length - 2] || '').trim(),
+                    firstName: (cols[cols.length - 1] || '').trim()
+                });
+            }
+            renderPlayerList();
+        }
+
+        function renderPlayerList(filter = '') {
+            playerList.innerHTML = '';
+            playerData.forEach((p, idx) => {
+                const fullName = `${p.firstName} ${p.lastName}`.toLowerCase();
+                if (filter && !fullName.includes(filter) && !p.jersey.toString().includes(filter)) return;
+
+                const li = document.createElement('li');
+                li.className = 'player-item' + (idx === selectedIndex ? ' active' : '');
+                li.innerHTML = `<span>#${p.jersey} ${p.firstName} ${p.lastName}</span><span style="color:var(--text-dim);">OVR: ${p.overall}</span>`;
+                li.onclick = () => selectPlayer(idx);
+                playerList.appendChild(li);
+            });
+        }
+
+        function selectPlayer(idx) {
+            selectedIndex = idx;
+            renderPlayerList(searchBox.value.toLowerCase());
+            const p = playerData[idx];
+            if (!p) return;
+
+            document.getElementById('currentPlayerName').innerText = `#${p.jersey} ${p.firstName} ${p.lastName}`;
+            document.getElementById('pFirstName').value = p.firstName;
+            document.getElementById('pLastName').value = p.lastName;
+            document.getElementById('pJersey').value = p.jersey;
+            document.getElementById('pPosition').value = p.pos;
+            document.getElementById('pHeight').value = p.height;
+            document.getElementById('pWeight').value = p.weight;
+
+            document.getElementById('rFieldGoal').value = p.fg;
+            document.getElementById('rThreePoint').value = p.tp;
+            document.getElementById('rFreeThrow').value = p.ft;
+            document.getElementById('rDunk').value = p.dunk;
+            document.getElementById('rSteal').value = p.stl;
+            document.getElementById('rBlock').value = p.blk;
+            document.getElementById('rSpeed').value = p.speed;
+            document.getElementById('rAgility').value = p.agility;
+            document.getElementById('rJump').value = p.jump;
+            document.getElementById('rOffAware').value = p.offAware;
+            document.getElementById('rDefAware').value = p.defAware;
+            document.getElementById('rOverall').value = p.overall;
+
+            document.getElementById('sGames').value = p.games;
+            document.getElementById('sStarts').value = p.starts;
+            document.getElementById('sMinutes').value = p.minutes;
+            document.getElementById('sPoints').value = p.points;
+            document.getElementById('sAssists').value = p.assists;
+            document.getElementById('sOffReb').value = p.offReb;
+            document.getElementById('sDefReb').value = p.defReb;
+            document.getElementById('sSteals').value = p.steals;
+            document.getElementById('sBlocks').value = p.blocks;
+
+            editorPanel.style.display = 'block';
+        }
+
+        document.getElementById('btnSavePlayer').onclick = function() {
+            if (selectedIndex < 0 || !playerData[selectedIndex]) return;
+            const p = playerData[selectedIndex];
+
+            p.firstName = document.getElementById('pFirstName').value;
+            p.lastName = document.getElementById('pLastName').value;
+            p.jersey = parseInt(document.getElementById('pJersey').value) || 0;
+            p.pos = parseInt(document.getElementById('pPosition').value) || 0;
+            p.height = parseInt(document.getElementById('pHeight').value) || 0;
+            p.weight = parseInt(document.getElementById('pWeight').value) || 0;
+
+            p.fg = parseInt(document.getElementById('rFieldGoal').value) || 0;
+            p.tp = parseInt(document.getElementById('rThreePoint').value) || 0;
+            p.ft = parseInt(document.getElementById('rFreeThrow').value) || 0;
+            p.dunk = parseInt(document.getElementById('rDunk').value) || 0;
+            p.stl = parseInt(document.getElementById('rSteal').value) || 0;
+            p.blk = parseInt(document.getElementById('rBlock').value) || 0;
+            p.speed = parseInt(document.getElementById('rSpeed').value) || 0;
+            p.agility = parseInt(document.getElementById('rAgility').value) || 0;
+            p.jump = parseInt(document.getElementById('rJump').value) || 0;
+            p.offAware = parseInt(document.getElementById('rOffAware').value) || 0;
+            p.defAware = parseInt(document.getElementById('rDefAware').value) || 0;
+            p.overall = parseInt(document.getElementById('rOverall').value) || 0;
+
+            p.games = parseInt(document.getElementById('sGames').value) || 0;
+            p.starts = parseInt(document.getElementById('sStarts').value) || 0;
+            p.minutes = parseInt(document.getElementById('sMinutes').value) || 0;
+            p.points = parseInt(document.getElementById('sPoints').value) || 0;
+            p.assists = parseInt(document.getElementById('sAssists').value) || 0;
+            p.offReb = parseInt(document.getElementById('sOffReb').value) || 0;
+            p.defReb = parseInt(document.getElementById('sDefReb').value) || 0;
+            p.steals = parseInt(document.getElementById('sSteals').value) || 0;
+            p.blocks = parseInt(document.getElementById('sBlocks').value) || 0;
+
+            renderPlayerList(searchBox.value.toLowerCase());
+            alert("Saved #" + p.jersey + " " + p.firstName + " " + p.lastName);
+        };
+
+        // Fetch default NBALIVE96OGROS.CSV
+        fetch('NBALIVE96OGROS.CSV')
+            .then(res => res.text())
+            .then(text => {
+                parseCSV(text);
+                appStatus.innerText = "Loaded Default Roster CSV (" + playerData.length + " players)";
+                document.getElementById('btnDownloadCSV').disabled = false;
+            })
+            .catch(err => console.log("Default CSV fetch skipped:", err));
+    </script>
 </body>
 </html>
