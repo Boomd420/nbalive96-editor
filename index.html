@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live 96 Web Editor & Roster Replica</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NBA Live 96 Web Editor</title>
     <style>
         :root {
             --bg-dark: #0f172a;
@@ -16,13 +16,15 @@
             --border-color: #334155;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-light);
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         header {
@@ -45,12 +47,8 @@
 
         header h1 {
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: #fff;
-        }
-
-        @media(min-width: 768px) {
-            header h1 { font-size: 1.4rem; }
         }
 
         .status-badge {
@@ -60,21 +58,24 @@
             border-radius: 4px;
             font-size: 0.8rem;
             font-weight: 600;
-            display: inline-block;
-            text-align: center;
+            align-self: flex-start;
         }
 
-        .main-layout {
+        @media(min-width: 768px) {
+            .status-badge { align-self: auto; }
+        }
+
+        .app-container {
             display: flex;
             flex-direction: column;
-            height: auto;
+            width: 100%;
         }
 
         @media(min-width: 900px) {
-            .main-layout {
+            .app-container {
                 display: grid;
                 grid-template-columns: 320px 1fr;
-                height: calc(100vh - 75px);
+                height: calc(100vh - 71px);
             }
         }
 
@@ -84,28 +85,26 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
+            height: 280px;
         }
 
         @media(min-width: 900px) {
             .sidebar {
                 border-bottom: none;
                 border-right: 1px solid var(--border-color);
-                max-height: none;
                 height: 100%;
+                max-height: none;
             }
         }
 
         .search-box {
             width: 100%;
-            padding: 0.6rem;
+            padding: 0.7rem;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             background-color: var(--bg-dark);
             color: #fff;
-            margin-bottom: 1rem;
-            box-sizing: border-box;
+            margin-bottom: 0.8rem;
             font-size: 1rem;
         }
 
@@ -114,20 +113,24 @@
             padding: 0;
             margin: 0;
             overflow-y: auto;
+            flex-grow: 1;
         }
 
         .player-item {
-            padding: 0.7rem 0.8rem;
-            border-radius: 4px;
+            padding: 0.8rem;
+            border-radius: 6px;
             cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 0.3rem;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             display: flex;
             justify-content: space-between;
+            align-items: center;
             font-size: 0.95rem;
         }
 
-        .player-item:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+        .player-item:active, .player-item:hover {
+            background-color: rgba(59, 130, 246, 0.15);
         }
 
         .player-item.active {
@@ -145,37 +148,57 @@
             .content-area { padding: 1.5rem; }
         }
 
-        .drop-zone {
-            border: 2px dashed var(--accent-blue);
-            background-color: rgba(59, 130, 246, 0.05);
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
+        .toolbar {
+            display: flex;
+            gap: 0.6rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
             cursor: pointer;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .btn-success { background-color: var(--accent-green); }
+        .btn-danger { background-color: var(--accent-red); }
+        .btn-secondary { background-color: #475569; }
+        .btn:active { opacity: 0.8; }
+
+        .editor-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
         }
 
         @media(min-width: 768px) {
-            .drop-zone { padding: 2.5rem; }
+            .editor-card { padding: 1.5rem; }
         }
 
         .editor-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
-        @media(min-width: 600px) {
-            .editor-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        @media(min-width: 550px) {
+            .editor-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        @media(min-width: 1024px) {
-            .editor-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        @media(min-width: 950px) {
+            .editor-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         .form-group {
@@ -184,88 +207,60 @@
         }
 
         .form-group label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-dim);
             margin-bottom: 0.3rem;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .form-group input, .form-group select {
-            padding: 0.6rem;
-            border-radius: 4px;
+            padding: 0.7rem;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
-            background-color: var(--panel-bg);
+            background-color: var(--bg-dark);
             color: #fff;
             font-size: 1rem;
             width: 100%;
-            box-sizing: border-box;
         }
 
         .section-title {
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-            margin-top: 1.5rem;
+            padding-bottom: 0.4rem;
+            margin-top: 1.2rem;
             margin-bottom: 1rem;
             color: var(--accent-blue);
-            font-size: 1.1rem;
-        }
-
-        .btn {
-            background-color: var(--accent-blue);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1.2rem;
-            border-radius: 4px;
+            font-size: 1.05rem;
             font-weight: 600;
-            cursor: pointer;
-            font-size: 0.95rem;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
         }
 
-        .btn-success { background-color: var(--accent-green); }
-        .btn-danger { background-color: var(--accent-red); }
-        .btn-secondary { background-color: #475569; }
-
-        .btn:hover { opacity: 0.9; }
-
-        .toolbar {
-            margin-bottom: 1.5rem;
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
-
-        /* Modal for Readme */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
-            z-index: 100;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.85);
             padding: 1rem;
-            box-sizing: border-box;
         }
         .modal-content {
             background-color: var(--panel-bg);
-            margin: 10% auto;
+            margin: 15% auto;
             padding: 1.5rem;
             border: 1px solid var(--border-color);
             width: 100%;
-            max-width: 600px;
+            max-width: 550px;
             border-radius: 8px;
-            max-height: 80vh;
+            max-height: 75vh;
             overflow-y: auto;
         }
         .close-btn {
             color: var(--text-dim);
             float: right;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             cursor: pointer;
         }
@@ -275,13 +270,14 @@
 <body>
 
     <header>
-        <h1>NBA Live 96 Roster & ROM Editor</h1>
-        <div class="status-badge" id="appStatus">Loading default roster...</div>
+        <h1>NBA Live 96 Web Editor</h1>
+        <div class="status-badge" id="appStatus">Ready (Default Roster Loaded)</div>
     </header>
 
-    <div class="main-layout">
+    <div class="app-container">
+        
         <div class="sidebar">
-            <input type="text" id="searchBox" class="search-box" placeholder="Search player roster...">
+            <input type="text" id="searchBox" class="search-box" placeholder="Search player name...">
             <ul class="player-list" id="playerList">
                 <li style="padding:1rem; text-align:center; color: var(--text-dim);">Loading roster...</li>
             </ul>
@@ -289,23 +285,18 @@
 
         <div class="content-area">
             
-            <div class="drop-zone" id="dropZone">
-                <h3 style="margin-top:0;">Load ROM (.BIN) or Roster (.CSV)</h3>
-                <p style="color: var(--text-dim); margin-bottom:0; font-size:0.9rem;">Tap here or drag & drop files to load</p>
-                <input type="file" id="fileInput" accept=".bin,.csv" style="display: none;">
-            </div>
-
             <div class="toolbar">
-                <button class="btn btn-success" id="btnDownloadCSV" disabled>Export CSV</button>
-                <button class="btn btn-danger" id="btnDownloadBIN" disabled>Save .BIN</button>
-                <a href="NBALIVE96OGROS.CSV" class="btn" download>Download CSV</a>
-                <button class="btn btn-secondary" id="btnOpenReadme">View Readme</button>
+                <button class="btn btn-success" id="btnExportCSV">Download CSV</button>
+                <button class="btn btn-danger" id="btnSaveBin" disabled>Save .BIN</button>
+                <button class="btn btn-secondary" id="btnLoadBinPrompt">Upload .BIN</button>
+                <button class="btn btn-secondary" id="btnOpenReadme">Readme</button>
+                <input type="file" id="binFileInput" accept=".bin" style="display:none;">
             </div>
 
-            <div id="editorPanel" style="display: none;">
-                <h2 id="currentPlayerName" style="margin-top:0; font-size:1.3rem;">Player Details</h2>
+            <div class="editor-card" id="editorPanel" style="display: none;">
+                <h2 id="currentPlayerName" style="margin-top:0; font-size:1.2rem; color:#fff;">Player Details</h2>
 
-                <div class="section-title">Biometrics & Information</div>
+                <div class="section-title">Biometrics</div>
                 <div class="editor-grid">
                     <div class="form-group"><label>First Name</label><input type="text" id="pFirstName"></div>
                     <div class="form-group"><label>Last Name</label><input type="text" id="pLastName"></div>
@@ -324,7 +315,7 @@
                     <div class="form-group"><label>Weight (+100)</label><input type="number" id="pWeight"></div>
                 </div>
 
-                <div class="section-title">Player Attributes & Ratings (0-99)</div>
+                <div class="section-title">Ratings & Attributes (0-99)</div>
                 <div class="editor-grid">
                     <div class="form-group"><label>Field Goal</label><input type="number" id="rFieldGoal" min="0" max="99"></div>
                     <div class="form-group"><label>3-Pointer</label><input type="number" id="rThreePoint" min="0" max="99"></div>
@@ -353,7 +344,12 @@
                     <div class="form-group"><label>Blocks</label><input type="number" id="sBlocks"></div>
                 </div>
 
-                <button class="btn btn-success" id="btnSavePlayer" style="margin-top: 1rem; width: 100%; padding: 0.9rem;">Save Player Changes</button>
+                <button class="btn btn-success" id="btnSavePlayer" style="margin-top: 1.2rem; width: 100%; padding: 0.9rem; font-size:1rem;">Save Player Changes</button>
+            </div>
+
+            <div id="welcomeCard" class="editor-card" style="text-align: center; padding: 2.5rem 1rem;">
+                <h3 style="margin-top:0; color:var(--accent-blue);">Welcome to NBA Live 96 Web Editor</h3>
+                <p style="color:var(--text-dim); font-size:0.95rem; max-width:450px; margin: 0 auto 1.5rem auto;">Select any player from the left sidebar to edit their biometrics, ratings, and stats, or upload your ROM binary (.bin).</p>
             </div>
 
         </div>
@@ -363,78 +359,76 @@
     <div id="readmeModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeModal">&times;</span>
-            <h2 style="color:var(--accent-blue); margin-top:0;">NBA Live 96 Editor Readme</h2>
-            <p style="color:var(--text-dim); line-height:1.6;" id="readmeText">Loading readme...</p>
+            <h2 style="color:var(--accent-blue); margin-top:0;">About NBA Live 96 Editor</h2>
+            <p style="color:var(--text-dim); line-height:1.6; font-size:0.95rem;">
+                Why would anyone bother coding an editor for NBA Live 96? Well, someone needed help hacking this classic Sega Genesis title. This web replica lets you modify player stats, jersey numbers, heights, weights, and ratings directly in your browser without dealing with desktop binaries or broken links.<br><br>
+                Use <b>Download CSV</b> to export the current roster dataset, or upload your <code>.bin</code> ROM file to patch changes directly.
+            </p>
         </div>
     </div>
 
     <script>
         let playerData = [];
+        let rawCSVHeaders = "";
         let selectedIndex = -1;
         let rawBinBuffer = null;
 
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
         const playerList = document.getElementById('playerList');
         const editorPanel = document.getElementById('editorPanel');
+        const welcomeCard = document.getElementById('welcomeCard');
         const appStatus = document.getElementById('appStatus');
         const searchBox = document.getElementById('searchBox');
         
         const readmeModal = document.getElementById('readmeModal');
         const btnOpenReadme = document.getElementById('btnOpenReadme');
         const closeModal = document.getElementById('closeModal');
-        const readmeText = document.getElementById('readmeText');
+        
+        const btnExportCSV = document.getElementById('btnExportCSV');
+        const btnSaveBin = document.getElementById('btnSaveBin');
+        const btnLoadBinPrompt = document.getElementById('btnLoadBinPrompt');
+        const binFileInput = document.getElementById('binFileInput');
 
-        dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
-
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#22c55e'; });
-        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#3b82f6'; });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-
-        searchBox.addEventListener('input', () => renderPlayerList(searchBox.value.toLowerCase()));
-
-        btnOpenReadme.onclick = () => {
-            readmeModal.style.display = 'block';
-            fetch('readme.txt')
-                .then(res => res.text())
-                .then(text => { readmeText.innerText = text; })
-                .catch(err => { readmeText.innerText = "Error loading readme.txt: " + err; });
-        };
-        closeModal.onclick = () => { readmeModal.style.display = 'none'; };
+        btnOpenReadme.onclick = () => readmeModal.style.display = 'block';
+        closeModal.onclick = () => readmeModal.style.display = 'none';
         window.onclick = (e) => { if (e.target == readmeModal) readmeModal.style.display = 'none'; };
 
-        function handleFile(file) {
-            appStatus.innerText = "Loading " + file.name + "...";
-            const reader = new FileReader();
-            if (file.name.toLowerCase().endsWith('.csv')) {
-                reader.onload = (evt) => {
-                    parseCSV(evt.target.result);
-                    appStatus.innerText = "Loaded CSV (" + playerData.length + " players)";
-                    document.getElementById('btnDownloadCSV').disabled = false;
-                };
-                reader.readAsText(file);
-            } else {
+        btnLoadBinPrompt.onclick = () => binFileInput.click();
+        binFileInput.onchange = (e) => {
+            if (e.target.files.length) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
                 reader.onload = (evt) => {
                     rawBinBuffer = evt.target.result;
-                    appStatus.innerText = "Loaded ROM Binary";
-                    document.getElementById('btnDownloadBIN').disabled = false;
+                    appStatus.innerText = "Loaded BIN: " + file.name;
+                    btnSaveBin.disabled = false;
+                    alert("ROM binary loaded successfully into memory!");
                 };
                 reader.readAsArrayBuffer(file);
             }
-        }
+        };
+
+        searchBox.addEventListener('input', () => renderPlayerList(searchBox.value.toLowerCase()));
+
+        // Embedded default sample CSV data
+        const defaultCSVText = `JerseyNumber:1,Position:1,Height:1,Weight:1:+100,School:1,SkinTone:1,?:1,?:1.1,Sequence:2,?:1.2,FieldGoal:1,ThreePoint:1,FreeThrow:1,Dunk:1,Steal:1,Block:1,OffRebound:1,DefRebound:1,BallControl:1,DefAware:1,Speed:1,Agility:1,Jump:1,Dribble:1,OffAware:1,?:1.3,?:1.4,Overall:1,?:1.5,?:1.6,?:1.7,?:1.8,?:1.9,?:1.10,?:1.11,?:1.12,?:1.13,Games:1,Starts:1,Minutes:2,FieldGoals:2,FieldGoalAttempts:2,ThreePointers:2,ThreePointAttempts:2,FreeThrows:2,reeThrowAttempts:2,OffRebounds:2,DefRebounds:2,Assists:2,Steals:2,TurnOvers:2,Blocks:2,Points:2,?:1.14,?:1.15,Fouls:2,?:1.16,?:1.17,?:1.18,?:1.19,?:1.20,?:1.21,?:1.22,?:1.23,?:1.24,?:1.25,?:1.26,?:1.27,?:1.28,?:1.29,?:1.30,?:1.31,?:1.32,?:1.33,?:1.34,?:1.35,?:1.36,?:1.37,?:1.38,?:1.39,?:1.40,?:1.41,?:1.42,?:1.43,LastName:ascii,FirstName:ascii
+28,0,83,250,7,0,6,0,0,75,70,55,80,80,67,80,75,79,68,85,72,70,77,68,67,80,80,73,85,114,22,16,7,7,6,7,0,82,63,2340,320,677,2,3,152,188,154,302,72,45,108,144,794,4,1,271,4,32,1,243,0,4,0,3,1,37,0,237,0,224,0,249,0,112,1,167,0,70,1,216,14,68,0,68,Lang,Andrew
+43,1,81,248,52,1,12,0,1,83,74,60,75,82,73,76,79,80,67,83,74,79,80,68,73,85,83,76,83,152,20,13,8,8,9,7,1,81,79,2641,342,716,11,31,244,325,191,415,131,109,155,34,939,3,0,243,4,107,2,28,0,48,0,17,2,1,1,129,0,53,1,45,0,207,1,128,0,172,2,143,16,77,0,112,Long,Grant
+23,1,79,215,12,0,4,0,2,65,72,62,70,75,65,70,68,70,64,78,75,74,72,65,68,75,78,71,80,120,18,12,6,6,5,6,0,75,50,2100,290,620,5,15,130,170,120,250,90,60,90,25,710,3,0,210,3,25,1,200,0,3,0,2,1,30,0,200,0,190,0,210,0,90,1,140,0,60,1,180,12,60,0,90,Jordan,Michael
+33,4,85,240,4,1,8,0,3,90,85,40,90,88,85,92,90,95,80,92,80,78,85,82,85,90,90,89,90,180,25,20,10,10,10,10,2,82,82,3100,550,1000,0,1,400,550,300,600,250,150,200,180,1500,5,2,300,6,150,3,300,0,6,0,5,2,50,0,300,0,280,0,320,0,150,2,250,0,100,2,250,20,90,1,150,Pippen,Scottie`;
+
+        parseCSV(defaultCSVText);
 
         function parseCSV(text) {
             const lines = text.trim().split('\n');
             if (lines.length < 2) return;
+            rawCSVHeaders = lines[0];
             playerData = [];
+
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',');
                 if (cols.length < 10) continue;
                 playerData.push({
+                    rawCols: cols,
                     jersey: parseInt(cols[0]) || 0,
                     pos: parseInt(cols[1]) || 0,
                     height: parseInt(cols[2]) || 0,
@@ -465,6 +459,7 @@
                 });
             }
             renderPlayerList();
+            appStatus.innerText = "Loaded (" + playerData.length + " players)";
         }
 
         function renderPlayerList(filter = '') {
@@ -475,7 +470,7 @@
 
                 const li = document.createElement('li');
                 li.className = 'player-item' + (idx === selectedIndex ? ' active' : '');
-                li.innerHTML = `<span>#${p.jersey} ${p.firstName} ${p.lastName}</span><span style="color:var(--text-dim);">OVR: ${p.overall}</span>`;
+                li.innerHTML = `<span>#${p.jersey} ${p.firstName} ${p.lastName}</span><span style="font-size:0.85rem; color:var(--text-dim);">OVR: ${p.overall}</span>`;
                 li.onclick = () => selectPlayer(idx);
                 playerList.appendChild(li);
             });
@@ -519,6 +514,7 @@
             document.getElementById('sBlocks').value = p.blocks;
 
             editorPanel.style.display = 'block';
+            welcomeCard.style.display = 'none';
         }
 
         document.getElementById('btnSavePlayer').onclick = function() {
@@ -555,22 +551,70 @@
             p.steals = parseInt(document.getElementById('sSteals').value) || 0;
             p.blocks = parseInt(document.getElementById('sBlocks').value) || 0;
 
+            p.rawCols[0] = p.jersey;
+            p.rawCols[1] = p.pos;
+            p.rawCols[2] = p.height;
+            p.rawCols[3] = p.weight;
+            p.rawCols[10] = p.fg;
+            p.rawCols[11] = p.tp;
+            p.rawCols[12] = p.ft;
+            p.rawCols[13] = p.dunk;
+            p.rawCols[14] = p.stl;
+            p.rawCols[15] = p.blk;
+            p.rawCols[20] = p.speed;
+            p.rawCols[21] = p.agility;
+            p.rawCols[22] = p.jump;
+            p.rawCols[24] = p.offAware;
+            p.rawCols[19] = p.defAware;
+            p.rawCols[27] = p.overall;
+            p.rawCols[37] = p.games;
+            p.rawCols[38] = p.starts;
+            p.rawCols[39] = p.minutes;
+            p.rawCols[52] = p.points;
+            p.rawCols[48] = p.assists;
+            p.rawCols[46] = p.offReb;
+            p.rawCols[47] = p.defReb;
+            p.rawCols[49] = p.steals;
+            p.rawCols[51] = p.blocks;
+            p.rawCols[p.rawCols.length - 2] = p.lastName;
+            p.rawCols[p.rawCols.length - 1] = p.firstName;
+
             renderPlayerList(searchBox.value.toLowerCase());
-            alert("Saved #" + p.jersey + " " + p.firstName + " " + p.lastName);
+            alert("Saved #" + p.jersey + " " + p.firstName + " " + p.lastName + " successfully!");
         };
 
-        // Auto-load CSV on start
-        fetch('NBALIVE96OGROS.CSV')
-            .then(res => res.text())
-            .then(text => {
-                parseCSV(text);
-                appStatus.innerText = "Loaded Roster (" + playerData.length + " players)";
-                document.getElementById('btnDownloadCSV').disabled = false;
-            })
-            .catch(err => {
-                appStatus.innerText = "Ready (Upload CSV or BIN)";
-                console.log("Fetch error:", err);
+        btnExportCSV.onclick = function() {
+            let csvContent = rawCSVHeaders + "\n";
+            playerData.forEach(p => {
+                csvContent += p.rawCols.join(",") + "\n";
             });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "NBALIVE96OGROS.CSV";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        btnSaveBin.onclick = function() {
+            if (!rawBinBuffer) {
+                alert("No ROM .bin file loaded in memory!");
+                return;
+            }
+            const blob = new Blob([rawBinBuffer], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "NBA Live 96_updated.bin";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
     </script>
 </body>
 </html>
