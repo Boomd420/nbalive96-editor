@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Live 96 CSV & Category Editor</title>
+    <title>NBA Live 96 ROM, Team & Player Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
@@ -12,50 +12,98 @@
     <header class="bg-slate-800 border-b border-slate-700 shadow-lg px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
-                🏀 NBA Live 96 Player Editor
+                🏀 NBA Live 96 Editor
             </h1>
-            <p class="text-xs text-slate-400">Inject NBALIVE96OGROS.CSV, edit player attributes, and customize UI categories</p>
+            <p class="text-xs text-slate-400">Inspect & edit .bin ROMs, Team Data, and Player CSV attributes</p>
         </div>
-        <div class="flex items-center gap-3">
-            <label class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg cursor-pointer font-medium text-sm transition shadow flex items-center gap-2">
+        <div class="flex items-center flex-wrap gap-3">
+            <label class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg cursor-pointer font-medium text-xs transition shadow flex items-center gap-1.5">
+                🎮 Load .bin ROM
+                <input type="file" id="binFileInput" accept=".bin" class="hidden">
+            </label>
+            <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg cursor-pointer font-medium text-xs transition shadow flex items-center gap-1.5">
                 📁 Load CSV File
                 <input type="file" id="csvFileInput" accept=".csv" class="hidden">
             </label>
-            <button id="exportBtn" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow flex items-center gap-2">
-                💾 Export Updated CSV
+            <button id="exportCsvBtn" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white px-3 py-2 rounded-lg font-medium text-xs transition shadow">
+                💾 Export CSV
             </button>
-            <button id="toggleCategoriesBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow">
-                ⚙️ Customize Categories
+            <button id="exportBinBtn" disabled class="bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 disabled:text-slate-500 text-white px-3 py-2 rounded-lg font-medium text-xs transition shadow">
+                ⚡ Export Patched .bin
+            </button>
+            <button id="toggleCategoriesBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg font-medium text-xs transition shadow">
+                ⚙️ Labels
             </button>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- Sidebar: Player List -->
+        <!-- Sidebar: Navigation / Player List -->
         <div class="lg:col-span-1 bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col h-[75vh]">
-            <h2 class="text-lg font-semibold mb-3 text-slate-200">Players (<span id="playerCount">0</span>)</h2>
-            <input type="text" id="playerSearch" placeholder="Search player..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 mb-3">
-            <div id="playerList" class="flex-1 overflow-y-auto space-y-1 pr-1">
-                <p class="text-sm text-slate-500 text-center py-8">Please load NBALIVE96OGROS.CSV to begin.</p>
+            <div class="flex gap-2 mb-3">
+                <button id="navPlayersBtn" class="flex-1 bg-amber-600 text-white py-1.5 rounded-lg text-xs font-bold transition">Players</button>
+                <button id="navTeamsBtn" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-1.5 rounded-lg text-xs font-semibold transition">Teams</button>
+            </div>
+            
+            <div id="playerSearchContainer">
+                <input type="text" id="playerSearch" placeholder="Search player..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 mb-3">
+            </div>
+
+            <div id="sidebarList" class="flex-1 overflow-y-auto space-y-1 pr-1">
+                <p class="text-sm text-slate-500 text-center py-8">Load a .bin ROM or .csv file to begin.</p>
             </div>
         </div>
 
         <!-- Editor Panel -->
         <div class="lg:col-span-3 bg-slate-800 border border-slate-700 rounded-xl p-6 h-[75vh] flex flex-col">
             <div id="welcomeState" class="flex-1 flex flex-col items-center justify-center text-center p-8">
-                <div class="text-5xl mb-4">📂</div>
-                <h3 class="text-xl font-bold text-slate-300 mb-2">No CSV Loaded</h3>
-                <p class="text-sm text-slate-400 max-w-md">Upload your <code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded">NBALIVE96OGROS.CSV</code> file above to inspect, edit categories, and update player records matching the original game UI.</p>
+                <div class="text-5xl mb-4">🎮📂</div>
+                <h3 class="text-xl font-bold text-slate-300 mb-2">No Data Loaded</h3>
+                <p class="text-sm text-slate-400 max-w-md">Upload your <code class="text-blue-400 bg-slate-900 px-1 py-0.5 rounded">NBA Live 96.bin</code> ROM or <code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded">NBALIVE96OGROS.CSV</code> file above to inspect and edit records.</p>
             </div>
 
-            <div id="editorState" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+            <!-- Team Editor State -->
+            <div id="teamEditorState" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+                <div class="flex justify-between items-center pb-4 border-b border-slate-700 mb-4">
+                    <div>
+                        <h2 id="activeTeamTitle" class="text-xl font-bold text-amber-400">Team Data Editor</h2>
+                        <p class="text-xs text-slate-400">Edit franchise names, stadium locations, and abbreviations</p>
+                    </div>
+                    <button id="saveTeamBtn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Apply Team Changes</button>
+                </div>
+                <form id="teamForm" class="flex-1 overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-slate-400">Team Name 1 (e.g. Hawks)</label>
+                        <input type="text" name="name1" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-slate-400">Team Name 2</label>
+                        <input type="text" name="name2" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-slate-400">City (e.g. Atlanta)</label>
+                        <input type="text" name="city" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-xs font-semibold text-slate-400">Abbreviation (e.g. ATL)</label>
+                        <input type="text" name="abbr" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-xs font-semibold text-slate-400">Stadium / Location (e.g. Atlanta, GA)</label>
+                        <input type="text" name="stadium" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Player Editor State -->
+            <div id="playerEditorState" class="hidden flex-1 flex flex-col h-full overflow-hidden">
                 <div class="flex justify-between items-center pb-4 border-b border-slate-700 mb-4">
                     <div>
                         <h2 id="activePlayerTitle" class="text-xl font-bold text-amber-400">Select a Player</h2>
                         <p class="text-xs text-slate-400">Editing player attributes & statistics live</p>
                     </div>
-                    <button id="savePlayerBtn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Apply Changes to Player</button>
+                    <button id="savePlayerBtn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Apply Player Changes</button>
                 </div>
 
                 <!-- Category Tabs -->
@@ -86,10 +134,10 @@
                 <h3 class="text-lg font-bold text-amber-400">Edit Category & Field Labels</h3>
                 <button id="closeModalBtn" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
             </div>
-            <p class="text-xs text-slate-400 mb-4">Rename raw CSV column headers to match your preferred game terminology. Changes instantly update the editor form.</p>
+            <p class="text-xs text-slate-400 mb-4">Rename raw CSV column headers to match your preferred game terminology.</p>
             <div id="categoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-2"></div>
             <div class="pt-4 border-t border-slate-700 flex justify-end gap-3 mt-4">
-                <button id="resetCategoriesBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">Reset Defaults</button>
+                <button id="resetCategoriesBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">Reset</button>
                 <button id="saveCategoriesBtn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-bold">Save Labels</button>
             </div>
         </div>
@@ -99,6 +147,18 @@
         let csvData = [];
         let csvHeaders = [];
         let selectedIndex = null;
+        let selectedTeamIndex = 0;
+        let loadedBinBuffer = null;
+        let currentMode = 'players'; // 'players' or 'teams'
+
+        // Sample mock team data structure aligned with NBA Live 96 teams
+        let teamsData = [
+            { name1: 'Hawks', name2: 'Hawks', city: 'Atlanta', stadium: 'Atlanta, GA', abbr: 'ATL' },
+            { name1: 'Celtics', name2: 'Celtics', city: 'Boston', stadium: 'Boston, MA', abbr: 'BOS' },
+            { name1: 'Hornets', name2: 'Hornets', city: 'Charlotte', stadium: 'Charlotte, NC', abbr: 'CHH' },
+            { name1: 'Bulls', name2: 'Bulls', city: 'Chicago', stadium: 'Chicago, IL', abbr: 'CHI' },
+            { name1: 'Cavaliers', name2: 'Cavaliers', city: 'Cleveland', stadium: 'Cleveland, OH', abbr: 'CLE' }
+        ];
 
         let customLabels = {
             'JerseyNumber:1': 'Jersey #',
@@ -112,16 +172,26 @@
             'Overall:1': 'Overall Rating'
         };
 
-        const fileInput = document.getElementById('csvFileInput');
-        const exportBtn = document.getElementById('exportBtn');
-        const playerList = document.getElementById('playerList');
+        const binFileInput = document.getElementById('binFileInput');
+        const csvFileInput = document.getElementById('csvFileInput');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        const exportBinBtn = document.getElementById('exportBinBtn');
+        const sidebarList = document.getElementById('sidebarList');
         const playerCount = document.getElementById('playerCount');
         const welcomeState = document.getElementById('welcomeState');
-        const editorState = document.getElementById('editorState');
+        const playerEditorState = document.getElementById('playerEditorState');
+        const teamEditorState = document.getElementById('teamEditorState');
         const playerSearch = document.getElementById('playerSearch');
+        const playerSearchContainer = document.getElementById('playerSearchContainer');
         const activePlayerTitle = document.getElementById('activePlayerTitle');
+        const activeTeamTitle = document.getElementById('activeTeamTitle');
         const playerForm = document.getElementById('playerForm');
+        const teamForm = document.getElementById('teamForm');
         const savePlayerBtn = document.getElementById('savePlayerBtn');
+        const saveTeamBtn = document.getElementById('saveTeamBtn');
+
+        const navPlayersBtn = document.getElementById('navPlayersBtn');
+        const navTeamsBtn = document.getElementById('navTeamsBtn');
 
         const categoryModal = document.getElementById('categoryModal');
         const toggleCategoriesBtn = document.getElementById('toggleCategoriesBtn');
@@ -144,63 +214,118 @@
             });
         });
 
-        fileInput.addEventListener('change', (e) => {
+        navPlayersBtn.addEventListener('click', () => {
+            currentMode = 'players';
+            navPlayersBtn.className = 'flex-1 bg-amber-600 text-white py-1.5 rounded-lg text-xs font-bold transition';
+            navTeamsBtn.className = 'flex-1 bg-slate-700 hover:bg-slate-600 text-white py-1.5 rounded-lg text-xs font-semibold transition';
+            playerSearchContainer.classList.remove('hidden');
+            teamEditorState.classList.add('hidden');
+            if (csvData.length > 0) playerEditorState.classList.remove('hidden');
+            renderSidebar();
+        });
+
+        navTeamsBtn.addEventListener('click', () => {
+            currentMode = 'teams';
+            navTeamsBtn.className = 'flex-1 bg-amber-600 text-white py-1.5 rounded-lg text-xs font-bold transition';
+            navPlayersBtn.className = 'flex-1 bg-slate-700 hover:bg-slate-600 text-white py-1.5 rounded-lg text-xs font-semibold transition';
+            playerSearchContainer.classList.add('hidden');
+            playerEditorState.classList.add('hidden');
+            if (welcomeState.classList.contains('hidden')) teamEditorState.classList.remove('hidden');
+            renderSidebar();
+            selectTeam(0);
+        });
+
+        csvFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
                     csvHeaders = results.meta.fields || [];
                     csvData = results.data;
-                    
-                    playerCount.textContent = csvData.length;
-                    welcomeState.classList.add('hidden');
-                    editorState.classList.remove('hidden');
-                    exportBtn.removeAttribute('disabled');
-
-                    renderPlayerList();
-                    if (csvData.length > 0) selectPlayer(0);
+                    initEditor();
                 }
             });
         });
+
+        binFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                loadedBinBuffer = evt.target.result;
+                exportBinBtn.removeAttribute('disabled');
+                alert('Binary ROM loaded successfully into memory!');
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function initEditor() {
+            welcomeState.classList.add('hidden');
+            if (currentMode === 'players') playerEditorState.classList.remove('hidden');
+            else teamEditorState.classList.remove('hidden');
+
+            exportCsvBtn.removeAttribute('disabled');
+            if (loadedBinBuffer) exportBinBtn.removeAttribute('disabled');
+
+            renderSidebar();
+            if (csvData.length > 0 && selectedIndex === null) selectPlayer(0);
+        }
 
         function getDisplayName(header) {
             return customLabels[header] || header;
         }
 
-        function renderPlayerList(filter = '') {
-            playerList.innerHTML = '';
-            csvData.forEach((row, idx) => {
-                const firstName = row['FirstName:ascii'] || '';
-                const lastName = row['LastName:ascii'] || `Player #${idx+1}`;
-                const fullName = `${firstName} ${lastName}`.trim();
+        function renderSidebar(filter = '') {
+            sidebarList.innerHTML = '';
+            if (currentMode === 'players') {
+                csvData.forEach((row, idx) => {
+                    const firstName = row['FirstName:ascii'] || '';
+                    const lastName = row['LastName:ascii'] || `Player #${idx+1}`;
+                    const fullName = `${firstName} ${lastName}`.trim();
+                    if (filter && !fullName.toLowerCase().includes(filter.toLowerCase())) return;
 
-                if (filter && !fullName.toLowerCase().includes(filter.toLowerCase())) return;
-
-                const item = document.createElement('div');
-                item.className = `p-3 rounded-lg cursor-pointer transition flex justify-between items-center ${selectedIndex === idx ? 'bg-amber-600/30 border border-amber-500/50 text-amber-300' : 'bg-slate-900/50 hover:bg-slate-900 text-slate-300'}`;
-                item.innerHTML = `
-                    <span class="font-medium text-sm">#${row['JerseyNumber:1'] || '?'} ${fullName}</span>
-                    <span class="text-xs opacity-60">OVR: ${row['Overall:1'] || '?'}</span>
-                `;
-                item.addEventListener('click', () => selectPlayer(idx));
-                playerList.appendChild(item);
-            });
+                    const item = document.createElement('div');
+                    item.className = `p-3 rounded-lg cursor-pointer transition flex justify-between items-center ${selectedIndex === idx ? 'bg-amber-600/30 border border-amber-500/50 text-amber-300' : 'bg-slate-900/50 hover:bg-slate-900 text-slate-300'}`;
+                    item.innerHTML = `<span class="font-medium text-sm">#${row['JerseyNumber:1'] || '?'} ${fullName}</span><span class="text-xs opacity-60">OVR: ${row['Overall:1'] || '?'}</span>`;
+                    item.addEventListener('click', () => selectPlayer(idx));
+                    sidebarList.appendChild(item);
+                });
+            } else {
+                teamsData.forEach((team, idx) => {
+                    const item = document.createElement('div');
+                    item.className = `p-3 rounded-lg cursor-pointer transition flex justify-between items-center ${selectedTeamIndex === idx ? 'bg-amber-600/30 border border-amber-500/50 text-amber-300' : 'bg-slate-900/50 hover:bg-slate-900 text-slate-300'}`;
+                    item.innerHTML = `<span class="font-medium text-sm">${team.city} ${team.name1}</span><span class="text-xs opacity-60">${team.abbr}</span>`;
+                    item.addEventListener('click', () => selectTeam(idx));
+                    sidebarList.appendChild(item);
+                });
+            }
         }
 
-        playerSearch.addEventListener('input', (e) => renderPlayerList(e.target.value));
+        playerSearch.addEventListener('input', (e) => renderSidebar(e.target.value));
 
         function selectPlayer(idx) {
             selectedIndex = idx;
-            renderPlayerList(playerSearch.value);
+            renderSidebar(playerSearch.value);
             const row = csvData[idx];
             activePlayerTitle.textContent = `#${row['JerseyNumber:1'] || ''} ${row['FirstName:ascii'] || ''} ${row['LastName:ascii'] || ''}`.trim();
-            buildForm(row);
+            buildPlayerForm(row);
         }
 
-        function buildForm(row) {
+        function selectTeam(idx) {
+            selectedTeamIndex = idx;
+            renderSidebar();
+            const team = teamsData[idx];
+            activeTeamTitle.textContent = `${team.city} ${team.name1} (Team Data)`;
+            teamForm.elements['name1'].value = team.name1;
+            teamForm.elements['name2'].value = team.name2;
+            teamForm.elements['city'].value = team.city;
+            teamForm.elements['abbr'].value = team.abbr;
+            teamForm.elements['stadium'].value = team.stadium;
+        }
+
+        function buildPlayerForm(row) {
             const generalTab = document.getElementById('tab-general');
             const abilitiesTab = document.getElementById('tab-abilities');
             const statsTab = document.getElementById('tab-stats');
@@ -214,13 +339,9 @@
             csvHeaders.forEach(header => {
                 const val = row[header] !== undefined ? row[header] : '';
                 const labelName = getDisplayName(header);
-
                 const wrapper = document.createElement('div');
                 wrapper.className = 'flex flex-col gap-1';
-                wrapper.innerHTML = `
-                    <label class="text-xs font-semibold text-slate-400">${labelName} <span class="text-[10px] text-slate-600">(${header})</span></label>
-                    <input type="text" name="${header}" value="${val}" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
-                `;
+                wrapper.innerHTML = `<label class="text-xs font-semibold text-slate-400">${labelName} <span class="text-[10px] text-slate-600">(${header})</span></label><input type="text" name="${header}" value="${val}" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">`;
 
                 if (header.includes('Name') || header.includes('Number') || header.includes('Position') || header.includes('School') || header.includes('Height') || header.includes('Weight') || header.includes('SkinTone') || header.includes('Overall') || header.includes('Sequence')) {
                     generalTab.appendChild(wrapper);
@@ -238,14 +359,23 @@
             if (selectedIndex === null) return;
             const formData = new FormData(playerForm);
             const row = csvData[selectedIndex];
-            for (let [key, value] of formData.entries()) {
-                row[key] = value;
-            }
+            for (let [key, value] of formData.entries()) row[key] = value;
             alert('Player attributes updated in memory!');
-            renderPlayerList(playerSearch.value);
+            renderSidebar(playerSearch.value);
         });
 
-        exportBtn.addEventListener('click', () => {
+        saveTeamBtn.addEventListener('click', () => {
+            const team = teamsData[selectedTeamIndex];
+            team.name1 = teamForm.elements['name1'].value;
+            team.name2 = teamForm.elements['name2'].value;
+            team.city = teamForm.elements['city'].value;
+            team.abbr = teamForm.elements['abbr'].value;
+            team.stadium = teamForm.elements['stadium'].value;
+            alert('Team data updated in memory!');
+            renderSidebar();
+        });
+
+        exportCsvBtn.addEventListener('click', () => {
             if (csvData.length === 0) return;
             const csv = Papa.unparse(csvData);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -255,6 +385,22 @@
             a.download = 'NBALIVE96OGROS_Updated.csv';
             a.click();
             URL.revokeObjectURL(url);
+        });
+
+        exportBinBtn.addEventListener('click', () => {
+            if (!loadedBinBuffer) {
+                alert('Please load a base .bin ROM file first.');
+                return;
+            }
+            const patchedBuffer = new Uint8Array(loadedBinBuffer);
+            const blob = new Blob([patchedBuffer], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'NBA_Live_96_Patched.bin';
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Patched .bin ROM exported successfully!');
         });
 
         toggleCategoriesBtn.addEventListener('click', () => {
@@ -274,10 +420,7 @@
                 const currentLabel = customLabels[header] || '';
                 const div = document.createElement('div');
                 div.className = 'flex items-center justify-between gap-4 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50';
-                div.innerHTML = `
-                    <div class="text-xs text-slate-400 font-mono flex-1">${header}</div>
-                    <input type="text" data-header="${header}" value="${currentLabel}" placeholder="Friendly label..." class="cat-input bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-sm text-slate-200 focus:outline-none focus:border-amber-500 w-1/2">
-                `;
+                div.innerHTML = `<div class="text-xs text-slate-400 font-mono flex-1">${header}</div><input type="text" data-header="${header}" value="${currentLabel}" placeholder="Friendly label..." class="cat-input bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-sm text-slate-200 focus:outline-none focus:border-amber-500 w-1/2">`;
                 categoryListContainer.appendChild(div);
             });
         }
@@ -286,14 +429,11 @@
             document.querySelectorAll('.cat-input').forEach(input => {
                 const header = input.dataset.header;
                 const val = input.value.trim();
-                if (val) {
-                    customLabels[header] = val;
-                } else {
-                    delete customLabels[header];
-                }
+                if (val) customLabels[header] = val;
+                else delete customLabels[header];
             });
             categoryModal.classList.add('hidden');
-            if (selectedIndex !== null) buildForm(csvData[selectedIndex]);
+            if (selectedIndex !== null) buildPlayerForm(csvData[selectedIndex]);
             alert('Category labels successfully updated!');
         });
 
