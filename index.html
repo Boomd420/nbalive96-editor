@@ -2,619 +2,305 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NBA Live 96 Web Editor</title>
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --panel-bg: #1e293b;
-            --accent-blue: #3b82f6;
-            --accent-green: #22c55e;
-            --accent-red: #ef4444;
-            --text-light: #f8fafc;
-            --text-dim: #94a3b8;
-            --border-color: #334155;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        header {
-            background-color: #1b263b;
-            padding: 1rem;
-            border-bottom: 2px solid var(--accent-blue);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        @media(min-width: 768px) {
-            header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem 2rem;
-            }
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.25rem;
-            color: #fff;
-        }
-
-        .status-badge {
-            background-color: rgba(59, 130, 246, 0.2);
-            color: var(--accent-blue);
-            padding: 0.3rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            align-self: flex-start;
-        }
-
-        @media(min-width: 768px) {
-            .status-badge { align-self: auto; }
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        @media(min-width: 900px) {
-            .app-container {
-                display: grid;
-                grid-template-columns: 320px 1fr;
-                height: calc(100vh - 71px);
-            }
-        }
-
-        .sidebar {
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-            height: 280px;
-        }
-
-        @media(min-width: 900px) {
-            .sidebar {
-                border-bottom: none;
-                border-right: 1px solid var(--border-color);
-                height: 100%;
-                max-height: none;
-            }
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 0.7rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-dark);
-            color: #fff;
-            margin-bottom: 0.8rem;
-            font-size: 1rem;
-        }
-
-        .player-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .player-item {
-            padding: 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-bottom: 0.3rem;
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.95rem;
-        }
-
-        .player-item:active, .player-item:hover {
-            background-color: rgba(59, 130, 246, 0.15);
-        }
-
-        .player-item.active {
-            background-color: var(--accent-blue);
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .content-area {
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        @media(min-width: 768px) {
-            .content-area { padding: 1.5rem; }
-        }
-
-        .toolbar {
-            display: flex;
-            gap: 0.6rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background-color: var(--accent-blue);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-            flex: 1;
-            min-width: 130px;
-            text-align: center;
-        }
-
-        .btn-success { background-color: var(--accent-green); }
-        .btn-danger { background-color: var(--accent-red); }
-        .btn-secondary { background-color: #475569; }
-        .btn:active { opacity: 0.8; }
-
-        .editor-card {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.2rem;
-            margin-bottom: 2rem;
-        }
-
-        @media(min-width: 768px) {
-            .editor-card { padding: 1.5rem; }
-        }
-
-        .editor-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        @media(min-width: 550px) {
-            .editor-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media(min-width: 950px) {
-            .editor-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .form-group input, .form-group select {
-            padding: 0.7rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-dark);
-            color: #fff;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        .section-title {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.4rem;
-            margin-top: 1.2rem;
-            margin-bottom: 1rem;
-            color: var(--accent-blue);
-            font-size: 1.05rem;
-            font-weight: 600;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.85);
-            padding: 1rem;
-        }
-        .modal-content {
-            background-color: var(--panel-bg);
-            margin: 15% auto;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 550px;
-            border-radius: 8px;
-            max-height: 75vh;
-            overflow-y: auto;
-        }
-        .close-btn {
-            color: var(--text-dim);
-            float: right;
-            font-size: 26px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-btn:hover { color: #fff; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Live 96 CSV & Category Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body>
-
-    <header>
-        <h1>NBA Live 96 Web Editor</h1>
-        <div class="status-badge" id="appStatus">Ready (Default Roster Loaded)</div>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 shadow-lg px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
+                🏀 NBA Live 96 Player Editor
+            </h1>
+            <p class="text-xs text-slate-400">Inject NBALIVE96OGROS.CSV, edit player attributes, and customize UI categories</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <label class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg cursor-pointer font-medium text-sm transition shadow flex items-center gap-2">
+                📁 Load CSV File
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+            </label>
+            <button id="exportBtn" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow flex items-center gap-2">
+                💾 Export Updated CSV
+            </button>
+            <button id="toggleCategoriesBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow">
+                ⚙️ Customize Categories
+            </button>
+        </div>
     </header>
 
-    <div class="app-container">
-        
-        <div class="sidebar">
-            <input type="text" id="searchBox" class="search-box" placeholder="Search player name...">
-            <ul class="player-list" id="playerList">
-                <li style="padding:1rem; text-align:center; color: var(--text-dim);">Loading roster...</li>
-            </ul>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Sidebar: Player List -->
+        <div class="lg:col-span-1 bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col h-[75vh]">
+            <h2 class="text-lg font-semibold mb-3 text-slate-200">Players (<span id="playerCount">0</span>)</h2>
+            <input type="text" id="playerSearch" placeholder="Search player..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 mb-3">
+            <div id="playerList" class="flex-1 overflow-y-auto space-y-1 pr-1">
+                <p class="text-sm text-slate-500 text-center py-8">Please load NBALIVE96OGROS.CSV to begin.</p>
+            </div>
         </div>
 
-        <div class="content-area">
-            
-            <div class="toolbar">
-                <button class="btn btn-success" id="btnExportCSV">Download CSV</button>
-                <button class="btn btn-danger" id="btnSaveBin" disabled>Save .BIN</button>
-                <button class="btn btn-secondary" id="btnLoadBinPrompt">Upload .BIN</button>
-                <button class="btn btn-secondary" id="btnOpenReadme">Readme</button>
-                <input type="file" id="binFileInput" accept=".bin" style="display:none;">
+        <!-- Editor Panel -->
+        <div class="lg:col-span-3 bg-slate-800 border border-slate-700 rounded-xl p-6 h-[75vh] flex flex-col">
+            <div id="welcomeState" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+                <div class="text-5xl mb-4">📂</div>
+                <h3 class="text-xl font-bold text-slate-300 mb-2">No CSV Loaded</h3>
+                <p class="text-sm text-slate-400 max-w-md">Upload your <code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded">NBALIVE96OGROS.CSV</code> file above to inspect, edit categories, and update player records matching the original game UI.</p>
             </div>
 
-            <div class="editor-card" id="editorPanel" style="display: none;">
-                <h2 id="currentPlayerName" style="margin-top:0; font-size:1.2rem; color:#fff;">Player Details</h2>
-
-                <div class="section-title">Biometrics</div>
-                <div class="editor-grid">
-                    <div class="form-group"><label>First Name</label><input type="text" id="pFirstName"></div>
-                    <div class="form-group"><label>Last Name</label><input type="text" id="pLastName"></div>
-                    <div class="form-group"><label>Jersey Number</label><input type="number" id="pJersey"></div>
-                    <div class="form-group">
-                        <label>Position</label>
-                        <select id="pPosition">
-                            <option value="0">Point Guard (PG)</option>
-                            <option value="1">Shooting Guard (SG)</option>
-                            <option value="2">Small Forward (SF)</option>
-                            <option value="3">Power Forward (PF)</option>
-                            <option value="4">Center (C)</option>
-                        </select>
+            <div id="editorState" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+                <div class="flex justify-between items-center pb-4 border-b border-slate-700 mb-4">
+                    <div>
+                        <h2 id="activePlayerTitle" class="text-xl font-bold text-amber-400">Select a Player</h2>
+                        <p class="text-xs text-slate-400">Editing player attributes & statistics live</p>
                     </div>
-                    <div class="form-group"><label>Height (in)</label><input type="number" id="pHeight"></div>
-                    <div class="form-group"><label>Weight (+100)</label><input type="number" id="pWeight"></div>
+                    <button id="savePlayerBtn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Apply Changes to Player</button>
                 </div>
 
-                <div class="section-title">Ratings & Attributes (0-99)</div>
-                <div class="editor-grid">
-                    <div class="form-group"><label>Field Goal</label><input type="number" id="rFieldGoal" min="0" max="99"></div>
-                    <div class="form-group"><label>3-Pointer</label><input type="number" id="rThreePoint" min="0" max="99"></div>
-                    <div class="form-group"><label>Free Throw</label><input type="number" id="rFreeThrow" min="0" max="99"></div>
-                    <div class="form-group"><label>Dunk</label><input type="number" id="rDunk" min="0" max="99"></div>
-                    <div class="form-group"><label>Steal</label><input type="number" id="rSteal" min="0" max="99"></div>
-                    <div class="form-group"><label>Block</label><input type="number" id="rBlock" min="0" max="99"></div>
-                    <div class="form-group"><label>Speed</label><input type="number" id="rSpeed" min="0" max="99"></div>
-                    <div class="form-group"><label>Agility</label><input type="number" id="rAgility" min="0" max="99"></div>
-                    <div class="form-group"><label>Jump</label><input type="number" id="rJump" min="0" max="99"></div>
-                    <div class="form-group"><label>Off. Awareness</label><input type="number" id="rOffAware" min="0" max="99"></div>
-                    <div class="form-group"><label>Def. Awareness</label><input type="number" id="rDefAware" min="0" max="99"></div>
-                    <div class="form-group"><label>Overall</label><input type="number" id="rOverall" min="0" max="99"></div>
+                <!-- Category Tabs -->
+                <div class="flex border-b border-slate-700 gap-2 mb-4 overflow-x-auto">
+                    <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-amber-400 text-amber-400" data-target="tab-general">General Info</button>
+                    <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-target="tab-abilities">Abilities</button>
+                    <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-target="tab-stats">Statistics</button>
+                    <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200" data-target="tab-unknown">Internal / Unknown</button>
                 </div>
 
-                <div class="section-title">Season Statistics</div>
-                <div class="editor-grid">
-                    <div class="form-group"><label>Games Played</label><input type="number" id="sGames"></div>
-                    <div class="form-group"><label>Games Started</label><input type="number" id="sStarts"></div>
-                    <div class="form-group"><label>Minutes</label><input type="number" id="sMinutes"></div>
-                    <div class="form-group"><label>Points</label><input type="number" id="sPoints"></div>
-                    <div class="form-group"><label>Assists</label><input type="number" id="sAssists"></div>
-                    <div class="form-group"><label>Rebounds (Off)</label><input type="number" id="sOffReb"></div>
-                    <div class="form-group"><label>Rebounds (Def)</label><input type="number" id="sDefReb"></div>
-                    <div class="form-group"><label>Steals</label><input type="number" id="sSteals"></div>
-                    <div class="form-group"><label>Blocks</label><input type="number" id="sBlocks"></div>
+                <!-- Tab Contents -->
+                <div class="flex-1 overflow-y-auto pr-2">
+                    <form id="playerForm" class="space-y-6">
+                        <div id="tab-general" class="tab-content grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                        <div id="tab-abilities" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                        <div id="tab-stats" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                        <div id="tab-unknown" class="tab-content hidden grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                    </form>
                 </div>
-
-                <button class="btn btn-success" id="btnSavePlayer" style="margin-top: 1.2rem; width: 100%; padding: 0.9rem; font-size:1rem;">Save Player Changes</button>
             </div>
-
-            <div id="welcomeCard" class="editor-card" style="text-align: center; padding: 2.5rem 1rem;">
-                <h3 style="margin-top:0; color:var(--accent-blue);">Welcome to NBA Live 96 Web Editor</h3>
-                <p style="color:var(--text-dim); font-size:0.95rem; max-width:450px; margin: 0 auto 1.5rem auto;">Select any player from the left sidebar to edit their biometrics, ratings, and stats, or upload your ROM binary (.bin).</p>
-            </div>
-
         </div>
-    </div>
+    </main>
 
-    <!-- Readme Modal -->
-    <div id="readmeModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeModal">&times;</span>
-            <h2 style="color:var(--accent-blue); margin-top:0;">About NBA Live 96 Editor</h2>
-            <p style="color:var(--text-dim); line-height:1.6; font-size:0.95rem;">
-                Why would anyone bother coding an editor for NBA Live 96? Well, someone needed help hacking this classic Sega Genesis title. This web replica lets you modify player stats, jersey numbers, heights, weights, and ratings directly in your browser without dealing with desktop binaries or broken links.<br><br>
-                Use <b>Download CSV</b> to export the current roster dataset, or upload your <code>.bin</code> ROM file to patch changes directly.
-            </p>
+    <!-- Category Customization Modal -->
+    <div id="categoryModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col p-6 shadow-2xl">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-700 mb-4">
+                <h3 class="text-lg font-bold text-amber-400">Edit Category & Field Labels</h3>
+                <button id="closeModalBtn" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Rename raw CSV column headers to match your preferred game terminology. Changes instantly update the editor form.</p>
+            <div id="categoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-2"></div>
+            <div class="pt-4 border-t border-slate-700 flex justify-end gap-3 mt-4">
+                <button id="resetCategoriesBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm">Reset Defaults</button>
+                <button id="saveCategoriesBtn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-bold">Save Labels</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let playerData = [];
-        let rawCSVHeaders = "";
-        let selectedIndex = -1;
-        let rawBinBuffer = null;
+        let csvData = [];
+        let csvHeaders = [];
+        let selectedIndex = null;
 
-        const playerList = document.getElementById('playerList');
-        const editorPanel = document.getElementById('editorPanel');
-        const welcomeCard = document.getElementById('welcomeCard');
-        const appStatus = document.getElementById('appStatus');
-        const searchBox = document.getElementById('searchBox');
-        
-        const readmeModal = document.getElementById('readmeModal');
-        const btnOpenReadme = document.getElementById('btnOpenReadme');
-        const closeModal = document.getElementById('closeModal');
-        
-        const btnExportCSV = document.getElementById('btnExportCSV');
-        const btnSaveBin = document.getElementById('btnSaveBin');
-        const btnLoadBinPrompt = document.getElementById('btnLoadBinPrompt');
-        const binFileInput = document.getElementById('binFileInput');
-
-        btnOpenReadme.onclick = () => readmeModal.style.display = 'block';
-        closeModal.onclick = () => readmeModal.style.display = 'none';
-        window.onclick = (e) => { if (e.target == readmeModal) readmeModal.style.display = 'none'; };
-
-        btnLoadBinPrompt.onclick = () => binFileInput.click();
-        binFileInput.onchange = (e) => {
-            if (e.target.files.length) {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    rawBinBuffer = evt.target.result;
-                    appStatus.innerText = "Loaded BIN: " + file.name;
-                    btnSaveBin.disabled = false;
-                    alert("ROM binary loaded successfully into memory!");
-                };
-                reader.readAsArrayBuffer(file);
-            }
+        let customLabels = {
+            'JerseyNumber:1': 'Jersey #',
+            'FirstName:ascii': 'First Name',
+            'LastName:ascii': 'Last Name',
+            'Position:1': 'Position',
+            'School:1': 'School',
+            'Height:1': 'Height (in)',
+            'Weight:1:+100': 'Weight (lbs)',
+            'SkinTone:1': 'Skin Tone',
+            'Overall:1': 'Overall Rating'
         };
 
-        searchBox.addEventListener('input', () => renderPlayerList(searchBox.value.toLowerCase()));
+        const fileInput = document.getElementById('csvFileInput');
+        const exportBtn = document.getElementById('exportBtn');
+        const playerList = document.getElementById('playerList');
+        const playerCount = document.getElementById('playerCount');
+        const welcomeState = document.getElementById('welcomeState');
+        const editorState = document.getElementById('editorState');
+        const playerSearch = document.getElementById('playerSearch');
+        const activePlayerTitle = document.getElementById('activePlayerTitle');
+        const playerForm = document.getElementById('playerForm');
+        const savePlayerBtn = document.getElementById('savePlayerBtn');
 
-        // Embedded default sample CSV data
-        const defaultCSVText = `JerseyNumber:1,Position:1,Height:1,Weight:1:+100,School:1,SkinTone:1,?:1,?:1.1,Sequence:2,?:1.2,FieldGoal:1,ThreePoint:1,FreeThrow:1,Dunk:1,Steal:1,Block:1,OffRebound:1,DefRebound:1,BallControl:1,DefAware:1,Speed:1,Agility:1,Jump:1,Dribble:1,OffAware:1,?:1.3,?:1.4,Overall:1,?:1.5,?:1.6,?:1.7,?:1.8,?:1.9,?:1.10,?:1.11,?:1.12,?:1.13,Games:1,Starts:1,Minutes:2,FieldGoals:2,FieldGoalAttempts:2,ThreePointers:2,ThreePointAttempts:2,FreeThrows:2,reeThrowAttempts:2,OffRebounds:2,DefRebounds:2,Assists:2,Steals:2,TurnOvers:2,Blocks:2,Points:2,?:1.14,?:1.15,Fouls:2,?:1.16,?:1.17,?:1.18,?:1.19,?:1.20,?:1.21,?:1.22,?:1.23,?:1.24,?:1.25,?:1.26,?:1.27,?:1.28,?:1.29,?:1.30,?:1.31,?:1.32,?:1.33,?:1.34,?:1.35,?:1.36,?:1.37,?:1.38,?:1.39,?:1.40,?:1.41,?:1.42,?:1.43,LastName:ascii,FirstName:ascii
-28,0,83,250,7,0,6,0,0,75,70,55,80,80,67,80,75,79,68,85,72,70,77,68,67,80,80,73,85,114,22,16,7,7,6,7,0,82,63,2340,320,677,2,3,152,188,154,302,72,45,108,144,794,4,1,271,4,32,1,243,0,4,0,3,1,37,0,237,0,224,0,249,0,112,1,167,0,70,1,216,14,68,0,68,Lang,Andrew
-43,1,81,248,52,1,12,0,1,83,74,60,75,82,73,76,79,80,67,83,74,79,80,68,73,85,83,76,83,152,20,13,8,8,9,7,1,81,79,2641,342,716,11,31,244,325,191,415,131,109,155,34,939,3,0,243,4,107,2,28,0,48,0,17,2,1,1,129,0,53,1,45,0,207,1,128,0,172,2,143,16,77,0,112,Long,Grant
-23,1,79,215,12,0,4,0,2,65,72,62,70,75,65,70,68,70,64,78,75,74,72,65,68,75,78,71,80,120,18,12,6,6,5,6,0,75,50,2100,290,620,5,15,130,170,120,250,90,60,90,25,710,3,0,210,3,25,1,200,0,3,0,2,1,30,0,200,0,190,0,210,0,90,1,140,0,60,1,180,12,60,0,90,Jordan,Michael
-33,4,85,240,4,1,8,0,3,90,85,40,90,88,85,92,90,95,80,92,80,78,85,82,85,90,90,89,90,180,25,20,10,10,10,10,2,82,82,3100,550,1000,0,1,400,550,300,600,250,150,200,180,1500,5,2,300,6,150,3,300,0,6,0,5,2,50,0,300,0,280,0,320,0,150,2,250,0,100,2,250,20,90,1,150,Pippen,Scottie`;
+        const categoryModal = document.getElementById('categoryModal');
+        const toggleCategoriesBtn = document.getElementById('toggleCategoriesBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const categoryListContainer = document.getElementById('categoryListContainer');
+        const saveCategoriesBtn = document.getElementById('saveCategoriesBtn');
+        const resetCategoriesBtn = document.getElementById('resetCategoriesBtn');
 
-        parseCSV(defaultCSVText);
-
-        function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            if (lines.length < 2) return;
-            rawCSVHeaders = lines[0];
-            playerData = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',');
-                if (cols.length < 10) continue;
-                playerData.push({
-                    rawCols: cols,
-                    jersey: parseInt(cols[0]) || 0,
-                    pos: parseInt(cols[1]) || 0,
-                    height: parseInt(cols[2]) || 0,
-                    weight: parseInt(cols[3]) || 0,
-                    fg: parseInt(cols[10]) || 0,
-                    tp: parseInt(cols[11]) || 0,
-                    ft: parseInt(cols[12]) || 0,
-                    dunk: parseInt(cols[13]) || 0,
-                    stl: parseInt(cols[14]) || 0,
-                    blk: parseInt(cols[15]) || 0,
-                    speed: parseInt(cols[20]) || 0,
-                    agility: parseInt(cols[21]) || 0,
-                    jump: parseInt(cols[22]) || 0,
-                    offAware: parseInt(cols[24]) || 0,
-                    defAware: parseInt(cols[19]) || 0,
-                    overall: parseInt(cols[27]) || 0,
-                    games: parseInt(cols[37]) || 0,
-                    starts: parseInt(cols[38]) || 0,
-                    minutes: parseInt(cols[39]) || 0,
-                    points: parseInt(cols[52]) || 0,
-                    assists: parseInt(cols[48]) || 0,
-                    offReb: parseInt(cols[46]) || 0,
-                    defReb: parseInt(cols[47]) || 0,
-                    steals: parseInt(cols[49]) || 0,
-                    blocks: parseInt(cols[51]) || 0,
-                    lastName: (cols[cols.length - 2] || '').trim(),
-                    firstName: (cols[cols.length - 1] || '').trim()
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('border-amber-400', 'text-amber-400');
+                    b.classList.add('border-transparent', 'text-slate-400');
                 });
-            }
-            renderPlayerList();
-            appStatus.innerText = "Loaded (" + playerData.length + " players)";
+                btn.classList.add('border-amber-400', 'text-amber-400');
+                btn.classList.remove('border-transparent', 'text-slate-400');
+
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.getElementById(btn.dataset.target).classList.remove('hidden');
+            });
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    csvHeaders = results.meta.fields || [];
+                    csvData = results.data;
+                    
+                    playerCount.textContent = csvData.length;
+                    welcomeState.classList.add('hidden');
+                    editorState.classList.remove('hidden');
+                    exportBtn.removeAttribute('disabled');
+
+                    renderPlayerList();
+                    if (csvData.length > 0) selectPlayer(0);
+                }
+            });
+        });
+
+        function getDisplayName(header) {
+            return customLabels[header] || header;
         }
 
         function renderPlayerList(filter = '') {
             playerList.innerHTML = '';
-            playerData.forEach((p, idx) => {
-                const fullName = `${p.firstName} ${p.lastName}`.toLowerCase();
-                if (filter && !fullName.includes(filter) && !p.jersey.toString().includes(filter)) return;
+            csvData.forEach((row, idx) => {
+                const firstName = row['FirstName:ascii'] || '';
+                const lastName = row['LastName:ascii'] || `Player #${idx+1}`;
+                const fullName = `${firstName} ${lastName}`.trim();
 
-                const li = document.createElement('li');
-                li.className = 'player-item' + (idx === selectedIndex ? ' active' : '');
-                li.innerHTML = `<span>#${p.jersey} ${p.firstName} ${p.lastName}</span><span style="font-size:0.85rem; color:var(--text-dim);">OVR: ${p.overall}</span>`;
-                li.onclick = () => selectPlayer(idx);
-                playerList.appendChild(li);
+                if (filter && !fullName.toLowerCase().includes(filter.toLowerCase())) return;
+
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-lg cursor-pointer transition flex justify-between items-center ${selectedIndex === idx ? 'bg-amber-600/30 border border-amber-500/50 text-amber-300' : 'bg-slate-900/50 hover:bg-slate-900 text-slate-300'}`;
+                item.innerHTML = `
+                    <span class="font-medium text-sm">#${row['JerseyNumber:1'] || '?'} ${fullName}</span>
+                    <span class="text-xs opacity-60">OVR: ${row['Overall:1'] || '?'}</span>
+                `;
+                item.addEventListener('click', () => selectPlayer(idx));
+                playerList.appendChild(item);
             });
         }
+
+        playerSearch.addEventListener('input', (e) => renderPlayerList(e.target.value));
 
         function selectPlayer(idx) {
             selectedIndex = idx;
-            renderPlayerList(searchBox.value.toLowerCase());
-            const p = playerData[idx];
-            if (!p) return;
-
-            document.getElementById('currentPlayerName').innerText = `#${p.jersey} ${p.firstName} ${p.lastName}`;
-            document.getElementById('pFirstName').value = p.firstName;
-            document.getElementById('pLastName').value = p.lastName;
-            document.getElementById('pJersey').value = p.jersey;
-            document.getElementById('pPosition').value = p.pos;
-            document.getElementById('pHeight').value = p.height;
-            document.getElementById('pWeight').value = p.weight;
-
-            document.getElementById('rFieldGoal').value = p.fg;
-            document.getElementById('rThreePoint').value = p.tp;
-            document.getElementById('rFreeThrow').value = p.ft;
-            document.getElementById('rDunk').value = p.dunk;
-            document.getElementById('rSteal').value = p.stl;
-            document.getElementById('rBlock').value = p.blk;
-            document.getElementById('rSpeed').value = p.speed;
-            document.getElementById('rAgility').value = p.agility;
-            document.getElementById('rJump').value = p.jump;
-            document.getElementById('rOffAware').value = p.offAware;
-            document.getElementById('rDefAware').value = p.defAware;
-            document.getElementById('rOverall').value = p.overall;
-
-            document.getElementById('sGames').value = p.games;
-            document.getElementById('sStarts').value = p.starts;
-            document.getElementById('sMinutes').value = p.minutes;
-            document.getElementById('sPoints').value = p.points;
-            document.getElementById('sAssists').value = p.assists;
-            document.getElementById('sOffReb').value = p.offReb;
-            document.getElementById('sDefReb').value = p.defReb;
-            document.getElementById('sSteals').value = p.steals;
-            document.getElementById('sBlocks').value = p.blocks;
-
-            editorPanel.style.display = 'block';
-            welcomeCard.style.display = 'none';
+            renderPlayerList(playerSearch.value);
+            const row = csvData[idx];
+            activePlayerTitle.textContent = `#${row['JerseyNumber:1'] || ''} ${row['FirstName:ascii'] || ''} ${row['LastName:ascii'] || ''}`.trim();
+            buildForm(row);
         }
 
-        document.getElementById('btnSavePlayer').onclick = function() {
-            if (selectedIndex < 0 || !playerData[selectedIndex]) return;
-            const p = playerData[selectedIndex];
+        function buildForm(row) {
+            const generalTab = document.getElementById('tab-general');
+            const abilitiesTab = document.getElementById('tab-abilities');
+            const statsTab = document.getElementById('tab-stats');
+            const unknownTab = document.getElementById('tab-unknown');
 
-            p.firstName = document.getElementById('pFirstName').value;
-            p.lastName = document.getElementById('pLastName').value;
-            p.jersey = parseInt(document.getElementById('pJersey').value) || 0;
-            p.pos = parseInt(document.getElementById('pPosition').value) || 0;
-            p.height = parseInt(document.getElementById('pHeight').value) || 0;
-            p.weight = parseInt(document.getElementById('pWeight').value) || 0;
+            generalTab.innerHTML = '';
+            abilitiesTab.innerHTML = '';
+            statsTab.innerHTML = '';
+            unknownTab.innerHTML = '';
 
-            p.fg = parseInt(document.getElementById('rFieldGoal').value) || 0;
-            p.tp = parseInt(document.getElementById('rThreePoint').value) || 0;
-            p.ft = parseInt(document.getElementById('rFreeThrow').value) || 0;
-            p.dunk = parseInt(document.getElementById('rDunk').value) || 0;
-            p.stl = parseInt(document.getElementById('rSteal').value) || 0;
-            p.blk = parseInt(document.getElementById('rBlock').value) || 0;
-            p.speed = parseInt(document.getElementById('rSpeed').value) || 0;
-            p.agility = parseInt(document.getElementById('rAgility').value) || 0;
-            p.jump = parseInt(document.getElementById('rJump').value) || 0;
-            p.offAware = parseInt(document.getElementById('rOffAware').value) || 0;
-            p.defAware = parseInt(document.getElementById('rDefAware').value) || 0;
-            p.overall = parseInt(document.getElementById('rOverall').value) || 0;
+            csvHeaders.forEach(header => {
+                const val = row[header] !== undefined ? row[header] : '';
+                const labelName = getDisplayName(header);
 
-            p.games = parseInt(document.getElementById('sGames').value) || 0;
-            p.starts = parseInt(document.getElementById('sStarts').value) || 0;
-            p.minutes = parseInt(document.getElementById('sMinutes').value) || 0;
-            p.points = parseInt(document.getElementById('sPoints').value) || 0;
-            p.assists = parseInt(document.getElementById('sAssists').value) || 0;
-            p.offReb = parseInt(document.getElementById('sOffReb').value) || 0;
-            p.defReb = parseInt(document.getElementById('sDefReb').value) || 0;
-            p.steals = parseInt(document.getElementById('sSteals').value) || 0;
-            p.blocks = parseInt(document.getElementById('sBlocks').value) || 0;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex flex-col gap-1';
+                wrapper.innerHTML = `
+                    <label class="text-xs font-semibold text-slate-400">${labelName} <span class="text-[10px] text-slate-600">(${header})</span></label>
+                    <input type="text" name="${header}" value="${val}" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                `;
 
-            p.rawCols[0] = p.jersey;
-            p.rawCols[1] = p.pos;
-            p.rawCols[2] = p.height;
-            p.rawCols[3] = p.weight;
-            p.rawCols[10] = p.fg;
-            p.rawCols[11] = p.tp;
-            p.rawCols[12] = p.ft;
-            p.rawCols[13] = p.dunk;
-            p.rawCols[14] = p.stl;
-            p.rawCols[15] = p.blk;
-            p.rawCols[20] = p.speed;
-            p.rawCols[21] = p.agility;
-            p.rawCols[22] = p.jump;
-            p.rawCols[24] = p.offAware;
-            p.rawCols[19] = p.defAware;
-            p.rawCols[27] = p.overall;
-            p.rawCols[37] = p.games;
-            p.rawCols[38] = p.starts;
-            p.rawCols[39] = p.minutes;
-            p.rawCols[52] = p.points;
-            p.rawCols[48] = p.assists;
-            p.rawCols[46] = p.offReb;
-            p.rawCols[47] = p.defReb;
-            p.rawCols[49] = p.steals;
-            p.rawCols[51] = p.blocks;
-            p.rawCols[p.rawCols.length - 2] = p.lastName;
-            p.rawCols[p.rawCols.length - 1] = p.firstName;
-
-            renderPlayerList(searchBox.value.toLowerCase());
-            alert("Saved #" + p.jersey + " " + p.firstName + " " + p.lastName + " successfully!");
-        };
-
-        btnExportCSV.onclick = function() {
-            let csvContent = rawCSVHeaders + "\n";
-            playerData.forEach(p => {
-                csvContent += p.rawCols.join(",") + "\n";
+                if (header.includes('Name') || header.includes('Number') || header.includes('Position') || header.includes('School') || header.includes('Height') || header.includes('Weight') || header.includes('SkinTone') || header.includes('Overall') || header.includes('Sequence')) {
+                    generalTab.appendChild(wrapper);
+                } else if (header.includes(':1') && !header.includes('?:')) {
+                    abilitiesTab.appendChild(wrapper);
+                } else if (header.includes(':2') || header.includes('Games') || header.includes('Starts') || header.includes('Minutes') || header.includes('Points') || header.includes('Fouls')) {
+                    statsTab.appendChild(wrapper);
+                } else {
+                    unknownTab.appendChild(wrapper);
+                }
             });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        }
+
+        savePlayerBtn.addEventListener('click', () => {
+            if (selectedIndex === null) return;
+            const formData = new FormData(playerForm);
+            const row = csvData[selectedIndex];
+            for (let [key, value] of formData.entries()) {
+                row[key] = value;
+            }
+            alert('Player attributes updated in memory!');
+            renderPlayerList(playerSearch.value);
+        });
+
+        exportBtn.addEventListener('click', () => {
+            if (csvData.length === 0) return;
+            const csv = Papa.unparse(csvData);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = "NBALIVE96OGROS.CSV";
-            document.body.appendChild(a);
+            a.download = 'NBALIVE96OGROS_Updated.csv';
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        };
+        });
 
-        btnSaveBin.onclick = function() {
-            if (!rawBinBuffer) {
-                alert("No ROM .bin file loaded in memory!");
+        toggleCategoriesBtn.addEventListener('click', () => {
+            if (csvHeaders.length === 0) {
+                alert('Please load a CSV file first.');
                 return;
             }
-            const blob = new Blob([rawBinBuffer], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "NBA Live 96_updated.bin";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        };
+            renderCategoryList();
+            categoryModal.classList.remove('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => categoryModal.classList.add('hidden'));
+
+        function renderCategoryList() {
+            categoryListContainer.innerHTML = '';
+            csvHeaders.forEach(header => {
+                const currentLabel = customLabels[header] || '';
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between gap-4 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50';
+                div.innerHTML = `
+                    <div class="text-xs text-slate-400 font-mono flex-1">${header}</div>
+                    <input type="text" data-header="${header}" value="${currentLabel}" placeholder="Friendly label..." class="cat-input bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-sm text-slate-200 focus:outline-none focus:border-amber-500 w-1/2">
+                `;
+                categoryListContainer.appendChild(div);
+            });
+        }
+
+        saveCategoriesBtn.addEventListener('click', () => {
+            document.querySelectorAll('.cat-input').forEach(input => {
+                const header = input.dataset.header;
+                const val = input.value.trim();
+                if (val) {
+                    customLabels[header] = val;
+                } else {
+                    delete customLabels[header];
+                }
+            });
+            categoryModal.classList.add('hidden');
+            if (selectedIndex !== null) buildForm(csvData[selectedIndex]);
+            alert('Category labels successfully updated!');
+        });
+
+        resetCategoriesBtn.addEventListener('click', () => {
+            customLabels = {};
+            renderCategoryList();
+        });
     </script>
 </body>
 </html>
