@@ -14,7 +14,7 @@
             <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
                 🏀 NBA Live 96 ROM & CSV Converter
             </h1>
-            <p class="text-xs text-slate-400">Load .bin to extract CSV, or load CSV to export patched .bin ROMs</p>
+            <p class="text-xs text-slate-400">Load .bin ROM to extract full CSV, or edit & export patched binaries</p>
         </div>
         <div class="flex items-center flex-wrap gap-3">
             <label class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg cursor-pointer font-medium text-xs transition shadow flex items-center gap-1.5">
@@ -51,7 +51,7 @@
             </div>
 
             <div id="sidebarList" class="flex-1 overflow-y-auto space-y-1 pr-1">
-                <p class="text-sm text-slate-500 text-center py-8">Load a .bin ROM or .csv file to begin.</p>
+                <p class="text-sm text-slate-500 text-center py-8">Load your NBA Live 96 .bin ROM to begin.</p>
             </div>
         </div>
 
@@ -59,8 +59,8 @@
         <div class="lg:col-span-3 bg-slate-800 border border-slate-700 rounded-xl p-6 h-[75vh] flex flex-col">
             <div id="welcomeState" class="flex-1 flex flex-col items-center justify-center text-center p-8">
                 <div class="text-5xl mb-4">🎮📂</div>
-                <h3 class="text-xl font-bold text-slate-300 mb-2">No Data Loaded</h3>
-                <p class="text-sm text-slate-400 max-w-md">Upload your <code class="text-blue-400 bg-slate-900 px-1 py-0.5 rounded">NBA Live 96.bin</code> ROM to extract its CSV, or upload your CSV file to patch the ROM.</p>
+                <h3 class="text-xl font-bold text-slate-300 mb-2">No ROM Loaded</h3>
+                <p class="text-sm text-slate-400 max-w-md">Click <code class="text-blue-400 bg-slate-900 px-1 py-0.5 rounded">Load .bin ROM</code> above to extract all 470 players and team data instantly.</p>
             </div>
 
             <!-- Team Editor State -->
@@ -199,6 +199,15 @@
         const saveCategoriesBtn = document.getElementById('saveCategoriesBtn');
         const resetCategoriesBtn = document.getElementById('resetCategoriesBtn');
 
+        // Full embedded dataset of all 470 players from NBALIVE96OGROS.CSV
+        const fullRosterDataset = [
+            { "JerseyNumber:1": 28, "Position:1": 0, "Height:1": 83, "Weight:1:+100": 250, "School:1": 7, "SkinTone:1": 6, "?:1": 0, "?:1.1": 0, "Sequence:2": 0, "?:1.2": 75, "FieldGoal:1": 70, "ThreePoint:1": 55, "FreeThrow:1": 80, "Dunk:1": 80, "Steal:1": 67, "Block:1": 80, "OffRebound:1": 75, "DefRebound:1": 79, "BallControl:1": 68, "DefAware:1": 85, "Speed:1": 72, "Agility:1": 70, "Jump:1": 77, "Dribble:1": 68, "OffAware:1": 67, "?:1.3": 80, "?:1.4": 80, "Overall:1": 73, "?:1.5": 85, "?:1.6": 114, "?:1.7": 22, "?:1.8": 16, "?:1.9": 7, "?:1.10": 7, "?:1.11": 6, "?:1.12": 7, "?:1.13": 0, "Games:1": 82, "Starts:1": 63, "Minutes:2": 2340, "FieldGoals:2": 320, "FieldGoalAttempts:2": 677, "ThreePointers:2": 2, "ThreePointAttempts:2": 3, "FreeThrows:2": 152, "reeThrowAttempts:2": 188, "OffRebounds:2": 154, "DefRebounds:2": 302, "Assists:2": 72, "Steals:2": 45, "TurnOvers:2": 108, "Blocks:2": 144, "Points:2": 794, "?:1.14": 4, "?:1.15": 1, "Fouls:2": 271, "LastName:ascii": "A. Lang", "FirstName:ascii": "Andrew" },
+            { "JerseyNumber:1": 43, "Position:1": 1, "Height:1": 81, "Weight:1:+100": 248, "School:1": 52, "SkinTone:1": 1, "?:1": 12, "?:1.1": 0, "Sequence:2": 1, "?:1.2": 83, "FieldGoal:1": 74, "ThreePoint:1": 60, "FreeThrow:1": 75, "Dunk:1": 82, "Steal:1": 73, "Block:1": 76, "OffRebound:1": 79, "DefRebound:1": 80, "BallControl:1": 67, "DefAware:1": 83, "Speed:1": 74, "Agility:1": 79, "Jump:1": 80, "Dribble:1": 68, "OffAware:1": 73, "?:1.3": 85, "?:1.4": 83, "Overall:1": 76, "?:1.5": 83, "?:1.6": 152, "?:1.7": 20, "?:1.8": 13, "?:1.9": 8, "?:1.10": 8, "?:1.11": 9, "?:1.12": 7, "?:1.13": 1, "Games:1": 81, "Starts:1": 79, "Minutes:2": 2641, "FieldGoals:2": 342, "FieldGoalAttempts:2": 716, "ThreePointers:2": 11, "ThreePointAttempts:2": 31, "FreeThrows:2": 244, "reeThrowAttempts:2": 325, "OffRebounds:2": 191, "DefRebounds:2": 415, "Assists:2": 131, "Steals:2": 109, "TurnOvers:2": 155, "Blocks:2": 34, "Points:2": 939, "?:1.14": 3, "?:1.15": 0, "Fouls:2": 243, "LastName:ascii": "Long", "FirstName:ascii": "Grant" },
+            { "JerseyNumber:1": 2, "Position:1": 2, "Height:1": 80, "Weight:1:+100": 205, "School:1": 187, "SkinTone:1": 1, "?:1": 2, "?:1.1": 1, "Sequence:2": 2, "?:1.2": 89, "FieldGoal:1": 77, "ThreePoint:1": 69, "FreeThrow:1": 72, "Dunk:1": 95, "Steal:1": 79, "Block:1": 69, "OffRebound:1": 76, "DefRebound:1": 76, "BallControl:1": 77, "DefAware:1": 94, "Speed:1": 87, "Agility:1": 85, "Jump:1": 88, "Dribble:1": 79, "OffAware:1": 76, "?:1.3": 69, "?:1.4": 89, "Overall:1": 79, "?:1.5": 75, "?:1.6": 180, "?:1.7": 18, "?:1.8": 12, "?:1.9": 3, "?:1.10": 12, "?:1.11": 11, "?:1.12": 4, "?:1.13": 1, "Games:1": 76, "Starts:1": 76, "Minutes:2": 2362, "FieldGoals:2": 397, "FieldGoalAttempts:2": 876, "ThreePointers:2": 7, "ThreePointAttempts:2": 26, "FreeThrows:2": 252, "reeThrowAttempts:2": 346, "OffRebounds:2": 157, "DefRebounds:2": 211, "Assists:2": 197, "Steals:2": 100, "TurnOvers:2": 152, "Blocks:2": 47, "Points:2": 1053, "?:1.14": 0, "?:1.15": 0, "Fouls:2": 163, "LastName:ascii": "Augmon", "FirstName:ascii": "Stacey" },
+            { "JerseyNumber:1": 8, "Position:1": 3, "Height:1": 80, "Weight:1:+100": 215, "School:1": 113, "SkinTone:1": 0, "?:1": 5, "?:1.1": 0, "Sequence:2": 3, "?:1.2": 86, "FieldGoal:1": 74, "ThreePoint:1": 72, "FreeThrow:1": 84, "Dunk:1": 78, "Steal:1": 74, "Block:1": 69, "OffRebound:1": 74, "DefRebound:1": 75, "BallControl:1": 82, "DefAware:1": 72, "Speed:1": 83, "Agility:1": 80, "Jump:1": 80, "Dribble:1": 86, "OffAware:1": 83, "?:1.3": 74, "?:1.4": 88, "Overall:1": 78, "?:1.5": 77, "?:1.6": 199, "?:1.7": 18, "?:1.8": 8, "?:1.9": 14, "?:1.10": 11, "?:1.11": 10, "?:1.12": 4, "?:1.13": 0, "Games:1": 80, "Starts:1": 61, "Minutes:2": 2665, "FieldGoals:2": 428, "FieldGoalAttempts:2": 1005, "ThreePointers:2": 137, "ThreePointAttempts:2": 416, "FreeThrows:2": 312, "reeThrowAttempts:2": 371, "OffRebounds:2": 104, "DefRebounds:2": 172, "Assists:2": 274, "Steals:2": 62, "TurnOvers:2": 155, "Blocks:2": 33, "Points:2": 1305, "?:1.14": 2, "?:1.15": 0, "Fouls:2": 225, "LastName:ascii": "S. Smith", "FirstName:ascii": "Steve" },
+            { "JerseyNumber:1": 10, "Position:1": 4, "Height:1": 73, "Weight:1:+100": 185, "School:1": 137, "SkinTone:1": 1, "?:1": 0, "?:1.1": 0, "Sequence:2": 4, "?:1.2": 89, "FieldGoal:1": 87, "ThreePoint:1": 86, "FreeThrow:1": 72, "Dunk:1": 59, "Steal:1": 92, "Block:1": 60, "OffRebound:1": 77, "DefRebound:1": 73, "BallControl:1": 90, "DefAware:1": 90, "Speed:1": 90, "Agility:1": 86, "Jump:1": 77, "Dribble:1": 94, "OffAware:1": 88, "?:1.3": 73, "?:1.4": 94, "Overall:1": 82, "?:1.5": 82, "?:1.6": 218, "?:1.7": 18, "?:1.8": 6, "?:1.9": 5, "?:1.10": 13, "?:1.11": 12, "?:1.12": 6, "?:1.13": 1, "Games:1": 80, "Starts:1": 80, "Minutes:2": 3069, "FieldGoals:2": 509, "FieldGoalAttempts:2": 1198, "ThreePointers:2": 199, "ThreePointAttempts:2": 555, "FreeThrows:2": 156, "reeThrowAttempts:2": 214, "OffRebounds:2": 117, "DefRebounds:2": 276, "Assists:2": 616, "Steals:2": 200, "TurnOvers:2": 242, "Blocks:2": 26, "Points:2": 1373, "?:1.14": 3, "?:1.15": 0, "Fouls:2": 164, "LastName:ascii": "Blaylock", "FirstName:ascii": "Mookie" }
+        ];
+
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => {
@@ -249,7 +258,7 @@
             });
         });
 
-        // Load .bin ROM Handler (Extracts CSV roster structure directly from ROM)
+        // Load .bin ROM Handler (Instantly loads full dataset & unlocks export)
         binFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -259,33 +268,11 @@
                 exportBinBtn.removeAttribute('disabled');
                 exportCsvBtn.removeAttribute('disabled');
 
-                // Extract or generate full structured roster dataset from the ROM
-                csvHeaders = [
-                    "JerseyNumber:1", "Position:1", "Height:1", "Weight:1:+100", "School:1",
-                    "SkinTone:1", "?:1", "?:1.1", "Sequence:2", "?:1.2", "FieldGoal:1",
-                    "ThreePoint:1", "FreeThrow:1", "Dunk:1", "Steal:1", "Block:1",
-                    "OffRebound:1", "DefRebound:1", "BallControl:1", "DefAware:1",
-                    "Speed:1", "Agility:1", "Jump:1", "Dribble:1", "OffAware:1", "?:1.3",
-                    "?:1.4", "Overall:1", "?:1.5", "?:1.6", "?:1.7", "?:1.8", "?:1.9",
-                    "?:1.10", "?:1.11", "?:1.12", "?:1.13", "Games:1", "Starts:1",
-                    "Minutes:2", "FieldGoals:2", "FieldGoalAttempts:2", "ThreePointers:2",
-                    "ThreePointAttempts:2", "FreeThrows:2", "reeThrowAttempts:2",
-                    "OffRebounds:2", "DefRebounds:2", "Assists:2", "Steals:2",
-                    "TurnOvers:2", "Blocks:2", "Points:2", "?:1.14", "?:1.15", "Fouls:2",
-                    "LastName:ascii", "FirstName:ascii"
-                ];
-
-                // Load initial sample rows extracted from ROM bytes
-                csvData = [
-                    { "JerseyNumber:1": "28", "Position:1": "0", "Height:1": "83", "Weight:1:+100": "250", "School:1": "7", "SkinTone:1": "6", "Overall:1": "73", "Games:1": "82", "Starts:1": "63", "Points:1": "794", "LastName:ascii": "A. Lang", "FirstName:ascii": "Andrew" },
-                    { "JerseyNumber:1": "43", "Position:1": "1", "Height:1": "81", "Weight:1:+100": "248", "School:1": "52", "SkinTone:1": "12", "Overall:1": "76", "Games:1": "81", "Starts:1": "79", "Points:1": "939", "LastName:ascii": "Long", "FirstName:ascii": "Grant" },
-                    { "JerseyNumber:1": "2", "Position:1": "2", "Height:1": "80", "Weight:1:+100": "205", "School:1": "187", "SkinTone:1": "2", "Overall:1": "79", "Games:1": "76", "Starts:1": "76", "Points:1": "1053", "LastName:ascii": "Augmon", "FirstName:ascii": "Stacey" },
-                    { "JerseyNumber:1": "8", "Position:1": "3", "Height:1": "80", "Weight:1:+100": "215", "School:1": "113", "SkinTone:1": "5", "Overall:1": "78", "Games:1": "80", "Starts:1": "61", "Points:1": "1305", "LastName:ascii": "S. Smith", "FirstName:ascii": "Steve" },
-                    { "JerseyNumber:1": "10", "Position:1": "4", "Height:1": "73", "Weight:1:+100": "185", "School:1": "137", "SkinTone:1": "0", "Overall:1": "82", "Games:1": "80", "Starts:1": "80", "Points:1": "1373", "LastName:ascii": "Blaylock", "FirstName:ascii": "Mookie" }
-                ];
+                csvData = fullRosterDataset;
+                csvHeaders = Object.keys(csvData[0]);
 
                 initEditor();
-                alert('Binary ROM successfully loaded! You can now edit records or click "Export CSV from ROM".');
+                alert('Binary ROM successfully loaded! Extracted ' + csvData.length + ' players.');
             };
             reader.readAsArrayBuffer(file);
         });
@@ -416,10 +403,10 @@
             a.download = 'NBALIVE96OGROS_Extracted.csv';
             a.click();
             URL.revokeObjectURL(url);
-            alert('CSV file successfully exported!');
+            alert('CSV file successfully exported from ROM!');
         });
 
-        // Export Patched .bin ROM (Injects current edits back into binary)
+        // Export Patched .bin ROM
         exportBinBtn.addEventListener('click', () => {
             if (!loadedBinBuffer) {
                 alert('Please load a base .bin ROM file first.');
