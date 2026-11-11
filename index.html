@@ -22,21 +22,35 @@
             color: var(--text-light);
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         header {
             background-color: #1b263b;
-            padding: 1rem 2rem;
+            padding: 1rem;
             border-bottom: 2px solid var(--accent-blue);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        @media(min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem 2rem;
+            }
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             color: #fff;
+        }
+
+        @media(min-width: 768px) {
+            header h1 { font-size: 1.4rem; }
         }
 
         .status-badge {
@@ -44,23 +58,43 @@
             color: var(--accent-blue);
             padding: 0.3rem 0.8rem;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
+            display: inline-block;
+            text-align: center;
         }
 
         .main-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            height: calc(100vh - 65px);
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        @media(min-width: 900px) {
+            .main-layout {
+                display: grid;
+                grid-template-columns: 320px 1fr;
+                height: calc(100vh - 75px);
+            }
         }
 
         .sidebar {
             background-color: var(--panel-bg);
-            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             padding: 1rem;
+            max-height: 300px;
             overflow-y: auto;
+        }
+
+        @media(min-width: 900px) {
+            .sidebar {
+                border-bottom: none;
+                border-right: 1px solid var(--border-color);
+                max-height: none;
+                height: 100%;
+            }
         }
 
         .search-box {
@@ -72,24 +106,24 @@
             color: #fff;
             margin-bottom: 1rem;
             box-sizing: border-box;
+            font-size: 1rem;
         }
 
         .player-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            flex-grow: 1;
             overflow-y: auto;
         }
 
         .player-item {
-            padding: 0.6rem 0.8rem;
+            padding: 0.7rem 0.8rem;
             border-radius: 4px;
             cursor: pointer;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .player-item:hover {
@@ -103,29 +137,45 @@
         }
 
         .content-area {
-            padding: 1.5rem;
+            padding: 1rem;
             overflow-y: auto;
+        }
+
+        @media(min-width: 768px) {
+            .content-area { padding: 1.5rem; }
         }
 
         .drop-zone {
             border: 2px dashed var(--accent-blue);
             background-color: rgba(59, 130, 246, 0.05);
             border-radius: 8px;
-            padding: 3rem;
+            padding: 1.5rem;
             text-align: center;
             margin-bottom: 1.5rem;
             cursor: pointer;
         }
 
-        .drop-zone:hover {
-            background-color: rgba(59, 130, 246, 0.1);
+        @media(min-width: 768px) {
+            .drop-zone { padding: 2.5rem; }
         }
 
         .editor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.2rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
             margin-bottom: 1.5rem;
+        }
+
+        @media(min-width: 600px) {
+            .editor-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(min-width: 1024px) {
+            .editor-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .form-group {
@@ -142,12 +192,14 @@
         }
 
         .form-group input, .form-group select {
-            padding: 0.5rem;
+            padding: 0.6rem;
             border-radius: 4px;
             border: 1px solid var(--border-color);
             background-color: var(--panel-bg);
             color: #fff;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .section-title {
@@ -163,15 +215,19 @@
             background-color: var(--accent-blue);
             color: #fff;
             border: none;
-            padding: 0.6rem 1.2rem;
+            padding: 0.7rem 1.2rem;
             border-radius: 4px;
             font-weight: 600;
             cursor: pointer;
-            margin-right: 0.5rem;
+            font-size: 0.95rem;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-success { background-color: var(--accent-green); }
         .btn-danger { background-color: var(--accent-red); }
+        .btn-secondary { background-color: #475569; }
 
         .btn:hover { opacity: 0.9; }
 
@@ -181,55 +237,79 @@
             gap: 0.8rem;
             flex-wrap: wrap;
         }
+
+        /* Modal for Readme */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background-color: var(--panel-bg);
+            margin: 10% auto;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-btn {
+            color: var(--text-dim);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover { color: #fff; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>NBA Live 96 Roster & ROM Web Editor</h1>
-        <div class="status-badge" id="appStatus">Ready - Load BIN or CSV File</div>
+        <h1>NBA Live 96 Roster & ROM Editor</h1>
+        <div class="status-badge" id="appStatus">Loading default roster...</div>
     </header>
 
     <div class="main-layout">
         <div class="sidebar">
             <input type="text" id="searchBox" class="search-box" placeholder="Search player roster...">
             <ul class="player-list" id="playerList">
-                <li style="padding:1rem; text-align:center; color: var(--text-dim);">No file loaded. Drag & drop your ROM or CSV to begin.</li>
+                <li style="padding:1rem; text-align:center; color: var(--text-dim);">Loading roster...</li>
             </ul>
         </div>
 
         <div class="content-area">
             
             <div class="drop-zone" id="dropZone">
-                <h2>Load ROM (.BIN) or Roster (.CSV) File</h2>
-                <p>Drag and drop <code>NBA Live 96.bin</code> or <code>NBALIVE96OGROS.CSV</code> here, or click to upload.</p>
+                <h3 style="margin-top:0;">Load ROM (.BIN) or Roster (.CSV)</h3>
+                <p style="color: var(--text-dim); margin-bottom:0; font-size:0.9rem;">Tap here or drag & drop files to load</p>
                 <input type="file" id="fileInput" accept=".bin,.csv" style="display: none;">
             </div>
 
             <div class="toolbar">
-                <button class="btn btn-success" id="btnDownloadCSV" disabled>Export Roster CSV</button>
-                <button class="btn btn-danger" id="btnDownloadBIN" disabled>Save & Download Updated .BIN ROM</button>
-                <a href="NBALIVE96OGROS.CSV" class="btn" download style="text-decoration:none; display:inline-block;">Download Default CSV</a>
-                <a href="readme.txt" class="btn" style="text-decoration:none; display:inline-block; background-color:#475569;">View Readme</a>
+                <button class="btn btn-success" id="btnDownloadCSV" disabled>Export CSV</button>
+                <button class="btn btn-danger" id="btnDownloadBIN" disabled>Save .BIN</button>
+                <a href="NBALIVE96OGROS.CSV" class="btn" download>Download CSV</a>
+                <button class="btn btn-secondary" id="btnOpenReadme">View Readme</button>
             </div>
 
             <div id="editorPanel" style="display: none;">
-                <h2 id="currentPlayerName" style="margin-top:0;">Player Details</h2>
+                <h2 id="currentPlayerName" style="margin-top:0; font-size:1.3rem;">Player Details</h2>
 
                 <div class="section-title">Biometrics & Information</div>
                 <div class="editor-grid">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" id="pFirstName">
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" id="pLastName">
-                    </div>
-                    <div class="form-group">
-                        <label>Jersey Number</label>
-                        <input type="number" id="pJersey">
-                    </div>
+                    <div class="form-group"><label>First Name</label><input type="text" id="pFirstName"></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" id="pLastName"></div>
+                    <div class="form-group"><label>Jersey Number</label><input type="number" id="pJersey"></div>
                     <div class="form-group">
                         <label>Position</label>
                         <select id="pPosition">
@@ -240,14 +320,8 @@
                             <option value="4">Center (C)</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Height (inches)</label>
-                        <input type="number" id="pHeight">
-                    </div>
-                    <div class="form-group">
-                        <label>Weight (+100 lbs)</label>
-                        <input type="number" id="pWeight">
-                    </div>
+                    <div class="form-group"><label>Height (in)</label><input type="number" id="pHeight"></div>
+                    <div class="form-group"><label>Weight (+100)</label><input type="number" id="pWeight"></div>
                 </div>
 
                 <div class="section-title">Player Attributes & Ratings (0-99)</div>
@@ -266,7 +340,7 @@
                     <div class="form-group"><label>Overall</label><input type="number" id="rOverall" min="0" max="99"></div>
                 </div>
 
-                <div class="section-title">Career / Season Statistics</div>
+                <div class="section-title">Season Statistics</div>
                 <div class="editor-grid">
                     <div class="form-group"><label>Games Played</label><input type="number" id="sGames"></div>
                     <div class="form-group"><label>Games Started</label><input type="number" id="sStarts"></div>
@@ -279,9 +353,18 @@
                     <div class="form-group"><label>Blocks</label><input type="number" id="sBlocks"></div>
                 </div>
 
-                <button class="btn btn-success" id="btnSavePlayer" style="margin-top: 1rem; width: 100%; padding: 0.8rem;">Save Player Changes</button>
+                <button class="btn btn-success" id="btnSavePlayer" style="margin-top: 1rem; width: 100%; padding: 0.9rem;">Save Player Changes</button>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Readme Modal -->
+    <div id="readmeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2 style="color:var(--accent-blue); margin-top:0;">NBA Live 96 Editor Readme</h2>
+            <p style="color:var(--text-dim); line-height:1.6;" id="readmeText">Loading readme...</p>
         </div>
     </div>
 
@@ -296,41 +379,49 @@
         const editorPanel = document.getElementById('editorPanel');
         const appStatus = document.getElementById('appStatus');
         const searchBox = document.getElementById('searchBox');
+        
+        const readmeModal = document.getElementById('readmeModal');
+        const btnOpenReadme = document.getElementById('btnOpenReadme');
+        const closeModal = document.getElementById('closeModal');
+        const readmeText = document.getElementById('readmeText');
 
         dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', handleFileSelect);
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.15)'; });
-        dropZone.addEventListener('dragleave', () => { dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.05)'; });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#22c55e'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#3b82f6'; });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
             if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
         });
 
         searchBox.addEventListener('input', () => renderPlayerList(searchBox.value.toLowerCase()));
 
-        function handleFileSelect(e) {
-            if (e.target.files.length) handleFile(e.target.files[0]);
-        }
+        btnOpenReadme.onclick = () => {
+            readmeModal.style.display = 'block';
+            fetch('readme.txt')
+                .then(res => res.text())
+                .then(text => { readmeText.innerText = text; })
+                .catch(err => { readmeText.innerText = "Error loading readme.txt: " + err; });
+        };
+        closeModal.onclick = () => { readmeModal.style.display = 'none'; };
+        window.onclick = (e) => { if (e.target == readmeModal) readmeModal.style.display = 'none'; };
 
         function handleFile(file) {
             appStatus.innerText = "Loading " + file.name + "...";
+            const reader = new FileReader();
             if (file.name.toLowerCase().endsWith('.csv')) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
+                reader.onload = (evt) => {
                     parseCSV(evt.target.result);
                     appStatus.innerText = "Loaded CSV (" + playerData.length + " players)";
                     document.getElementById('btnDownloadCSV').disabled = false;
                 };
                 reader.readAsText(file);
             } else {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
+                reader.onload = (evt) => {
                     rawBinBuffer = evt.target.result;
-                    appStatus.innerText = "Loaded ROM Binary (" + file.name + ")";
+                    appStatus.innerText = "Loaded ROM Binary";
                     document.getElementById('btnDownloadBIN').disabled = false;
-                    document.getElementById('btnDownloadCSV').disabled = false;
                 };
                 reader.readAsArrayBuffer(file);
             }
@@ -340,7 +431,6 @@
             const lines = text.trim().split('\n');
             if (lines.length < 2) return;
             playerData = [];
-
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',');
                 if (cols.length < 10) continue;
@@ -469,15 +559,18 @@
             alert("Saved #" + p.jersey + " " + p.firstName + " " + p.lastName);
         };
 
-        // Fetch default NBALIVE96OGROS.CSV
+        // Auto-load CSV on start
         fetch('NBALIVE96OGROS.CSV')
             .then(res => res.text())
             .then(text => {
                 parseCSV(text);
-                appStatus.innerText = "Loaded Default Roster CSV (" + playerData.length + " players)";
+                appStatus.innerText = "Loaded Roster (" + playerData.length + " players)";
                 document.getElementById('btnDownloadCSV').disabled = false;
             })
-            .catch(err => console.log("Default CSV fetch skipped:", err));
+            .catch(err => {
+                appStatus.innerText = "Ready (Upload CSV or BIN)";
+                console.log("Fetch error:", err);
+            });
     </script>
 </body>
 </html>
